@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import Navigation from "@/components/Navigation";
+import simonWechatQR from "@/assets/simon-wechat-qr.jpg";
 
 const Registration = () => {
   const [showForm, setShowForm] = useState(false);
@@ -59,6 +60,43 @@ const Registration = () => {
                   </p>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-2 border-primary/20">
+            <CardHeader className="bg-gradient-primary text-primary-foreground">
+              <CardTitle>Join Our WeChat Research Community</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="flex-1 space-y-4">
+                  <p className="text-lg font-medium">
+                    Connect with fellow research students in our WeChat group!
+                  </p>
+                  <p className="text-muted-foreground">
+                    We have an active WeChat community for research students where you can:
+                  </p>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Stay updated on upcoming workshops and events</li>
+                    <li>Share resources and research tips</li>
+                    <li>Network with other graduate students</li>
+                    <li>Get quick answers to your questions</li>
+                  </ul>
+                  <p className="text-lg font-semibold pt-4">
+                    Interested? Connect with Dr. Simon Wang via WeChat →
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <img 
+                    src={simonWechatQR} 
+                    alt="Simon Wang WeChat QR Code - Scan to connect" 
+                    className="w-64 h-auto rounded-lg border-2 border-primary/20 shadow-lg"
+                  />
+                  <p className="text-center text-sm text-muted-foreground mt-2">
+                    Scan QR code to add Dr. Simon Wang
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
