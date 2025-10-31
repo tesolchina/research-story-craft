@@ -15,7 +15,7 @@ const Search = () => {
           
           <div className="w-full bg-card rounded-lg shadow-lg overflow-hidden border">
             <iframe 
-              src="https://erpp.hkbu.me/search" 
+              src="https://ff87c1f4-86b2-45e3-be52-0b0fe5610edf.lovableproject.com" 
               className="w-full h-[800px]"
               title="ERPP Search Tool"
               style={{ border: 'none' }}
