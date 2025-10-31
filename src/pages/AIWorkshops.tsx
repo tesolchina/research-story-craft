@@ -26,27 +26,28 @@ const AIWorkshops = () => {
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <p className="text-foreground/90">
-                Our AI workshops are designed to help research students harness the power of artificial 
-                intelligence in their academic writing and research processes. We provide hands-on training 
-                in the latest AI tools and techniques specifically tailored for academic research.
+                Our AI workshops teach research students to leverage AI agents via GitHub IDE (VS Code - 
+                locally installed or GitHub Codespace) for both textual tasks and programming tasks in 
+                data analysis. Designed for tech-savvy students, these workshops provide hands-on training 
+                in cutting-edge AI tools and techniques tailored for academic research.
               </p>
               <div className="grid md:grid-cols-2 gap-4 pt-4">
                 <div className="space-y-2">
                   <h3 className="font-semibold text-lg">What You'll Learn:</h3>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Effective prompting techniques</li>
-                    <li>AI-assisted literature review</li>
-                    <li>Research data analysis with AI</li>
-                    <li>Automated citation management</li>
+                    <li>AI agents via GitHub IDE (VS Code/Codespace)</li>
+                    <li>Textual task automation with AI</li>
+                    <li>Programming for data analysis</li>
+                    <li>Advanced prompting techniques</li>
                   </ul>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-lg">Workshop Features:</h3>
+                  <h3 className="font-semibold text-lg">Additional Services:</h3>
                   <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Hands-on practical sessions</li>
-                    <li>Discipline-specific examples</li>
-                    <li>AI agent technology training</li>
-                    <li>Best practices and ethics</li>
+                    <li>Customized chatbot development</li>
+                    <li>In-house AI solutions for research teams</li>
+                    <li>Discipline-specific implementations</li>
+                    <li>Ongoing technical support</li>
                   </ul>
                 </div>
               </div>
@@ -108,14 +109,19 @@ const AIWorkshops = () => {
             <CardHeader>
               <CardTitle className="text-2xl flex items-center">
                 <Brain className="mr-2 w-6 h-6" />
-                AI Agent Technology
+                AI Agent Technology & Custom Solutions
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <p className="opacity-90 mb-4">
+                Master AI agents through GitHub IDE (VS Code locally or GitHub Codespace) to handle 
+                textual and programming tasks for data analysis. Perfect for tech-savvy researchers 
+                looking to leverage cutting-edge AI technology.
+              </p>
               <p className="opacity-90">
-                Our workshops include cutting-edge training on AI agent technology, teaching you how 
-                to create sophisticated AI workflows that can autonomously assist with complex research 
-                tasks. Learn to design multi-step AI processes that enhance your research productivity.
+                We also offer customized chatbot development and in-house AI solutions tailored 
+                specifically for research teams, helping you build sophisticated AI workflows that 
+                enhance your research productivity.
               </p>
             </CardContent>
           </Card>
