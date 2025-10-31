@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import Navigation from "@/components/Navigation";
 
 const Registration = () => {
+  const [showForm, setShowForm] = useState(false);
+  
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -25,14 +30,35 @@ const Registration = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8">
-              <div className="bg-muted/30 border-2 border-dashed border-primary/30 rounded-lg p-12 text-center">
-                <p className="text-xl text-muted-foreground font-medium">
-                  Registration Form
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  [Form will be embedded here]
-                </p>
+              <div className="flex items-center justify-center space-x-3 mb-6">
+                <Label htmlFor="form-toggle" className="text-base font-medium">
+                  {showForm ? "Hide Form" : "Show Registration Form"}
+                </Label>
+                <Switch
+                  id="form-toggle"
+                  checked={showForm}
+                  onCheckedChange={setShowForm}
+                />
               </div>
+              
+              {showForm ? (
+                <div className="w-full" style={{ height: '800px' }}>
+                  <iframe
+                    src="https://forms.office.com/pages/responsepage.aspx?id=IKmc7T5UBUOaZNYjlxbvu9wqq_BmZ7NEi6jig-YKo1FUQTVHWjZWQ0kxVUdPSDhVUDA1WEsyVzEyRy4u&route=shorturl"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    className="rounded-lg border border-primary/20"
+                    title="Registration Form"
+                  />
+                </div>
+              ) : (
+                <div className="bg-muted/30 border-2 border-dashed border-primary/30 rounded-lg p-12 text-center">
+                  <p className="text-lg text-muted-foreground font-medium">
+                    Toggle the switch above to view and complete the registration form
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
