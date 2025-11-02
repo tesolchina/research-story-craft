@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github } from "lucide-react";
+import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github, QrCode } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const BiologyWorkshop = () => {
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://erpp.hkbu.me/ai-workshops/biology0711')}`;
@@ -19,6 +20,45 @@ const BiologyWorkshop = () => {
               Back to AI Workshops
             </Button>
           </Link>
+
+          {/* QR Code Section - Collapsible */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="qr-code" className="border-2 border-primary/20 rounded-lg">
+              <AccordionTrigger className="px-6 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <QrCode className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-xl">Share This Workshop</CardTitle>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <CardContent className="p-6 pt-0">
+                  <div className="flex flex-col md:flex-row items-center gap-8">
+                    <div className="flex-1 space-y-4">
+                      <p className="text-foreground/90">
+                        Scan the QR code to access this workshop page:
+                      </p>
+                      <p className="text-sm text-muted-foreground break-all">
+                        <a href="https://erpp.hkbu.me/ai-workshops/biology0711" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                          https://erpp.hkbu.me/ai-workshops/biology0711
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={qrCodeUrl}
+                        alt="QR Code - Scan to access workshop page" 
+                        className="w-64 h-64 rounded-lg border-2 border-primary/20 shadow-lg"
+                      />
+                      <p className="text-center text-sm text-muted-foreground mt-2">
+                        Scan to access this page
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           {/* Invitation Only Notice */}
           <Card className="border-2 border-primary/50 bg-primary/5">
@@ -166,36 +206,6 @@ const BiologyWorkshop = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-primary/20">
-            <CardHeader>
-              <CardTitle className="text-2xl">Share This Workshop</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="flex-1 space-y-4">
-                  <p className="text-foreground/90">
-                    Scan the QR code to access this workshop page:
-                  </p>
-                  <p className="text-sm text-muted-foreground break-all">
-                    <a href="https://erpp.hkbu.me/ai-workshops/biology0711" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
-                      https://erpp.hkbu.me/ai-workshops/biology0711
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </p>
-                </div>
-                <div className="flex-shrink-0">
-                  <img 
-                    src={qrCodeUrl}
-                    alt="QR Code - Scan to access workshop page" 
-                    className="w-64 h-64 rounded-lg border-2 border-primary/20 shadow-lg"
-                  />
-                  <p className="text-center text-sm text-muted-foreground mt-2">
-                    Scan to access this page
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </main>
 
