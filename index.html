@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>English for Research Publication | HKBU Language Centre</title>
     <meta name="description" content="Expert support for research students at Hong Kong Baptist University. Get up to 8 hours of one-on-one consultation for manuscript revision, strategic writing advice, and AI-powered research tools." />
@@ -17,5 +18,37 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Hide any Lovable branding elements
+      function hideLovableBranding() {
+        // Hide elements with data-lovable attribute
+        document.querySelectorAll('[data-lovable]').forEach(el => el.remove());
+        
+        // Hide fixed position buttons/elements at bottom corners that contain "Lovable" or link to lovable.dev
+        document.querySelectorAll('button, a, div').forEach(el => {
+          const style = window.getComputedStyle(el);
+          const isFixedBottom = style.position === 'fixed' && 
+            (style.bottom !== 'auto' || el.style.bottom);
+          const text = (el.textContent || el.innerText || '').trim();
+          const href = (el.href || '').toLowerCase();
+          
+          // Only hide if it's a fixed bottom element AND contains Lovable branding
+          if (isFixedBottom && (text.includes('Lovable') || text.includes('Edit with') || href.includes('lovable.dev'))) {
+            el.style.display = 'none';
+            el.remove();
+          }
+        });
+      }
+      
+      // Run on DOMContentLoaded and also watch for dynamically added elements
+      document.addEventListener('DOMContentLoaded', hideLovableBranding);
+      setTimeout(hideLovableBranding, 100);
+      setTimeout(hideLovableBranding, 500);
+      setTimeout(hideLovableBranding, 1000);
+      
+      // Use MutationObserver to catch dynamically added elements
+      const observer = new MutationObserver(hideLovableBranding);
+      observer.observe(document.body, { childList: true, subtree: true });
+    </script>
   </body>
 </html>

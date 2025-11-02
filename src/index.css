@@ -89,3 +89,9 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide any Lovable branding elements */
+[data-lovable],
+iframe[src*="lovable"] {
+  display: none !important;
+}
