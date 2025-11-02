@@ -72,7 +72,7 @@ const AIWorkshops = () => {
                     A dedicated workshop focusing on AI applications in biological research, 
                     including data visualization, statistical analysis, and literature review.
                   </p>
-                  <Link to="/ai-workshops/biology">
+                  <Link to="/biology0711">
                     <Button className="w-full" variant="default">
                       Learn More <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
