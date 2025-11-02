@@ -110,7 +110,7 @@ const BiologyWorkshop = () => {
               </div>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Laptop className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <p className="text-foreground/90">
@@ -119,9 +119,48 @@ const BiologyWorkshop = () => {
                 </div>
                 <div className="flex items-start gap-3">
                   <Github className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                  <p className="text-foreground/90">
-                    <strong>Sign up for a GitHub account</strong> using your HKBU email address before the workshop. This is essential for the IDE-embedded AI agent activities.
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-foreground/90">
+                      <strong>Sign up for a GitHub account</strong> using your HKBU email address before the workshop. This is essential for the IDE-embedded AI agent activities.
+                    </p>
+                    <p className="text-foreground/90">
+                      <strong>Apply for GitHub Education benefits:</strong> As a student, you qualify for free access to professional developer tools through GitHub Education. We strongly encourage you to apply for these benefits before the workshop to maximize your learning experience. 
+                      <a 
+                        href="https://docs.github.com/en/education/about-github-education/github-education-for-students/apply-to-github-education-as-a-student" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-primary hover:underline inline-flex items-center gap-1 ml-1"
+                      >
+                        Learn more and apply here
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Github className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="space-y-2">
+                    <p className="text-foreground/90">
+                      <strong>Workshop Repository:</strong> Participants will be asked to fork the workshop repository at the beginning of the session.
+                    </p>
+                    <div className="bg-background/50 rounded-lg p-3 border border-primary/20">
+                      <p className="text-sm text-muted-foreground mb-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-500/10 text-amber-700 dark:text-amber-500 rounded text-xs font-medium">
+                          Work in Progress
+                        </span>
+                      </p>
+                      <a 
+                        href="https://github.com/tesolchina/Agent4BioPhD.git" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                      >
+                        <Github className="w-4 h-4" />
+                        https://github.com/tesolchina/Agent4BioPhD.git
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
