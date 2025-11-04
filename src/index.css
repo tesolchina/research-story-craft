@@ -91,7 +91,6 @@ All colors MUST be HSL.
 }
 
 /* Hide any Lovable branding elements */
-[data-lovable],
-iframe[src*="lovable"] {
+[data-lovable] {
   display: none !important;
 }
