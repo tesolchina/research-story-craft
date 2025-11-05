@@ -152,7 +152,7 @@ const Home = () => {
                   </div>
                   <div className="text-center md:text-right">
                     <p className="text-2xl font-bold text-primary">7 Nov 2025</p>
-                    <Link to="/biology0711">
+                    <Link to="/ai-workshops/biology0711">
                       <Button variant="outline" className="mt-2">
                         Learn More
                       </Button>
