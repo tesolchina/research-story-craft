@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github, QrCode, Presentation } from "lucide-react";
+import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github, QrCode, Presentation, FileText } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -124,6 +124,46 @@ const BiologyWorkshop = () => {
                         allowFullScreen={true}
                         className="absolute top-0 left-0 w-full h-full"
                         title="Workshop Slides"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Step-by-step Guidance - Collapsible */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="guidance" className="border-2 border-primary/20 rounded-lg">
+              <AccordionTrigger className="px-6 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-xl">Step-by-step Guidance</CardTitle>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <CardContent className="p-6 pt-0 space-y-4">
+                  <div className="flex items-center justify-end mb-2">
+                    <a
+                      href="https://docs.google.com/document/d/e/2PACX-1vT--aT8fzULfXjWm3PVOVUEwOElJG9uLvQpsS47Hds629vwxBNFyW0sDt2JyKZmkAtMDoYaBgnFOVXs/pub"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Open in new window
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                  <div className="w-full overflow-hidden rounded-lg border-2 border-primary/20 bg-background">
+                    <div className="relative w-full" style={{ minHeight: '600px' }}>
+                      <iframe
+                        src="https://docs.google.com/document/d/e/2PACX-1vT--aT8fzULfXjWm3PVOVUEwOElJG9uLvQpsS47Hds629vwxBNFyW0sDt2JyKZmkAtMDoYaBgnFOVXs/pub?embedded=true"
+                        frameBorder="0"
+                        width="100%"
+                        height="100%"
+                        className="absolute top-0 left-0 w-full h-full"
+                        style={{ minHeight: '600px' }}
+                        title="Step-by-step Guidance"
                       />
                     </div>
                   </div>
