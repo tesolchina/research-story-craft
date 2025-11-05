@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github, QrCode } from "lucide-react";
+import { ArrowLeft, Dna, User, ExternalLink, AlertCircle, Laptop, Github, QrCode, Presentation } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -102,6 +102,35 @@ const BiologyWorkshop = () => {
               </p>
             </CardContent>
           </Card>
+
+          {/* Workshop Slides - Collapsible */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="slides" className="border-2 border-primary/20 rounded-lg">
+              <AccordionTrigger className="px-6 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <Presentation className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-xl">Workshop Slides</CardTitle>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <CardContent className="p-6 pt-0">
+                  <div className="w-full overflow-hidden rounded-lg border-2 border-primary/20 bg-background">
+                    <div className="relative w-full" style={{ paddingBottom: '59.27%', minHeight: '400px' }}>
+                      <iframe
+                        src="https://docs.google.com/presentation/d/e/2PACX-1vST_jqZCwj7EyjDTHai6EWFj7daQ0ZUZvJlzHDOEGjOIcNqUotheEt8gq2Cfwz04eSAROh1eI_arRR1/pubembed?start=false&loop=false&delayms=3000"
+                        frameBorder="0"
+                        width="100%"
+                        height="100%"
+                        allowFullScreen={true}
+                        className="absolute top-0 left-0 w-full h-full"
+                        title="Workshop Slides"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
           <Card className="border-2 border-accent/20">
             <CardHeader>
