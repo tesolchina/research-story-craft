@@ -9,6 +9,7 @@ import AIWorkshops from "./pages/AIWorkshops";
 import BiologyWorkshop from "./pages/BiologyWorkshop";
 import AIResources from "./pages/AIResources";
 import Search from "./pages/Search";
+import Zhou from "./pages/Zhou";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/biology0711" element={<Navigate to="/ai-workshops/biology0711" replace />} />
           <Route path="/ai-workshops/resources" element={<AIResources />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/zhou" element={<Zhou />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
