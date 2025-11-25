@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Brain, FlaskConical, Library } from "lucide-react";
+import { ArrowRight, Brain, FlaskConical, Library, BookOpen } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const AIWorkshops = () => {
@@ -56,7 +56,7 @@ const AIWorkshops = () => {
 
           <section className="space-y-6">
             <h2 className="text-3xl font-bold text-center text-foreground">Specialized Workshops</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="hover:shadow-lg transition-all border-2 hover:border-primary/50">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
@@ -73,6 +73,29 @@ const AIWorkshops = () => {
                     including data visualization, statistical analysis, and literature review.
                   </p>
                   <Link to="/ai-workshops/biology0711">
+                    <Button className="w-full" variant="default">
+                      Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-all border-2 hover:border-primary/50">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-2">
+                    <BookOpen className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle>Philosophy & Religious Studies</CardTitle>
+                  <CardDescription>
+                    AI tools for humanities research
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    A workshop focusing on AI applications for philosophical inquiry, 
+                    textual analysis, and religious studies research.
+                  </p>
+                  <Link to="/ai-workshops/philosophy">
                     <Button className="w-full" variant="default">
                       Learn More <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
