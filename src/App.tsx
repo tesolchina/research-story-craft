@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Registration from "./pages/Registration";
 import AIWorkshops from "./pages/AIWorkshops";
 import BiologyWorkshop from "./pages/BiologyWorkshop";
+import PhilosophyWorkshop from "./pages/PhilosophyWorkshop";
 import AIResources from "./pages/AIResources";
 import Search from "./pages/Search";
 import Zhou from "./pages/Zhou";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/ai-workshops" element={<AIWorkshops />} />
           <Route path="/ai-workshops/biology0711" element={<BiologyWorkshop />} />
           <Route path="/biology0711" element={<Navigate to="/ai-workshops/biology0711" replace />} />
+          <Route path="/ai-workshops/philosophy" element={<PhilosophyWorkshop />} />
           <Route path="/ai-workshops/resources" element={<AIResources />} />
           <Route path="/search" element={<Search />} />
           <Route path="/zhou" element={<Zhou />} />
