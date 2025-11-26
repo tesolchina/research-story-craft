@@ -87,7 +87,7 @@ const AIWorkshops = () => {
                   </div>
                   <CardTitle>Philosophy & Religious Studies</CardTitle>
                   <CardDescription>
-                    AI tools for humanities research
+                    27 Nov 2024 | 2:45-3:45pm | CEC1002
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

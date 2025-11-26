@@ -87,6 +87,11 @@ const PhilosophyWorkshop = () => {
             <p className="text-xl text-muted-foreground">
               Enhancing Scholarly Analysis and Literature Review with AI
             </p>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground pt-2">
+              <span className="bg-primary/10 px-4 py-2 rounded-full">📅 27 November 2024</span>
+              <span className="bg-primary/10 px-4 py-2 rounded-full">🕐 2:45 - 3:45pm</span>
+              <span className="bg-primary/10 px-4 py-2 rounded-full">📍 CEC1002</span>
+            </div>
           </section>
 
           <Card className="border-2 border-primary/20">
