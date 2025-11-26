@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, User, ExternalLink, AlertCircle, Laptop, Github, QrCode, Presentation, FileText } from "lucide-react";
+import { ArrowLeft, BookOpen, User, ExternalLink, AlertCircle, Laptop, Github, QrCode } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -95,59 +95,13 @@ const PhilosophyWorkshop = () => {
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               <p className="text-foreground/90 leading-relaxed">
-                This workshop explores how AI agents can enhance research in Philosophy and Religious Studies by automating literature analysis, assisting with textual interpretation, and streamlining academic writing workflows. Recent developments show that AI agents have significant potential to transform humanities research by processing vast bodies of literature and generating structured insights (Gibney, 2025).
+                This workshop explores how AI agents can enhance research in Philosophy and Religious Studies by handling mundane tasks such as OCR processing of documents, identifying and extracting arguments from research articles, and streamlining academic writing workflows. Recent developments show that AI agents have significant potential to transform humanities research by processing vast bodies of literature and generating structured insights (Gibney, 2025).
               </p>
               <p className="text-foreground/90 leading-relaxed">
                 Participants will learn to leverage IDE-embedded AI agents to conduct systematic literature reviews, analyze philosophical texts, compare religious traditions, and generate well-structured academic arguments. The session demonstrates how AI can serve as a research assistant that reads scholarly works, extracts key concepts, and helps synthesize complex ideas within a unified environment.
               </p>
             </CardContent>
           </Card>
-
-          {/* Workshop Slides - Collapsible */}
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="slides" className="border-2 border-primary/20 rounded-lg">
-              <AccordionTrigger className="px-6 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Presentation className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-xl">Workshop Slides</CardTitle>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <CardContent className="p-6 pt-0">
-                  <div className="w-full overflow-hidden rounded-lg border-2 border-primary/20 bg-background">
-                    <div className="relative w-full" style={{ paddingBottom: '59.27%', minHeight: '400px' }}>
-                      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-muted/20">
-                        <p className="text-muted-foreground">Slides will be available soon</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* Step-by-step Guidance - Collapsible */}
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="guidance" className="border-2 border-primary/20 rounded-lg">
-              <AccordionTrigger className="px-6 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <CardTitle className="text-xl">Step-by-step Guidance</CardTitle>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <CardContent className="p-6 pt-0 space-y-4">
-                  <div className="w-full overflow-hidden rounded-lg border-2 border-primary/20 bg-background">
-                    <div className="relative w-full" style={{ minHeight: '300px' }}>
-                      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-muted/20">
-                        <p className="text-muted-foreground">Guidance document will be available soon</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
 
           <Card className="border-2 border-accent/20">
             <CardHeader>
@@ -198,17 +152,17 @@ const PhilosophyWorkshop = () => {
                   <Github className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <div className="space-y-2">
                     <p className="text-foreground/90">
-                      <strong>Sign up for a GitHub account</strong> using your HKBU email address before the workshop. This is essential for the IDE-embedded AI agent activities.
+                      <strong>Sign up for a GitHub account</strong> using your HKBU email address before the workshop.
                     </p>
                     <p className="text-foreground/90">
-                      <strong>Apply for GitHub Education benefits:</strong> As a student, you qualify for free access to professional developer tools through GitHub Education. We strongly encourage you to apply for these benefits before the workshop to maximize your learning experience. 
+                      <strong>Fork the workshop repository:</strong> Login to GitHub and visit the link below to fork the repo (we will demo this during the workshop).
                       <a 
-                        href="https://docs.github.com/en/education/about-github-education/github-education-for-students/apply-to-github-education-as-a-student" 
+                        href="https://github.com/tesolchina/ai7010" 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="text-primary hover:underline inline-flex items-center gap-1 ml-1"
                       >
-                        Learn more and apply here
+                        https://github.com/tesolchina/ai7010
                         <ExternalLink className="w-3 h-3" />
                       </a>
                     </p>
