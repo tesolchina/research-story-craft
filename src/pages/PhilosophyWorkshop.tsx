@@ -177,6 +177,42 @@ const PhilosophyWorkshop = () => {
             </CardContent>
           </Card>
 
+          {/* Workshop Slides Section - Collapsible */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="slides" className="border-2 border-primary/20 rounded-lg">
+              <AccordionTrigger className="px-6 hover:no-underline">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-xl">Workshop Slides</CardTitle>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <CardContent className="p-6 pt-0 space-y-4">
+                  <div className="flex justify-end">
+                    <a 
+                      href="https://docs.google.com/presentation/d/e/2PACX-1vQvcPLUxZuYAGrKr5dwTiS18TFFsg9_v6gfck1lJ_Gy9QL3KZ7llkt3zVOOXzuwHEfnftjz0Qq_3xWa/pub?start=false&loop=false&delayms=3000" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="outline" size="sm">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Open in New Window
+                      </Button>
+                    </a>
+                  </div>
+                  <div className="aspect-video w-full rounded-lg overflow-hidden border-2 border-primary/10">
+                    <iframe
+                      src="https://docs.google.com/presentation/d/e/2PACX-1vQvcPLUxZuYAGrKr5dwTiS18TFFsg9_v6gfck1lJ_Gy9QL3KZ7llkt3zVOOXzuwHEfnftjz0Qq_3xWa/embed?start=false&loop=false&delayms=3000"
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Philosophy Workshop Slides"
+                    />
+                  </div>
+                </CardContent>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
         </div>
       </main>
 
