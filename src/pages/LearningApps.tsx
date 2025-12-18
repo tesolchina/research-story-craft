@@ -24,11 +24,13 @@ const LearningApps = () => {
 
             <h1 className="text-3xl font-bold text-primary mb-6">Revise Chatbot</h1>
             
-            <div className="aspect-[4/3] w-full rounded-lg overflow-hidden border-2 border-primary/10">
+            <div className="w-full rounded-lg overflow-hidden border-2 border-primary/10">
               <iframe
-                src="https://docs.google.com/document/d/13anviSYDGGBM8QKKuVh8_kHphy6v8vP7upT5kSY5JDY/edit?usp=sharing&embedded=true"
-                className="w-full h-full"
-                title="Revise Chatbot"
+                src="https://essay-revision-chatbot-simonwanghkbu.replit.app/"
+                className="w-full border-none rounded-lg"
+                style={{ height: '800px' }}
+                allow="clipboard-write"
+                title="Essay Revision Assistant"
               />
             </div>
           </div>
