@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Brain, FlaskConical, Library, BookOpen, Bot } from "lucide-react";
+import { ArrowRight, Brain, FlaskConical, Library, BookOpen, Bot, Search } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const AIWorkshops = () => {
@@ -144,6 +144,29 @@ const AIWorkshops = () => {
                   <Link to="/ai-workshops/resources">
                     <Button className="w-full" variant="default">
                       Explore Resources <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-all border-2 hover:border-accent/50">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-2">
+                    <Search className="w-6 h-6 text-accent" />
+                  </div>
+                  <CardTitle>Search</CardTitle>
+                  <CardDescription>
+                    Find resources and information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Search across our workshop materials, resources, and documentation 
+                    to find exactly what you need.
+                  </p>
+                  <Link to="/search">
+                    <Button className="w-full" variant="default">
+                      Search <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
                 </CardContent>

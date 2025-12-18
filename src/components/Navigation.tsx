@@ -8,7 +8,7 @@ const Navigation = () => {
     { name: "Home", path: "/" },
     { name: "Registration", path: "/registration" },
     { name: "AI Workshops", path: "/ai-workshops" },
-    { name: "Search", path: "/search" },
+    { name: "Learning Apps", path: "/learning-apps" },
   ];
 
   return (
