@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Brain, FlaskConical, Library, BookOpen } from "lucide-react";
+import { ArrowRight, Brain, FlaskConical, Library, BookOpen, Bot } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
 const AIWorkshops = () => {
@@ -98,6 +98,29 @@ const AIWorkshops = () => {
                   <Link to="/ai-workshops/philosophy">
                     <Button className="w-full" variant="default">
                       Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="hover:shadow-lg transition-all border-2 hover:border-accent/50">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-2">
+                    <Bot className="w-6 h-6 text-accent" />
+                  </div>
+                  <CardTitle>Learning Apps</CardTitle>
+                  <CardDescription>
+                    AI-powered tools for learning and research
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Access AI chatbots and learning tools designed to support your research 
+                    and academic writing journey.
+                  </p>
+                  <Link to="/learning-apps">
+                    <Button className="w-full" variant="default">
+                      Explore Apps <ArrowRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>
                 </CardContent>
