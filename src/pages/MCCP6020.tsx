@@ -120,7 +120,7 @@ const MCCP6020 = () => {
                 <CardContent>
                   <p className="font-medium">Dr. Simon Wang</p>
                   <p className="text-sm text-muted-foreground">Language Centre, HKBU</p>
-                  <a href="/zhou" className="text-sm text-primary hover:underline mt-2 inline-block">
+                  <a href="https://lc.hkbu.edu.hk/main/simonwang/" className="text-sm text-primary hover:underline mt-2 inline-block" target="_blank" rel="noopener noreferrer">
                     View profile →
                   </a>
                 </CardContent>
