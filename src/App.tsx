@@ -34,7 +34,7 @@ const App = () => (
           <Route path="/learning-apps" element={<LearningApps />} />
           <Route path="/search" element={<Search />} />
           <Route path="/zhou" element={<Zhou />} />
-          <Route path="/mccp6020" element={<MCCP6020 />} />
+          <Route path="/mccp" element={<MCCP6020 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
