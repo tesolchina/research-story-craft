@@ -27,12 +27,20 @@ const API_KEY_STORAGE_KEY = "hkbu-genai-api-key";
 
 const weeklySchedule = [
   { id: "week1", label: "Week 1: Introduction", path: "/mccp/week1", icon: BookOpen },
-  { id: "weeks2-4", label: "Weeks 2-4: Group Meetings", path: "/mccp/weeks2-4", icon: Users },
-  { id: "weeks5-6", label: "Weeks 5-6: Research Paper", path: "/mccp/weeks5-6", icon: Mic },
+  { 
+    id: "weeks2-4", 
+    label: "Weeks 2-4: Group Meetings", 
+    path: "/mccp/weeks2-4", 
+    icon: Users,
+    items: [
+      { id: "weeks2-4-writing", label: "Writing Component (Take-home)", path: "/mccp/weeks2-4" }
+    ]
+  },
+  { id: "weeks5-6", label: "Weeks 5-6: Research Paper Presentation", path: "/mccp/weeks5-6", icon: Mic },
   { id: "weeks7-9", label: "Weeks 7-9: Group Meetings", path: "/mccp/weeks7-9", icon: Users },
-  { id: "week10", label: "Week 10: Poster", path: "/mccp/week10", icon: Presentation },
+  { id: "week10", label: "Week 10: Poster Presentation", path: "/mccp/week10", icon: Presentation },
   { id: "weeks11-12", label: "Weeks 11-12: Consultations", path: "/mccp/weeks11-12", icon: MessageSquare },
-  { id: "week13", label: "Week 13: 3MT", path: "/mccp/week13", icon: GraduationCap },
+  { id: "week13", label: "Week 13: 3MT Presentation", path: "/mccp/week13", icon: GraduationCap },
 ];
 
 const MCCP6020 = () => {
@@ -145,33 +153,61 @@ const MCCP6020 = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-primary" />
-                  Key Tasks & Deadlines
+                  <GraduationCap className="h-5 w-5 text-primary" />
+                  Assessment Components
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Mic className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
+              <CardContent className="space-y-4">
+                <div className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Mic className="h-4 w-4 text-primary" />
                       <p className="font-medium">Research Paper Presentation</p>
-                      <p className="text-sm text-muted-foreground">Weeks 5-6</p>
                     </div>
+                    <p className="text-sm text-muted-foreground pl-6">Weeks 5-6 • In-class • 20%</p>
                   </div>
-                  <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                    <Presentation className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/mccp/weeks5-6">View Details</Link>
+                  </Button>
+                </div>
+
+                <div className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <Presentation className="h-4 w-4 text-primary" />
                       <p className="font-medium">Poster Presentation</p>
-                      <p className="text-sm text-muted-foreground">Week 10</p>
                     </div>
+                    <p className="text-sm text-muted-foreground pl-6">Week 10 • In-class • 20%</p>
                   </div>
-                  <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                    <GraduationCap className="h-5 w-5 text-primary mt-0.5" />
-                    <div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/mccp/week10">View Details</Link>
+                  </Button>
+                </div>
+
+                <div className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-4 w-4 text-primary" />
                       <p className="font-medium">3MT Presentation</p>
-                      <p className="text-sm text-muted-foreground">Week 13</p>
                     </div>
+                    <p className="text-sm text-muted-foreground pl-6">Week 13 • In-class • 20%</p>
                   </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/mccp/week13">View Details</Link>
+                  </Button>
+                </div>
+
+                <div className="flex items-start justify-between border-b pb-3 last:border-0 last:pb-0">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      <p className="font-medium">Writing Component (Take-home)</p>
+                    </div>
+                    <p className="text-sm text-muted-foreground pl-6">Weeks 2-4 • Take-home • 40%</p>
+                  </div>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/mccp/weeks2-4">View Details</Link>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -334,13 +370,25 @@ const MCCP6020 = () => {
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {weeklySchedule.map((week) => (
-                            <SidebarMenuSubItem key={week.id}>
-                              <SidebarMenuSubButton asChild>
-                                <Link to={week.path} className="text-xs">
-                                  {week.label}
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
+                            <div key={week.id}>
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton asChild>
+                                  <Link to={week.path} className="text-xs">
+                                    {week.label}
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                              {/* @ts-ignore */}
+                              {week.items?.map((item: any) => (
+                                <SidebarMenuSubItem key={item.id}>
+                                  <SidebarMenuSubButton asChild className="pl-6 h-8">
+                                    <Link to={item.path} className="text-xs text-muted-foreground">
+                                      {item.label}
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </div>
                           ))}
                         </SidebarMenuSub>
                       </CollapsibleContent>
