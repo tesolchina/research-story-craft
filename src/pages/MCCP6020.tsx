@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Calendar, Key, FileText, BookOpen, GraduationCap, MessageSquare, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Calendar, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronRight, Eye, EyeOff, Loader2, Check } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   Sidebar,
   SidebarContent,
@@ -17,86 +16,129 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+
+const API_KEY_STORAGE_KEY = "hkbu-genai-api-key";
 
 const weeklySchedule = [
-  { week: 1, topic: "Course Introduction & AI in Academic Writing", description: "Overview of course objectives, introduction to AI-assisted language learning, and setting up tools." },
-  { week: 2, topic: "Academic Reading Strategies with AI", description: "Using AI to analyze complex academic texts, identifying main arguments, and summarizing research papers." },
-  { week: 3, topic: "Critical Analysis & Source Evaluation", description: "Evaluating sources for credibility, using AI to cross-reference claims, and developing critical thinking skills." },
-  { week: 4, topic: "Academic Vocabulary Development", description: "Building discipline-specific vocabulary, using AI for contextual word learning, and collocations." },
-  { week: 5, topic: "Paragraph Structure & Cohesion", description: "Constructing coherent paragraphs, using transitions effectively, and AI-assisted revision." },
-  { week: 6, topic: "Literature Review Writing", description: "Synthesizing sources, identifying research gaps, and structuring literature reviews with AI support." },
-  { week: 7, topic: "Research Methodology Description", description: "Writing methodology sections, describing research processes, and using appropriate academic register." },
-  { week: 8, topic: "Data Presentation & Analysis", description: "Describing results, using AI to interpret data visualizations, and academic hedging language." },
-  { week: 9, topic: "Argumentation & Persuasion", description: "Building logical arguments, counter-arguments, and persuasive academic writing techniques." },
-  { week: 10, topic: "Academic Presentation Skills", description: "Oral presentation techniques, using AI for speech preparation, and handling Q&A sessions." },
-  { week: 11, topic: "Revision & Editing Strategies", description: "Self-editing techniques, peer review processes, and using AI for grammar and style improvement." },
-  { week: 12, topic: "Citation & Academic Integrity", description: "Proper citation practices, avoiding plagiarism, and ethical use of AI in academic work." },
-  { week: 13, topic: "Course Review & Portfolio Submission", description: "Final review, portfolio preparation, and reflection on learning journey." },
+  {
+    id: "week1",
+    weeks: "Week 1",
+    title: "Introduction to the Course",
+    icon: BookOpen,
+    path: "/mccp/week1",
+  },
+  {
+    id: "weeks2-4",
+    weeks: "Weeks 2-4",
+    title: "Small Group Meetings",
+    icon: Users,
+    path: "/mccp/weeks2-4",
+  },
+  {
+    id: "weeks5-6",
+    weeks: "Weeks 5-6",
+    title: "Oral Presentation: Research Paper",
+    icon: Mic,
+    path: "/mccp/weeks5-6",
+  },
+  {
+    id: "weeks7-9",
+    weeks: "Weeks 7-9",
+    title: "Small Group Meetings",
+    icon: Users,
+    path: "/mccp/weeks7-9",
+  },
+  {
+    id: "week10",
+    weeks: "Week 10",
+    title: "Oral Presentation: Poster",
+    icon: Presentation,
+    path: "/mccp/week10",
+  },
+  {
+    id: "weeks11-12",
+    weeks: "Weeks 11-12",
+    title: "Individual Consultations",
+    icon: MessageSquare,
+    path: "/mccp/weeks11-12",
+  },
+  {
+    id: "week13",
+    weeks: "Week 13",
+    title: "Oral Presentation: 3MT",
+    icon: GraduationCap,
+    path: "/mccp/week13",
+  },
 ];
 
 const sidebarItems = [
   { id: "schedule", title: "Weekly Schedule", icon: Calendar },
   { id: "api-key", title: "API Key Setup", icon: Key },
-  { id: "export", title: "Export for Moodle", icon: FileText },
   { id: "resources", title: "Resources", icon: BookOpen },
 ];
 
 const MCCP6020 = () => {
   const [activeSection, setActiveSection] = useState("schedule");
   const [apiKey, setApiKey] = useState("");
-  const [chatHistory, setChatHistory] = useState("");
-  const { toast } = useToast();
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
+  const [isKeyValid, setIsKeyValid] = useState<boolean | null>(null);
 
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem("hkbu-genai-api-key", apiKey);
-      toast({
-        title: "API Key Saved",
-        description: "Your API key has been saved locally in your browser.",
-      });
+  // Load API key from localStorage on mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+    if (savedKey) {
+      setApiKey(savedKey);
+      setIsKeyValid(true);
+    }
+  }, []);
+
+  const validateApiKey = async (key: string) => {
+    if (!key.trim()) {
+      toast.error("Please enter an API key");
+      return;
+    }
+
+    setIsValidating(true);
+
+    try {
+      const response = await fetch(
+        "https://genai.hkbu.edu.hk/general/rest/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-15-preview",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": key,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: "Hi" }],
+            max_tokens: 5,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        localStorage.setItem(API_KEY_STORAGE_KEY, key);
+        setIsKeyValid(true);
+        toast.success("API key validated and saved!");
+      } else {
+        setIsKeyValid(false);
+        toast.error("Invalid API key. Please check and try again.");
+      }
+    } catch (error) {
+      setIsKeyValid(false);
+      toast.error("Failed to validate API key. Please try again.");
+    } finally {
+      setIsValidating(false);
     }
   };
 
-  const generateMoodleHTML = () => {
-    const simpleHTML = `<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-<h2 style="color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">AI Chat Session Output</h2>
-<div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
-${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6;">${line}</p>`).join('\n')}
-</div>
-<p style="color: #666; font-size: 12px; margin-top: 20px;">Generated from MCCP 6020 - Advanced EAP Course</p>
-</div>`;
-    
-    navigator.clipboard.writeText(simpleHTML);
-    toast({
-      title: "HTML Copied!",
-      description: "Simple HTML code copied to clipboard. Paste it into Moodle's HTML editor.",
-    });
-  };
-
-  const downloadHTML = () => {
-    const simpleHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>AI Chat Output - MCCP 6020</title>
-</head>
-<body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-<h2 style="color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px;">AI Chat Session Output</h2>
-<div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;">
-${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6;">${line}</p>`).join('\n')}
-</div>
-<p style="color: #666; font-size: 12px; margin-top: 20px;">Generated from MCCP 6020 - Advanced EAP Course</p>
-</body>
-</html>`;
-    
-    const blob = new Blob([simpleHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'chat-output.html';
-    a.click();
-    URL.revokeObjectURL(url);
+  const clearApiKey = () => {
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+    setApiKey("");
+    setIsKeyValid(null);
+    toast.success("API key cleared");
   };
 
   const renderContent = () => {
@@ -108,24 +150,31 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
               <h2 className="text-2xl font-bold text-primary mb-2">13-Week Course Schedule</h2>
               <p className="text-muted-foreground">Spring 2026 • Advanced English for Academic Purposes</p>
             </div>
-            
-            <Accordion type="single" collapsible className="space-y-3">
+
+            <div className="space-y-3">
               {weeklySchedule.map((week) => (
-                <AccordionItem key={week.week} value={`week-${week.week}`} className="border rounded-lg px-4 bg-card">
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex items-center gap-4 text-left">
-                      <span className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-bold text-sm">
-                        {week.week}
-                      </span>
-                      <span className="font-medium">{week.topic}</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pl-14 pb-4 text-muted-foreground">
-                    {week.description}
-                  </AccordionContent>
-                </AccordionItem>
+                <Link key={week.id} to={week.path}>
+                  <Card className="hover:shadow-md hover:border-primary/50 transition-all cursor-pointer">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <week.icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                              {week.weeks}
+                            </p>
+                            <p className="font-medium">{week.title}</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
-            </Accordion>
+            </div>
           </div>
         );
 
@@ -139,22 +188,66 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
                   HKBU Gen AI API Key
                 </CardTitle>
                 <CardDescription>
-                  Enter your personal API key to access AI-powered learning tools
+                  Enter your API key to enable AI-powered learning features. Your key is stored locally in your browser.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="password"
-                    placeholder="Enter your HKBU Gen AI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Your API key is stored locally in your browser and never sent to our servers.
-                  </p>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showApiKey ? "text" : "password"}
+                      placeholder="Enter your HKBU Gen AI API key"
+                      value={apiKey}
+                      onChange={(e) => {
+                        setApiKey(e.target.value);
+                        setIsKeyValid(null);
+                      }}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                    >
+                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <Button onClick={() => validateApiKey(apiKey)} disabled={isValidating || !apiKey.trim()}>
+                    {isValidating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : isKeyValid ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      "Validate"
+                    )}
+                  </Button>
                 </div>
-                <Button onClick={handleSaveApiKey}>Save API Key</Button>
+
+                {isKeyValid && (
+                  <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-600">
+                      <Check className="h-4 w-4" />
+                      <span className="text-sm font-medium">API key validated and saved</span>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={clearApiKey}>
+                      Clear
+                    </Button>
+                  </div>
+                )}
+
+                <div className="text-sm text-muted-foreground space-y-2">
+                  <p>
+                    <strong>How to get your API key:</strong>
+                  </p>
+                  <ol className="list-decimal list-inside space-y-1 ml-2">
+                    <li>Visit the HKBU Gen AI Portal</li>
+                    <li>Log in with your HKBU credentials</li>
+                    <li>Navigate to API Keys section</li>
+                    <li>Generate or copy your existing API key</li>
+                  </ol>
+                </div>
               </CardContent>
             </Card>
 
@@ -164,70 +257,12 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
               </CardHeader>
               <CardContent className="space-y-3 text-muted-foreground">
                 <p>
-                  An <strong>API key</strong> is like a personal password that identifies you when using AI services. 
+                  An <strong>API key</strong> is like a personal password that identifies you when using AI services.
                   HKBU provides each student with a unique key to access the university's Gen AI platform.
                 </p>
                 <p>
-                  <strong>Why do you need it?</strong> The API key allows you to use AI tools for language learning 
+                  <strong>Why do you need it?</strong> The API key allows you to use AI tools for language learning
                   while ensuring your usage is tracked under your student account's quota.
-                </p>
-                <p>
-                  <strong>How to get your key:</strong> Log in to the HKBU Gen AI platform with your university 
-                  credentials and navigate to your account settings to find or generate your API key.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        );
-
-      case "export":
-        return (
-          <div className="max-w-2xl mx-auto space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Export Chat History for Moodle
-                </CardTitle>
-                <CardDescription>
-                  Paste your AI chat conversation below to generate Moodle-compatible HTML
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  placeholder="Paste your chat history here...&#10;&#10;Example:&#10;User: What is academic writing?&#10;AI: Academic writing is a formal style of writing..."
-                  value={chatHistory}
-                  onChange={(e) => setChatHistory(e.target.value)}
-                  className="min-h-[200px] font-mono text-sm"
-                />
-                <div className="flex gap-3">
-                  <Button onClick={generateMoodleHTML} disabled={!chatHistory.trim()}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Copy HTML for Moodle
-                  </Button>
-                  <Button variant="outline" onClick={downloadHTML} disabled={!chatHistory.trim()}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download HTML File
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>How to Use in Moodle</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-muted-foreground">
-                <ol className="list-decimal list-inside space-y-2">
-                  <li>Paste your chat conversation in the text area above</li>
-                  <li>Click "Copy HTML for Moodle" to copy the formatted code</li>
-                  <li>In Moodle, open the assignment or forum post editor</li>
-                  <li>Switch to HTML mode (usually a "&lt;/&gt;" button)</li>
-                  <li>Paste the copied HTML code</li>
-                  <li>Switch back to visual mode to see the formatted output</li>
-                </ol>
-                <p className="text-sm italic mt-4">
-                  Note: The HTML uses simple inline styles to ensure compatibility with Moodle's restrictions.
                 </p>
               </CardContent>
             </Card>
@@ -248,11 +283,18 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
                 <div className="grid gap-4">
                   <a href="/learning-apps" className="block p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <h3 className="font-medium mb-1">Learning Apps</h3>
-                    <p className="text-sm text-muted-foreground">Access AI-powered tools for essay revision and language learning</p>
+                    <p className="text-sm text-muted-foreground">
+                      Access AI-powered tools for essay revision and language learning
+                    </p>
                   </a>
-                  <a href="/ai-workshops/resources" className="block p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <a
+                    href="/ai-workshops/resources"
+                    className="block p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <h3 className="font-medium mb-1">AI Resources</h3>
-                    <p className="text-sm text-muted-foreground">Explore additional AI tools and resources for academic writing</p>
+                    <p className="text-sm text-muted-foreground">
+                      Explore additional AI tools and resources for academic writing
+                    </p>
                   </a>
                   <a href="/search" className="block p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <h3 className="font-medium mb-1">AI Search</h3>
@@ -268,15 +310,16 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
               </CardHeader>
               <CardContent className="space-y-3 text-muted-foreground">
                 <p>
-                  <strong>MCCP 6020: Advanced English for Academic Purposes</strong> is designed to help 
-                  postgraduate students develop the language skills needed for success in academic contexts.
+                  <strong>MCCP 6020: Advanced English for Academic Purposes</strong> is designed to help postgraduate
+                  students develop the language skills needed for success in academic contexts.
                 </p>
                 <p>
-                  This course integrates AI tools to enhance the learning experience while maintaining 
-                  a focus on developing authentic academic communication skills.
+                  This course integrates AI tools to enhance the learning experience while maintaining a focus on
+                  developing authentic academic communication skills.
                 </p>
                 <p className="text-sm">
-                  <strong>Instructor:</strong> Dr. Simon Wang<br />
+                  <strong>Instructor:</strong> Dr. Simon Wang
+                  <br />
                   <strong>Term:</strong> Spring 2026
                 </p>
               </CardContent>
@@ -330,10 +373,8 @@ ${chatHistory.split('\n').map(line => `<p style="margin: 8px 0; line-height: 1.6
               <p className="text-sm text-muted-foreground">Dr. Simon Wang • Spring 2026</p>
             </div>
           </header>
-          
-          <div className="p-6">
-            {renderContent()}
-          </div>
+
+          <div className="p-6">{renderContent()}</div>
         </main>
       </div>
     </SidebarProvider>

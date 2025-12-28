@@ -13,6 +13,13 @@ import LearningApps from "./pages/LearningApps";
 import Search from "./pages/Search";
 import Zhou from "./pages/Zhou";
 import MCCP6020 from "./pages/MCCP6020";
+import Week1 from "./pages/mccp/Week1";
+import Weeks2to4 from "./pages/mccp/Weeks2to4";
+import Weeks5to6 from "./pages/mccp/Weeks5to6";
+import Weeks7to9 from "./pages/mccp/Weeks7to9";
+import Week10 from "./pages/mccp/Week10";
+import Weeks11to12 from "./pages/mccp/Weeks11to12";
+import Week13 from "./pages/mccp/Week13";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +42,13 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/zhou" element={<Zhou />} />
           <Route path="/mccp" element={<MCCP6020 />} />
+          <Route path="/mccp/week1" element={<Week1 />} />
+          <Route path="/mccp/weeks2-4" element={<Weeks2to4 />} />
+          <Route path="/mccp/weeks5-6" element={<Weeks5to6 />} />
+          <Route path="/mccp/weeks7-9" element={<Weeks7to9 />} />
+          <Route path="/mccp/week10" element={<Week10 />} />
+          <Route path="/mccp/weeks11-12" element={<Weeks11to12 />} />
+          <Route path="/mccp/week13" element={<Week13 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
