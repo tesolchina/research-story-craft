@@ -20,6 +20,7 @@ import Weeks7to9 from "./pages/mccp/Weeks7to9";
 import Week10 from "./pages/mccp/Week10";
 import Weeks11to12 from "./pages/mccp/Weeks11to12";
 import Week13 from "./pages/mccp/Week13";
+import Syllabus from "./pages/mccp/Syllabus";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/mccp/week10" element={<Week10 />} />
           <Route path="/mccp/weeks11-12" element={<Weeks11to12 />} />
           <Route path="/mccp/week13" element={<Week13 />} />
+          <Route path="/mccp/syllabus" element={<Syllabus />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

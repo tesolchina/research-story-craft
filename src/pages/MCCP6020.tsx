@@ -135,8 +135,8 @@ const MCCP6020 = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-2">Course objectives, materials, and policies</p>
-                  <Button variant="outline" size="sm" disabled>
-                    Coming Soon
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/mccp/syllabus">View Syllabus</Link>
                   </Button>
                 </CardContent>
               </Card>
