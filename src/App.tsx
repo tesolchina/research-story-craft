@@ -12,6 +12,7 @@ import AIResources from "./pages/AIResources";
 import LearningApps from "./pages/LearningApps";
 import Search from "./pages/Search";
 import Zhou from "./pages/Zhou";
+import MCCP6020 from "./pages/MCCP6020";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/learning-apps" element={<LearningApps />} />
           <Route path="/search" element={<Search />} />
           <Route path="/zhou" element={<Zhou />} />
+          <Route path="/mccp6020" element={<MCCP6020 />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
