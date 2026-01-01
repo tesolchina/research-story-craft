@@ -20,6 +20,7 @@ import ResourcesPage from "./pages/mccp/ResourcesPage";
 import WritingComponent from "./pages/mccp/WritingComponent";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
 import Week1 from "./pages/mccp/Week1";
+import Week1Syllabus from "./pages/mccp/Week1Syllabus";
 import Weeks2to4 from "./pages/mccp/Weeks2to4";
 import Weeks5to6 from "./pages/mccp/Weeks5to6";
 import Weeks7to9 from "./pages/mccp/Weeks7to9";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="feedback" element={<FeedbackPage />} />
             <Route path="syllabus" element={<Syllabus />} />
             <Route path="week1" element={<Week1 />} />
+            <Route path="week1/syllabus" element={<Week1Syllabus />} />
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/writing" element={<WritingComponent />} />
             <Route path="weeks5-6" element={<Weeks5to6 />} />

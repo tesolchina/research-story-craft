@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen } from "lucide-react";
+import { ArrowLeft, BookOpen, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -19,25 +19,40 @@ const Week1 = () => {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Welcome to MCCP 6020: Advanced English for Academic Purposes. This introductory session will cover:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-              <li>Course objectives and learning outcomes</li>
-              <li>Assessment structure and expectations</li>
-              <li>Introduction to AI-assisted language learning</li>
-              <li>Setting up your HKBU Gen AI API key</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="hover:border-primary transition-colors cursor-pointer group" asChild>
+            <Link to="/mccp/week1/syllabus">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 group-hover:text-primary transition-colors">
+                  <GraduationCap className="h-5 w-5" />
+                  Syllabus & Assessment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  View course objectives, CILOs, and the detailed assessment schedule.
+                </p>
+              </CardContent>
+            </Link>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Course objectives and outcomes</li>
+                <li>Assessment structure</li>
+                <li>AI-assisted learning</li>
+                <li>HKBU Gen AI API setup</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
 
         <Card>
           <CardHeader>
