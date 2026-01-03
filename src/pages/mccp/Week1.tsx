@@ -20,8 +20,8 @@ const Week1 = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="hover:border-primary transition-colors cursor-pointer group" asChild>
-            <Link to="/mccp/week1/syllabus">
+          <Link to="/mccp/syllabus">
+            <Card className="hover:border-primary transition-colors cursor-pointer group h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 group-hover:text-primary transition-colors">
                   <GraduationCap className="h-5 w-5" />
@@ -33,8 +33,8 @@ const Week1 = () => {
                   View course objectives, CILOs, and the detailed assessment schedule.
                 </p>
               </CardContent>
-            </Link>
-          </Card>
+            </Card>
+          </Link>
 
           <Card>
             <CardHeader>
