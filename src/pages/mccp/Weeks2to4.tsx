@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Weeks2to4 = () => {
   return (
@@ -41,14 +42,49 @@ const Weeks2to4 = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Group Meeting Schedule</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <span>Group Meeting Schedule</span>
+              <a 
+                href="https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=345213" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm font-normal text-primary hover:underline inline-flex items-center gap-1"
+              >
+                View on Moodle <ExternalLink className="h-3 w-3" />
+              </a>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="p-6 bg-muted/50 rounded-lg border border-dashed text-center">
-              <p className="text-muted-foreground italic">
-                Group meeting schedules and room assignments will be posted here.
-              </p>
-            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Week</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Session 1</TableHead>
+                  <TableHead>Session 2</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell className="font-medium">Week 2</TableCell>
+                  <TableCell>19 Jan</TableCell>
+                  <TableCell>2.1: 10:30 - 11:20</TableCell>
+                  <TableCell>2.2: 11:30 - 12:20</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Week 3</TableCell>
+                  <TableCell>26 Jan</TableCell>
+                  <TableCell>3.1</TableCell>
+                  <TableCell>3.2</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-medium">Week 4</TableCell>
+                  <TableCell>2 Feb</TableCell>
+                  <TableCell>4.1</TableCell>
+                  <TableCell>4.2</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
 
