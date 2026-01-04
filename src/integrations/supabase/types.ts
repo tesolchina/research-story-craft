@@ -52,6 +52,27 @@ export type Database = {
           },
         ]
       }
+      students: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          student_code: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          student_code: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          student_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

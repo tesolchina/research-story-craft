@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MessageSquare, Send, Trash2, ChevronDown, ChevronRight, User, GraduationCap as Teacher } from "lucide-react";
+import { MessageSquare, Send, Trash2, ChevronDown, ChevronRight, User, GraduationCap as Teacher, HelpCircle } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,11 @@ interface Discussion {
   created_at: string;
 }
 
+interface Student {
+  student_code: string;
+  name: string;
+}
+
 interface DiscussionBoardProps {
   sectionId: string;
   sectionTitle: string;
@@ -25,22 +30,43 @@ interface DiscussionBoardProps {
 }
 
 const TEACHER_CODE = "0000"; // Special code for teacher posts
+const HELP_LINK = "https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=345203#p542207";
 
 const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: DiscussionBoardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [students, setStudents] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [studentId, setStudentId] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Load discussions when opened
+  // Load discussions and student names when opened
   useEffect(() => {
     if (isOpen) {
       loadDiscussions();
+      loadStudents();
     }
   }, [isOpen, sectionId]);
+
+  const loadStudents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("students")
+        .select("student_code, name");
+
+      if (error) throw error;
+      
+      const studentMap: Record<string, string> = {};
+      data?.forEach((s: Student) => {
+        studentMap[s.student_code] = s.name;
+      });
+      setStudents(studentMap);
+    } catch (error) {
+      console.error("Error loading students:", error);
+    }
+  };
 
   const loadDiscussions = async () => {
     setLoading(true);
@@ -64,6 +90,10 @@ const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: Discussion
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDisplayName = (code: string) => {
+    return students[code] || `Student ***${code}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,8 +216,19 @@ const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: Discussion
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-4">
         <div className="border rounded-lg p-4 space-y-4 bg-card">
-          <div className="text-sm text-muted-foreground">
-            Discussion for: <span className="font-medium text-foreground">{sectionTitle}</span>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Discussion for: <span className="font-medium text-foreground">{sectionTitle}</span>
+            </div>
+            <a
+              href={HELP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-primary hover:underline"
+            >
+              <HelpCircle className="h-3 w-3" />
+              Need help?
+            </a>
           </div>
 
           {/* Discussion messages */}
@@ -218,7 +259,7 @@ const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: Discussion
                       ) : (
                         <>
                           <User className="h-3 w-3" />
-                          <span>Student ***{discussion.student_id}</span>
+                          <span>{getDisplayName(discussion.student_id)}</span>
                         </>
                       )}
                       <span>•</span>
