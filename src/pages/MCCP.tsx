@@ -14,6 +14,15 @@ const MCCP = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">MCCP 6020</h1>
             <p className="text-xl text-muted-foreground">Advanced English for Academic Purposes</p>
+            <div className="mt-4 inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
+              <span className="text-sm font-medium">Section taught by Dr Simon Wang</span>
+            </div>
+          </div>
+          
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
+            <p className="text-amber-800 text-sm text-center">
+              <strong>Note:</strong> The materials on this site are only applicable to the section taught by Dr Simon Wang.
+            </p>
           </div>
 
           <Card className="mb-8">
