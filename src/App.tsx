@@ -21,14 +21,14 @@ import WritingComponent from "./pages/mccp/WritingComponent";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
 import Week1 from "./pages/mccp/Week1";
 import Week1Introduction from "./pages/mccp/Week1Introduction";
-
+import Week1AIAgentIDE from "./pages/mccp/Week1AIAgentIDE";
 import Weeks2to4 from "./pages/mccp/Weeks2to4";
 import Weeks5to6 from "./pages/mccp/Weeks5to6";
 import Weeks7to9 from "./pages/mccp/Weeks7to9";
 import Week10 from "./pages/mccp/Week10";
 import Weeks11to12 from "./pages/mccp/Weeks11to12";
 import Week13 from "./pages/mccp/Week13";
-import Syllabus from "./pages/mccp/Syllabus";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,9 +57,9 @@ const App = () => (
             <Route path="api-key" element={<ApiKeyPage />} />
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="feedback" element={<FeedbackPage />} />
-            <Route path="syllabus" element={<Syllabus />} />
             <Route path="week1" element={<Week1 />} />
             <Route path="week1/introduction" element={<Week1Introduction />} />
+            <Route path="week1/ai-agent-ide" element={<Week1AIAgentIDE />} />
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/writing" element={<WritingComponent />} />
             <Route path="weeks5-6" element={<Weeks5to6 />} />
