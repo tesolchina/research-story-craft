@@ -74,14 +74,14 @@ const Weeks2to4 = () => {
                 <TableRow>
                   <TableCell className="font-medium">Week 3</TableCell>
                   <TableCell>26 Jan</TableCell>
-                  <TableCell>3.1</TableCell>
-                  <TableCell>3.2</TableCell>
+                  <TableCell>3.1: 10:30 - 11:20</TableCell>
+                  <TableCell>3.2: 11:30 - 12:20</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-medium">Week 4</TableCell>
                   <TableCell>2 Feb</TableCell>
-                  <TableCell>4.1</TableCell>
-                  <TableCell>4.2</TableCell>
+                  <TableCell>4.1: 10:30 - 11:20</TableCell>
+                  <TableCell>4.2: 11:30 - 12:20</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
