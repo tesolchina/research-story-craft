@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, BookOpen, GraduationCap, Target, ClipboardList, Bot, FileText, Calendar, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, GraduationCap, Target, ClipboardList, Bot, FileText, Calendar, CheckCircle, AlertCircle, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import InstructorNotes from "@/components/mccp/InstructorNotes";
 import DiscussionBoard from "@/components/mccp/DiscussionBoard";
 import AIChatDialog from "@/components/mccp/AIChatDialog";
@@ -34,6 +35,37 @@ const aiPrompts = {
   ],
 };
 
+interface CollapsibleModuleProps {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+}
+
+const CollapsibleModule = ({ title, icon, children, defaultOpen = true, className = "" }: CollapsibleModuleProps) => {
+  return (
+    <Collapsible defaultOpen={defaultOpen}>
+      <Card className={className}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                {icon}
+                {title}
+              </span>
+              <ChevronDown className="h-5 w-5 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+            </CardTitle>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent>{children}</CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
+  );
+};
+
 const Week1Introduction = () => {
   return (
     <div className="min-h-screen bg-background p-6">
@@ -51,14 +83,8 @@ const Week1Introduction = () => {
         </div>
 
         {/* Course Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Course Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CollapsibleModule title="Course Overview" icon={<BookOpen className="h-5 w-5" />}>
+          <div className="space-y-4">
             <p className="text-muted-foreground">
               Welcome to MCCP 6020: Advanced English for Academic Purposes. This course is designed to 
               help you develop essential academic communication skills for your research journey.
@@ -88,15 +114,12 @@ const Week1Introduction = () => {
               notes="Welcome to the course! I'm excited to work with you this semester. Our first session will be an orientation where we'll get to know each other and discuss your research interests. Please come prepared to introduce yourself and your research area briefly (1-2 minutes)."
             />
             <DiscussionBoard sectionId="week1-overview" sectionTitle="Course Overview" />
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Basic Course Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Course Information</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-6 md:grid-cols-2">
+        <CollapsibleModule title="Course Information">
+          <div className="grid gap-6 md:grid-cols-2">
             <div>
               <h3 className="font-semibold text-primary">Course Title</h3>
               <p>Advanced English for Academic Purposes</p>
@@ -113,18 +136,12 @@ const Week1Introduction = () => {
               <h3 className="font-semibold text-primary">Offering Department</h3>
               <p>Language Centre</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Aims & Objectives */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-primary" />
-              Aims & Objectives
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CollapsibleModule title="Aims & Objectives" icon={<GraduationCap className="h-5 w-5 text-primary" />}>
+          <div className="space-y-4">
             <p>
               Offered as a compulsory course to all research postgraduate students at HKBU, Advanced English for Academic Purposes aims to socialize the students into the research community where knowledge is constructed and contested through conference presentations, research article publications and thesis writing for research degrees.
             </p>
@@ -134,18 +151,12 @@ const Week1Introduction = () => {
             <p>
               Strategies for utilizing AI and technology, along with data-driven learning techniques, will be taught to enhance accuracy in academic writing and to prevent plagiarism.
             </p>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Course Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              Course Content
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <CollapsibleModule title="Course Content" icon={<BookOpen className="h-5 w-5 text-primary" />}>
+          <div>
             <p className="mb-4">
               The course focuses on academic presentations and research writing, with the two components integrated organically and taught holistically throughout the semester.
             </p>
@@ -178,18 +189,12 @@ const Week1Introduction = () => {
                 <li><strong>Considering assessment criteria and proofreading the thesis</strong></li>
               </ol>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* CILOs */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-primary" />
-              Course Intended Learning Outcomes (CILOs)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <CollapsibleModule title="Course Intended Learning Outcomes (CILOs)" icon={<CheckCircle className="h-5 w-5 text-primary" />}>
+          <div>
             <p className="mb-4">By the end of the course, students should be able to:</p>
             <div className="space-y-6">
               {/* CILO 1 */}
@@ -272,60 +277,46 @@ const Week1Introduction = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* TLAs */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              Teaching & Learning Activities (TLAs)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[120px]">CILO No.</TableHead>
-                  <TableHead>TLAs</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">CILO 1 & 3</TableCell>
-                  <TableCell>Deliver presentations and share research ideas.</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">CILO 1 & 3</TableCell>
-                  <TableCell>Study and analyze authentic seminar presentations.</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">CILO 2 & 3</TableCell>
-                  <TableCell>Analyze research articles to identify genre and linguistic features.</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">CILO 3</TableCell>
-                  <TableCell>Evaluate academic style and expression in various sections of academic articles.</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">CILO 4</TableCell>
-                  <TableCell>Practice the strategic use of in-text citations and references.</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <CollapsibleModule title="Teaching & Learning Activities (TLAs)" icon={<FileText className="h-5 w-5 text-primary" />}>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]">CILO No.</TableHead>
+                <TableHead>TLAs</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">CILO 1 & 3</TableCell>
+                <TableCell>Deliver presentations and share research ideas.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">CILO 1 & 3</TableCell>
+                <TableCell>Study and analyze authentic seminar presentations.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">CILO 2 & 3</TableCell>
+                <TableCell>Analyze research articles to identify genre and linguistic features.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">CILO 3</TableCell>
+                <TableCell>Evaluate academic style and expression in various sections of academic articles.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">CILO 4</TableCell>
+                <TableCell>Practice the strategic use of in-text citations and references.</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CollapsibleModule>
 
         {/* Assessment Methods */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-primary" />
-              Assessment Methods (AMs)
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <CollapsibleModule title="Assessment Methods (AMs)" icon={<Calendar className="h-5 w-5 text-primary" />}>
+          <div className="space-y-6">
             {/* Presentation 1 */}
             <div className="space-y-3 p-4 border rounded-lg">
               <div className="flex items-center justify-between flex-wrap gap-2">
@@ -421,18 +412,12 @@ const Week1Introduction = () => {
                 <DiscussionBoard sectionId="assessment-3mt" sectionTitle="3MT Presentation" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Course Policies */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-primary" />
-              Course Policies
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <CollapsibleModule title="Course Policies" icon={<AlertCircle className="h-5 w-5 text-primary" />}>
+          <div className="space-y-6">
             <div>
               <h3 className="font-semibold text-lg mb-2">i) Late submissions of assignments</h3>
               <p className="mb-2">
@@ -457,18 +442,12 @@ const Week1Introduction = () => {
                 <li><a href="https://copyleaks.com/ai-content-detector" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Copyleaks</a></li>
               </ul>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Recommended Readings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              Textbooks / Recommended Readings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CollapsibleModule title="Textbooks / Recommended Readings" icon={<BookOpen className="h-5 w-5 text-primary" />}>
+          <div className="space-y-4">
             <div>
               <h3 className="font-semibold mb-3">Recommended Textbook</h3>
               <p>
@@ -482,18 +461,12 @@ const Week1Introduction = () => {
                 <li><a href="http://owl.english.purdue.edu/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Purdue Online Writing Lab</a></li>
               </ul>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* AI Tools */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5" />
-              AI-Assisted Learning
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <CollapsibleModule title="AI-Assisted Learning" icon={<Bot className="h-5 w-5" />}>
+          <div className="space-y-4">
             <p className="text-muted-foreground">
               This course incorporates AI tools to enhance your learning experience.
             </p>
@@ -510,8 +483,8 @@ const Week1Introduction = () => {
               notes="While AI tools are encouraged for learning and revision, all submitted work must be your own. AI can help you brainstorm, check grammar, and understand concepts, but the ideas and writing should reflect your authentic voice."
             />
             <DiscussionBoard sectionId="week1-ai" sectionTitle="AI-Assisted Learning" />
-          </CardContent>
-        </Card>
+          </div>
+        </CollapsibleModule>
 
         {/* Copyright Notice */}
         <Card className="bg-muted/50">
