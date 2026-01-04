@@ -20,6 +20,22 @@ const Week1 = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
+          <Link to="/mccp/week1/introduction">
+            <Card className="hover:border-primary transition-colors cursor-pointer group h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 group-hover:text-primary transition-colors">
+                  <BookOpen className="h-5 w-5" />
+                  Introduction to the Course
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Course overview, objectives, assessment structure, and AI-assisted learning setup.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link to="/mccp/syllabus">
             <Card className="hover:border-primary transition-colors cursor-pointer group h-full">
               <CardHeader>
@@ -30,28 +46,11 @@ const Week1 = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  View course objectives, CILOs, and the detailed assessment schedule.
+                  View detailed CILOs, assessment criteria, and grading rubrics.
                 </p>
               </CardContent>
             </Card>
           </Link>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Course objectives and outcomes</li>
-                <li>Assessment structure</li>
-                <li>AI-assisted learning</li>
-                <li>HKBU Gen AI API setup</li>
-              </ul>
-            </CardContent>
-          </Card>
         </div>
 
         <Card>
