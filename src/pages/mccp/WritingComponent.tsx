@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileText, BookOpen, Target, Calendar, CheckCircle2, ChevronDown } from "lucide-react";
+import { ArrowLeft, FileText, BookOpen, Target, Calendar, CheckCircle2, ChevronDown, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface CollapsibleModuleProps {
   title: string;
@@ -17,10 +18,10 @@ const CollapsibleModule = ({ title, icon, children, defaultOpen = true }: Collap
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card>
+      <Card className="mb-4">
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardTitle className="flex items-center justify-between">
+            <CardTitle className="flex items-center justify-between text-lg">
               <div className="flex items-center gap-2">
                 {icon}
                 {title}
@@ -41,103 +42,199 @@ const CollapsibleModule = ({ title, icon, children, defaultOpen = true }: Collap
 
 const WritingComponent = () => {
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="max-w-4xl mx-auto space-y-6 p-6">
+      <div className="flex items-center gap-4 mb-6">
         <Button variant="ghost" size="icon" asChild>
-          <Link to="/mccp/weeks2-4">
+          <Link to="/mccp">
             <ArrowLeft className="h-5 w-5" />
           </Link>
         </Button>
         <div>
           <p className="text-sm text-muted-foreground">Weeks 2-4</p>
-          <h1 className="text-2xl font-bold">Writing Component (Take-home)</h1>
+          <h1 className="text-2xl font-bold">Writing Assignment – Introduction & Literature Review</h1>
         </div>
       </div>
 
+      <div className="grid gap-6 md:grid-cols-3 mb-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Deadline
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-bold">15 March 2026 (SUN)</div>
+            <div className="text-sm text-muted-foreground">11:59pm</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Weighting
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">40%</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Word Count
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">1000-1500</div>
+          </CardContent>
+        </Card>
+      </div>
+
       <CollapsibleModule
-        title="Assignment Overview"
-        icon={<FileText className="h-5 w-5 text-primary" />}
+        title="Instructions"
+        icon={<AlertCircle className="h-5 w-5 text-primary" />}
       >
-        <p className="text-muted-foreground">
-          Students will complete a take-home assignment that includes sufficient background information to provide context and significance for the research, a review of recent and relevant literature, proper acknowledgment of previous work on the topic, and an analysis or reference to the research gap that needs to be filled. Additionally, the assignment should feature a purpose statement highlighting the novelty and contributions of the research.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2 mt-4">
-          <div className="p-4 border rounded-lg bg-muted/30">
-            <h3 className="font-semibold mb-2">Weighting</h3>
-            <p className="text-2xl font-bold text-primary">40%</p>
-          </div>
-          <div className="p-4 border rounded-lg bg-muted/30">
-            <h3 className="font-semibold mb-2">Deadline</h3>
-            <p className="text-lg">TBA</p>
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Write an introduction and a literature review of your research using the provided template. 
+            Follow the rhetorical moves and incorporate linguistic features discussed in the course. 
+            Indicate the moves using headings or the 'comment' function.
+          </p>
+          
+          <div className="space-y-6 mt-4">
+            <div>
+              <h3 className="text-lg font-semibold text-primary border-b pb-2 mb-3 text-center">INTRODUCTION</h3>
+              <div className="space-y-4">
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 1 - Establishing a Territory</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Present general topic area / research problem</li>
+                    <li>Highlight research importance</li>
+                    <li>Synthesise key prior research</li>
+                  </ul>
+                  <p className="text-xs italic mt-2">e.g. Research in [Topic] has gained significant attention due to [reasons].</p>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 2 - Identifying a Niche</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Introduce opposing viewpoint/perspective</li>
+                    <li>Identify gaps in existing literature</li>
+                    <li>Explain why addressing these gaps is necessary</li>
+                  </ul>
+                  <p className="text-xs italic mt-2">e.g. Despite extensive studies on [topic], there remains a lack of understanding regarding [gap].</p>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 3 - Occupying the Niche</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>State research purpose or question</li>
+                    <li>Outline objectives and how it fills the gaps</li>
+                  </ul>
+                  <p className="text-xs italic mt-2">e.g. This study aims to investigate [question], focusing on [aspects].</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-primary border-b pb-2 mb-3 text-center">LITERATURE REVIEW</h3>
+              <div className="space-y-4">
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 1 - Thematic Overview</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Provide context (defining key terms/concepts)</li>
+                    <li>Explain purpose and scope of the review</li>
+                  </ul>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 2 - Critical Analysis</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Group literature by themes, theories, or methodologies</li>
+                    <li>Summarize and synthesize connection/contrasts</li>
+                    <li>Critique methodologies and findings</li>
+                  </ul>
+                  <p className="text-xs italic mt-2">e.g. While [Author] provides insights, their approach lacks [limitations].</p>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 3 - Research Gaps</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Reiterate gaps identified in previous studies</li>
+                    <li>Emphasize need for further investigation</li>
+                  </ul>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-bold mb-1">Move 4 - Conclusion</h4>
+                  <ul className="list-disc list-inside text-sm space-y-1 text-muted-foreground">
+                    <li>Summarize key insights and implications</li>
+                    <li>Set stage for your research contribution</li>
+                    <li>Emphasize significance in relation to research question</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </CollapsibleModule>
 
       <CollapsibleModule
-        title="Key Requirements"
-        icon={<BookOpen className="h-5 w-5 text-primary" />}
+        title="Formatting & Submission"
+        icon={<CheckCircle2 className="h-5 w-5 text-primary" />}
       >
-        <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-            <span><strong>Introduction Section:</strong> Provide research context and significance</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-            <span><strong>Literature Review:</strong> Review of recent and relevant sources</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-            <span><strong>Research Gap:</strong> Identify and analyze the gap to be addressed</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-            <span><strong>Purpose Statement:</strong> Highlight novelty and contributions</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 shrink-0" />
-            <span><strong>Citations:</strong> Proper citation and referencing throughout</span>
-          </li>
-        </ul>
-      </CollapsibleModule>
-
-      <CollapsibleModule
-        title="Learning Objectives"
-        icon={<Target className="h-5 w-5 text-primary" />}
-      >
-        <ul className="space-y-3">
-          <li className="flex items-start gap-3">
-            <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">1</span>
-            <span>Develop skills in academic writing and scholarly communication</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">2</span>
-            <span>Learn to critically analyze and synthesize existing literature</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">3</span>
-            <span>Practice identifying research gaps and formulating purpose statements</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm shrink-0">4</span>
-            <span>Apply proper academic citation and referencing conventions</span>
-          </li>
-        </ul>
-      </CollapsibleModule>
-
-      <CollapsibleModule
-        title="Submission Guidelines"
-        icon={<Calendar className="h-5 w-5 text-primary" />}
-      >
-        <div className="space-y-4">
-          <p className="text-muted-foreground">
-            Detailed submission guidelines will be provided during the course. Please check Moodle regularly for updates.
-          </p>
-          <div className="p-4 border rounded-lg bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              <strong>Note:</strong> All submissions must be made through Moodle before the deadline. Late submissions may incur penalties as per the course policy.
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <h4 className="font-bold">Requirements</h4>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+              <li>Font: Times New Roman, Size 12</li>
+              <li>Spacing: 1.5 or Double</li>
+              <li>Margin: 2.54cm (1 inch)</li>
+              <li>Cite using discipline style</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <h4 className="font-bold">Submission</h4>
+            <p className="text-sm text-muted-foreground">
+              Submit soft copy (MS Word) to Turnitin via Moodle by the deadline. 
+              Late submissions incur 1% deduction per day.
             </p>
           </div>
+        </div>
+      </CollapsibleModule>
+
+      <CollapsibleModule
+        title="Assessment Rubric (40%)"
+        icon={<Target className="h-5 w-5 text-primary" />}
+      >
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[150px]">Criteria</TableHead>
+                <TableHead>Excellent (9-10)</TableHead>
+                <TableHead>Satisfactory (6-8)</TableHead>
+                <TableHead>Unsatisfactory (1-5)</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium text-xs">Task Achievement</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Extremely clear explanation of background, focus and objectives. Skilfully paraphrase, synthesise and critically evaluate literature. Research gap clearly delineated.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Generally clear explanation. Appropriately paraphrase and synthesise literature. Research gap identified.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Insufficient explanation. Limited attempt to synthesise. Gap is vague. Ineffective use of sources.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium text-xs">Organisation</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Very clear logical flow. Effective use of cohesive devices. Exceptional clarity in research story.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Generally clear flow. Cohesive devices used, though narrative could be more logical.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Flow not easy to follow. Lack of cohesive devices and logical flaws.</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium text-xs">Language Range & Accuracy</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Effective use of advanced structures and precise lexical resources.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Adequate and generally accurate use of complex structures with some errors.</TableCell>
+                <TableCell className="text-xs text-muted-foreground">Limited use of complex structures. Numerous errors causing difficulties.</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </CollapsibleModule>
     </div>
