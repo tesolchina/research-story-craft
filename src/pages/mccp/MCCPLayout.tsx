@@ -25,7 +25,8 @@ const weeklySchedule = [
     path: "/mccp/week1", 
     icon: BookOpen,
     items: [
-      { id: "week1-intro", label: "Introduction to the Course", path: "/mccp/week1/introduction" }
+      { id: "week1-intro", label: "Introduction to the Course", path: "/mccp/week1/introduction" },
+      { id: "week1-ai-ide", label: "AI Agent in IDE", path: "/mccp/week1/ai-agent-ide" }
     ]
   },
   { 

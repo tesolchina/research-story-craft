@@ -30,23 +30,23 @@ const Week1 = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Course overview, objectives, assessment structure, and AI-assisted learning setup.
+                  Course overview, syllabus, CILOs, assessment structure, and AI-assisted learning setup.
                 </p>
               </CardContent>
             </Card>
           </Link>
 
-          <Link to="/mccp/syllabus">
+          <Link to="/mccp/week1/ai-agent-ide">
             <Card className="hover:border-primary transition-colors cursor-pointer group h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 group-hover:text-primary transition-colors">
                   <GraduationCap className="h-5 w-5" />
-                  Syllabus & Assessment
+                  Introduction to AI Agent in IDE
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  View detailed CILOs, assessment criteria, and grading rubrics.
+                  Learn how to use AI-powered IDEs for academic writing and research.
                 </p>
               </CardContent>
             </Card>
