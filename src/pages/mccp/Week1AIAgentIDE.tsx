@@ -104,8 +104,17 @@ const Week1AIAgentIDE = () => {
           icon={<Github className="h-5 w-5 text-primary" />}
         >
           <div className="space-y-4">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/10 mb-4">
+              <h4 className="font-bold mb-2">Workflow for Students:</h4>
+              <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
+                <li><strong>Fork</strong> the repository on GitHub.</li>
+                <li><strong>Clone</strong> your forked version to your local machine.</li>
+                <li><strong>Contribute:</strong> Later, you can sync with the upstream repo or issue Pull Requests to contribute your improvements.</li>
+              </ol>
+            </div>
+            
             <p className="text-muted-foreground">
-              Clone the course repository to your local machine to get started with Lab 0.
+              Clone the course repository (or your fork) to get started:
             </p>
             <div className="bg-muted p-4 rounded-lg font-mono text-sm relative group">
               <code className="block">git clone https://github.com/tesolchina/mccpSpring2026.git</code>
@@ -113,12 +122,12 @@ const Week1AIAgentIDE = () => {
             <div className="p-4 border-l-4 border-primary bg-muted/30">
               <h4 className="font-bold mb-1">Next Step:</h4>
               <p className="text-sm text-muted-foreground">
-                Open the cloned folder in your AI IDE and navigate to <code>AgentLabs/Lab0</code> to explore the initial setup tasks.
+                Open the folder in your AI IDE and navigate to <code>AgentLabs/Lab0</code>.
               </p>
             </div>
             <Button asChild className="w-full">
               <a href="https://github.com/tesolchina/mccpSpring2026" target="_blank" rel="noopener noreferrer">
-                View Repository <Code className="ml-2 h-4 w-4" />
+                View Repository on GitHub <Code className="ml-2 h-4 w-4" />
               </a>
             </Button>
           </div>
