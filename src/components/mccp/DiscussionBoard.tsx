@@ -29,7 +29,7 @@ interface DiscussionBoardProps {
   className?: string;
 }
 
-const TEACHER_CODE = "0000"; // Special code for teacher posts
+const TEACHER_CODE = "1989"; // Special code for teacher posts (Simon)
 const HELP_LINK = "https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=345203#p542207";
 
 const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: DiscussionBoardProps) => {
