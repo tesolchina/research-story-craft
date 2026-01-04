@@ -9,6 +9,7 @@ const Navigation = () => {
     { name: "Registration", path: "/registration" },
     { name: "AI Workshops", path: "/ai-workshops" },
     { name: "Learning Apps", path: "/learning-apps" },
+    { name: "MCCP", path: "/mccp-info" },
   ];
 
   return (

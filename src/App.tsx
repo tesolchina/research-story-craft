@@ -12,6 +12,7 @@ import AIResources from "./pages/AIResources";
 import LearningApps from "./pages/LearningApps";
 import Search from "./pages/Search";
 import Zhou from "./pages/Zhou";
+import MCCPInfo from "./pages/MCCP";
 // MCCP Components
 import MCCPLayout from "./pages/mccp/MCCPLayout";
 import MCCPHome from "./pages/mccp/MCCPHome";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/learning-apps" element={<LearningApps />} />
           <Route path="/search" element={<Search />} />
           <Route path="/zhou" element={<Zhou />} />
+          <Route path="/mccp-info" element={<MCCPInfo />} />
           
           {/* MCCP 6020 Routes */}
           <Route path="/mccp" element={<MCCPLayout />}>
