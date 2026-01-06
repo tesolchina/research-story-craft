@@ -19,16 +19,7 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const weeklySchedule = [
-  { 
-    id: "week1", 
-    label: "Week 1: Introduction", 
-    path: "/mccp/week1", 
-    icon: BookOpen,
-    items: [
-      { id: "week1-intro", label: "Introduction to the Course", path: "/mccp/week1/introduction" },
-      { id: "week1-ai-ide", label: "AI Agent in IDE", path: "/mccp/week1/ai-agent-ide" }
-    ]
-  },
+  { id: "week1", label: "Week 1: Introduction", path: "/mccp/week1", icon: BookOpen },
   { 
     id: "weeks2-4", 
     label: "Weeks 2-4: Group Meetings", 
