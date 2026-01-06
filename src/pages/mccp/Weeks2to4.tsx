@@ -90,14 +90,15 @@ const Weeks2to4 = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Discussion Topics</CardTitle>
+            <CardTitle>Pre-Meeting Tasks</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="p-6 bg-muted/50 rounded-lg border border-dashed text-center">
-              <p className="text-muted-foreground italic">
-                Discussion topics and preparation materials will be available here.
-              </p>
-            </div>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              Complete the MC quizzes and writing tasks before your small group meeting.
+            </p>
+            <Button asChild>
+              <Link to="/mccp/weeks2-4/tasks">Start Tasks</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

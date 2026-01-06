@@ -94,6 +94,45 @@ export type Database = {
         }
         Relationships: []
       }
+      students_progress: {
+        Row: {
+          ai_feedback: string | null
+          answer: Json | null
+          created_at: string
+          id: string
+          is_correct: boolean | null
+          score: number | null
+          student_id: string
+          task_id: string
+          task_type: string
+          updated_at: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          answer?: Json | null
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          score?: number | null
+          student_id: string
+          task_id: string
+          task_type: string
+          updated_at?: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          answer?: Json | null
+          created_at?: string
+          id?: string
+          is_correct?: boolean | null
+          score?: number | null
+          student_id?: string
+          task_id?: string
+          task_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
