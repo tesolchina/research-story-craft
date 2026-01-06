@@ -15,7 +15,7 @@ import Zhou from "./pages/Zhou";
 import MCCPInfo from "./pages/MCCP";
 // MCCP Components
 import MCCPLayout from "./pages/mccp/MCCPLayout";
-import MCCPHome from "./pages/mccp/MCCPHome";
+
 import ApiKeyPage from "./pages/mccp/ApiKeyPage";
 import ResourcesPage from "./pages/mccp/ResourcesPage";
 import WritingComponent from "./pages/mccp/WritingComponent";
@@ -53,7 +53,7 @@ const App = () => (
           
           {/* MCCP 6020 Routes */}
           <Route path="/mccp" element={<MCCPLayout />}>
-            <Route index element={<MCCPHome />} />
+            <Route index element={<Navigate to="/mccp/week1" replace />} />
             <Route path="api-key" element={<ApiKeyPage />} />
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="feedback" element={<FeedbackPage />} />
