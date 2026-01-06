@@ -3,18 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ExternalLink, User, Hash } from "lucide-react";
+import { Shield, ExternalLink, User, Hash, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-// Pseudonym list for students
-const pseudonyms = [
-  "Phoenix", "Dragon", "Griffin", "Unicorn", "Pegasus",
-  "Sphinx", "Centaur", "Kraken", "Hydra", "Chimera",
-  "Thunderbird", "Basilisk", "Cerberus", "Minotaur", "Leviathan",
-  "Valkyrie", "Titan", "Atlas", "Aurora", "Orion",
-  "Nova", "Stellar", "Cosmos", "Nebula", "Quantum",
-  "Echo", "Cipher", "Vector", "Matrix", "Prism"
-];
 
 interface StudentInfo {
   pseudonym: string;
@@ -24,27 +14,37 @@ interface StudentInfo {
 const StudentParticipation = () => {
   const [last4Digits, setLast4Digits] = useState("");
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [allStudents, setAllStudents] = useState<StudentInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Generate a consistent pseudonym based on the 4-digit code
-  const generatePseudonym = (digits: string): string => {
-    const hash = digits.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return pseudonyms[hash % pseudonyms.length];
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (last4Digits.length === 4 && /^\d{4}$/.test(last4Digits)) {
-      const pseudonym = generatePseudonym(last4Digits);
-      const newStudent: StudentInfo = { pseudonym, last4Digits };
-      setStudentInfo(newStudent);
+      setIsLoading(true);
+      setError(null);
       
-      // Store in localStorage
-      localStorage.setItem("mccp_student_id", last4Digits);
+      const { data, error: fetchError } = await supabase
+        .from("student_pseudonyms")
+        .select("pseudonym, last_4_digits")
+        .eq("last_4_digits", last4Digits)
+        .maybeSingle();
       
-      // Add to displayed list if not already there
-      if (!allStudents.find(s => s.last4Digits === last4Digits)) {
-        setAllStudents(prev => [...prev, newStudent]);
+      setIsLoading(false);
+      
+      if (fetchError) {
+        setError("Error looking up your ID. Please try again.");
+        return;
+      }
+      
+      if (data) {
+        const newStudent: StudentInfo = { 
+          pseudonym: data.pseudonym, 
+          last4Digits: data.last_4_digits 
+        };
+        setStudentInfo(newStudent);
+        localStorage.setItem("mccp_student_id", last4Digits);
+      } else {
+        setError("Student ID not found. Please check your last 4 digits.");
+        setStudentInfo(null);
       }
     }
   };
@@ -54,8 +54,22 @@ const StudentParticipation = () => {
     const stored = localStorage.getItem("mccp_student_id");
     if (stored && stored.length === 4) {
       setLast4Digits(stored);
-      const pseudonym = generatePseudonym(stored);
-      setStudentInfo({ pseudonym, last4Digits: stored });
+      // Auto-fetch pseudonym for stored ID
+      const fetchPseudonym = async () => {
+        const { data } = await supabase
+          .from("student_pseudonyms")
+          .select("pseudonym, last_4_digits")
+          .eq("last_4_digits", stored)
+          .maybeSingle();
+        
+        if (data) {
+          setStudentInfo({ 
+            pseudonym: data.pseudonym, 
+            last4Digits: data.last_4_digits 
+          });
+        }
+      };
+      fetchPseudonym();
     }
   }, []);
 
@@ -103,13 +117,28 @@ const StudentParticipation = () => {
               placeholder="e.g., 1234"
               maxLength={4}
               value={last4Digits}
-              onChange={(e) => setLast4Digits(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => {
+                setLast4Digits(e.target.value.replace(/\D/g, ""));
+                setError(null);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && last4Digits.length === 4) {
+                  handleSubmit();
+                }
+              }}
               className="max-w-32 text-center text-lg font-mono"
             />
-            <Button onClick={handleSubmit} disabled={last4Digits.length !== 4}>
-              Get Pseudonym
+            <Button onClick={handleSubmit} disabled={last4Digits.length !== 4 || isLoading}>
+              {isLoading ? "Looking up..." : "Get Pseudonym"}
             </Button>
           </div>
+
+          {error && (
+            <div className="mt-4 p-3 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </div>
+          )}
 
           {studentInfo && (
             <div className="mt-6 p-4 bg-primary/10 rounded-lg">

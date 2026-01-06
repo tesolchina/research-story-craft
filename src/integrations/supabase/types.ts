@@ -52,6 +52,27 @@ export type Database = {
           },
         ]
       }
+      student_pseudonyms: {
+        Row: {
+          created_at: string
+          id: string
+          last_4_digits: string
+          pseudonym: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_4_digits: string
+          pseudonym: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_4_digits?: string
+          pseudonym?: string
+        }
+        Relationships: []
+      }
       students: {
         Row: {
           created_at: string | null
