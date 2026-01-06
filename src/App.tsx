@@ -20,6 +20,7 @@ import ApiKeyPage from "./pages/mccp/ApiKeyPage";
 import ResourcesPage from "./pages/mccp/ResourcesPage";
 import WritingComponent from "./pages/mccp/WritingComponent";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
+import StudentParticipation from "./pages/mccp/StudentParticipation";
 import Week1 from "./pages/mccp/Week1";
 import Weeks2to4 from "./pages/mccp/Weeks2to4";
 import Weeks5to6 from "./pages/mccp/Weeks5to6";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="api-key" element={<ApiKeyPage />} />
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="feedback" element={<FeedbackPage />} />
+            <Route path="participation" element={<StudentParticipation />} />
             <Route path="week1" element={<Week1 />} />
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/writing" element={<WritingComponent />} />
