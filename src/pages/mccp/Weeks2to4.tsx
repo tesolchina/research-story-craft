@@ -42,6 +42,16 @@ const Weeks2to4 = () => {
               </Button>
             </div>
 
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
+              <h4 className="font-semibold text-blue-700 dark:text-blue-300">Writing Materials Reference</h4>
+              <p className="text-sm text-muted-foreground">
+                Access all writing-related course materials organized by topic for flexible use during meetings.
+              </p>
+              <Button variant="outline" size="sm" asChild className="mt-2">
+                <Link to="/mccp/weeks2-4/writing-materials">View Writing Materials →</Link>
+              </Button>
+            </div>
+
             <div className="bg-muted/50 rounded-lg p-4">
               <p className="text-sm text-muted-foreground italic">
                 📌 Additional tasks will be assigned in due course during the group meetings.

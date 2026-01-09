@@ -28,6 +28,7 @@ import Week1Activity3 from "./pages/mccp/Week1Activity3";
 import Week1Activity4 from "./pages/mccp/Week1Activity4";
 import Weeks2to4 from "./pages/mccp/Weeks2to4";
 import Weeks2to4Tasks from "./pages/mccp/Weeks2to4Tasks";
+import WritingMaterialsPage from "./pages/mccp/WritingMaterialsPage";
 import Weeks5to6 from "./pages/mccp/Weeks5to6";
 import Weeks7to9 from "./pages/mccp/Weeks7to9";
 import Week10 from "./pages/mccp/Week10";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="week1/activity-4" element={<Week1Activity4 />} />
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/tasks" element={<Weeks2to4Tasks />} />
+            <Route path="weeks2-4/writing-materials" element={<WritingMaterialsPage />} />
             <Route path="weeks2-4/dashboard" element={<TeacherDashboard />} />
             <Route path="weeks5-6" element={<Weeks5to6 />} />
             <Route path="weeks7-9" element={<Weeks7to9 />} />
