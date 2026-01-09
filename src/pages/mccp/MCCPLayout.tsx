@@ -19,7 +19,15 @@ import {
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const weeklySchedule = [
-  { id: "week1", label: "Week 1: Introduction", path: "/mccp/week1", icon: BookOpen },
+  { 
+    id: "week1", 
+    label: "Week 1: Introduction", 
+    path: "/mccp/week1", 
+    icon: BookOpen,
+    subItems: [
+      { id: "week1-ai", label: "AI Agent Setup", path: "/mccp/week1/ai-agent" }
+    ]
+  },
   { id: "weeks2-4", label: "Weeks 2-4: Group Meetings", path: "/mccp/weeks2-4", icon: Users },
   { id: "weeks5-6", label: "Weeks 5-6: Research Paper Presentation", path: "/mccp/weeks5-6", icon: Mic },
   { id: "weeks7-9", label: "Weeks 7-9: Group Meetings", path: "/mccp/weeks7-9", icon: Users },
@@ -59,13 +67,24 @@ const MCCPLayout = () => {
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {weeklySchedule.map((week) => (
-                              <SidebarMenuSubItem key={week.id}>
+                            <div key={week.id}>
+                              <SidebarMenuSubItem>
                                 <SidebarMenuSubButton asChild isActive={location.pathname === week.path}>
                                   <Link to={week.path} className="text-xs">
                                     {week.label}
                                   </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
+                              {week.subItems?.map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.id} className="ml-4">
+                                  <SidebarMenuSubButton asChild isActive={location.pathname === subItem.path}>
+                                    <Link to={subItem.path} className="text-xs text-muted-foreground">
+                                      ↳ {subItem.label}
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </div>
                           ))}
                         </SidebarMenuSub>
                       </CollapsibleContent>
