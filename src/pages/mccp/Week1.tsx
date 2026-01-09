@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import AIChatDialog from "@/components/mccp/AIChatDialog";
+
 
 interface CollapsibleModuleProps {
   title: string;
@@ -222,11 +222,6 @@ const Week1 = () => {
                 <span className="font-bold text-primary text-lg">20%</span>
               </div>
             </div>
-            <AIChatDialog
-              sectionId="assessment"
-              sectionTitle="Assessment Methods"
-              context="Four assessments: Oral Presentation 1 (20%) - 8-minute article presentation; Oral Presentation 2 (20%) - Poster; Writing Assignment (40%) - Intro & Lit Review; Oral Presentation 3 (20%) - 3MT."
-            />
           </div>
         </CollapsibleModule>
 
