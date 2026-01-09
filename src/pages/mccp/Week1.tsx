@@ -217,7 +217,7 @@ const Week1 = () => {
                 <div>
                   <h4 className="font-bold">Oral Presentation 1</h4>
                   <p className="text-sm text-muted-foreground">8-minute presentation on a journal article</p>
-                  <Link to="/mccp/weeks5-6" className="text-xs text-primary hover:underline">View details →</Link>
+                  <Link to="/mccp/assessment#oral1" className="text-xs text-primary hover:underline">View details →</Link>
                 </div>
                 <span className="font-bold text-primary text-lg">20%</span>
               </div>
@@ -225,7 +225,7 @@ const Week1 = () => {
                 <div>
                   <h4 className="font-bold">Oral Presentation 2</h4>
                   <p className="text-sm text-muted-foreground">Poster Presentation of research design</p>
-                  <Link to="/mccp/week10" className="text-xs text-primary hover:underline">View details →</Link>
+                  <Link to="/mccp/assessment#oral2" className="text-xs text-primary hover:underline">View details →</Link>
                 </div>
                 <span className="font-bold text-primary text-lg">20%</span>
               </div>
@@ -233,7 +233,7 @@ const Week1 = () => {
                 <div>
                   <h4 className="font-bold">Writing Assignment</h4>
                   <p className="text-sm text-muted-foreground">Introduction and Literature Review</p>
-                  <Link to="/mccp/weeks2-4/writing" className="text-xs text-primary hover:underline">View details →</Link>
+                  <Link to="/mccp/assessment#writing" className="text-xs text-primary hover:underline">View details →</Link>
                 </div>
                 <span className="font-bold text-primary text-lg">40%</span>
               </div>
@@ -241,7 +241,7 @@ const Week1 = () => {
                 <div>
                   <h4 className="font-bold">Oral Presentation 3</h4>
                   <p className="text-sm text-muted-foreground">3-minute presentation (3MT style)</p>
-                  <Link to="/mccp/week13" className="text-xs text-primary hover:underline">View details →</Link>
+                  <Link to="/mccp/assessment#oral3" className="text-xs text-primary hover:underline">View details →</Link>
                 </div>
                 <span className="font-bold text-primary text-lg">20%</span>
               </div>

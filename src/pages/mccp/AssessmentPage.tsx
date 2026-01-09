@@ -34,6 +34,7 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
   badge?: string;
   badgeVariant?: "default" | "secondary" | "destructive" | "outline";
+  id?: string;
 }
 
 const CollapsibleSection = ({ 
@@ -42,13 +43,14 @@ const CollapsibleSection = ({
   children, 
   defaultOpen = false, 
   badge,
-  badgeVariant = "default"
+  badgeVariant = "default",
+  id
 }: CollapsibleSectionProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="mb-4">
+      <Card className="mb-4" id={id}>
         <CollapsibleTrigger asChild>
           <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
             <CardTitle className="flex items-center justify-between text-lg font-bold">
@@ -118,6 +120,7 @@ const AssessmentPage = () => {
           icon={<FileText className="h-5 w-5 text-primary" />}
           badge="40%"
           defaultOpen={true}
+          id="writing"
         >
           <div className="space-y-6">
             {/* Key Info */}
@@ -329,13 +332,14 @@ const AssessmentPage = () => {
           title="Oral Presentation 1 – Research Story-telling" 
           icon={<Mic className="h-5 w-5 text-primary" />}
           badge="20%"
+          id="oral1"
         >
           <div className="space-y-6">
             {/* Key Info */}
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span><strong>Date:</strong> Sessions 5 & 6</span>
+                <span><strong>Date:</strong> Weeks 5 & 6</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -438,13 +442,14 @@ const AssessmentPage = () => {
           title="Oral Presentation 2 – Poster Presentation" 
           icon={<Presentation className="h-5 w-5 text-primary" />}
           badge="20%"
+          id="oral2"
         >
           <div className="space-y-6">
             {/* Key Info */}
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span><strong>Date:</strong> Session 10</span>
+                <span><strong>Date:</strong> Week 10</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />
@@ -521,7 +526,7 @@ const AssessmentPage = () => {
 
             {/* Rundown */}
             <div>
-              <h4 className="font-semibold mb-3">📅 Session Rundown</h4>
+              <h4 className="font-semibold mb-3">📅 Week Rundown</h4>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -584,13 +589,14 @@ const AssessmentPage = () => {
           title="Oral Presentation 3 – Three-Minute Thesis (3MT)" 
           icon={<GraduationCap className="h-5 w-5 text-primary" />}
           badge="20%"
+          id="oral3"
         >
           <div className="space-y-6">
             {/* Key Info */}
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span><strong>Date:</strong> Session 13</span>
+                <span><strong>Date:</strong> Week 13</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />

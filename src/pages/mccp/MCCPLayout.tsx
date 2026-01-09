@@ -20,15 +20,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 const weeklySchedule = [
   { id: "week1", label: "Week 1: Introduction", path: "/mccp/week1", icon: BookOpen },
-  { 
-    id: "weeks2-4", 
-    label: "Weeks 2-4: Group Meetings", 
-    path: "/mccp/weeks2-4", 
-    icon: Users,
-    items: [
-      { id: "weeks2-4-writing", label: "Writing Component (Take-home)", path: "/mccp/weeks2-4/writing" }
-    ]
-  },
+  { id: "weeks2-4", label: "Weeks 2-4: Group Meetings", path: "/mccp/weeks2-4", icon: Users },
   { id: "weeks5-6", label: "Weeks 5-6: Research Paper Presentation", path: "/mccp/weeks5-6", icon: Mic },
   { id: "weeks7-9", label: "Weeks 7-9: Group Meetings", path: "/mccp/weeks7-9", icon: Users },
   { id: "week10", label: "Week 10: Poster Presentation", path: "/mccp/week10", icon: Presentation },
@@ -67,25 +59,13 @@ const MCCPLayout = () => {
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {weeklySchedule.map((week) => (
-                            <div key={week.id}>
-                              <SidebarMenuSubItem>
+                              <SidebarMenuSubItem key={week.id}>
                                 <SidebarMenuSubButton asChild isActive={location.pathname === week.path}>
                                   <Link to={week.path} className="text-xs">
                                     {week.label}
                                   </Link>
                                 </SidebarMenuSubButton>
                               </SidebarMenuSubItem>
-                              {/* @ts-ignore */}
-                              {week.items?.map((item: any) => (
-                                <SidebarMenuSubItem key={item.id}>
-                                  <SidebarMenuSubButton asChild className="pl-6 h-8" isActive={location.pathname === item.path}>
-                                    <Link to={item.path} className="text-xs text-muted-foreground">
-                                      {item.label}
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </div>
                           ))}
                         </SidebarMenuSub>
                       </CollapsibleContent>

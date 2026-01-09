@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Mic, Calendar, Target, ListChecks, HelpCircle } from "lucide-react";
+import { ArrowLeft, Mic, Calendar, Target, ListChecks, HelpCircle, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Weeks5to6 = () => {
   return (
@@ -29,7 +28,7 @@ const Weeks5to6 = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold">Sessions 5 & 6</div>
+              <div className="text-lg font-bold">Weeks 5 & 6</div>
             </CardContent>
           </Card>
           <Card>
@@ -49,7 +48,7 @@ const Weeks5to6 = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ListChecks className="h-5 w-5 text-primary" />
-              Instructions
+              Overview
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -97,48 +96,20 @@ const Weeks5to6 = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Assessment Rubric (20%)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[150px]">Criteria</TableHead>
-                    <TableHead>Excellent (9-10)</TableHead>
-                    <TableHead>Satisfactory (6-8)</TableHead>
-                    <TableHead>Unsatisfactory (1-5)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Content & Interaction</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Appropriate for lay audience. Effective strategies for concepts. In-depth reflection. Clear logic & transitions. Excellent Q&A answers.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Generally appropriate. Some strategies used. Some critical reflection. Mostly easy to follow.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Overuse of jargon. Little reflection. Flawed structure. Inadequate Q&A responses.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Delivery & Body Language</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">High level of clarity. Effective intonation/volume. Strong non-verbal skills. No reading from scripts. Excellent timing.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Satisfactory clarity. Reasonable delivery. Some non-verbal skills. Few instances of reading from scripts.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Inadequate clarity. Ineffective delivery. Poor timing. Always reading from scripts.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Visual Aids</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Excellent design and integration of PowerPoint slides.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Mostly effective, but some design issues.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Poorly designed or ineffective supplementation.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Language Accuracy</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">High communicative effectiveness. Only minor 'slips'.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Satisfactory effectiveness. Errors don't impede communication.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Limited effectiveness. Frequent errors impede communication.</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+        {/* Link to full assessment info */}
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold">Full Assessment Details & Rubric</h4>
+                <p className="text-sm text-muted-foreground">View complete instructions, requirements, and grading criteria</p>
+              </div>
+              <Button asChild>
+                <Link to="/mccp/assessment#oral1">
+                  <Mic className="mr-2 h-4 w-4" />
+                  View Details
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
