@@ -32,7 +32,16 @@ const weeklySchedule = [
       { id: "week1-ai", label: "AI Agent Setup", path: "/mccp/week1/ai-agent" }
     ]
   },
-  { id: "weeks2-4", label: "Weeks 2-4: Group Meetings", path: "/mccp/weeks2-4", icon: Users },
+  { 
+    id: "weeks2-4", 
+    label: "Weeks 2-4: Group Meetings", 
+    path: "/mccp/weeks2-4", 
+    icon: Users,
+    subItems: [
+      { id: "weeks2-4-writing", label: "Writing Materials", path: "/mccp/weeks2-4/writing-materials" },
+      { id: "weeks2-4-tasks", label: "Pre-Meeting Tasks", path: "/mccp/weeks2-4/tasks" }
+    ]
+  },
   { id: "weeks5-6", label: "Weeks 5-6: Research Paper Presentation", path: "/mccp/weeks5-6", icon: Mic },
   { id: "weeks7-9", label: "Weeks 7-9: Group Meetings", path: "/mccp/weeks7-9", icon: Users },
   { id: "week10", label: "Week 10: Poster Presentation", path: "/mccp/week10", icon: Presentation },
