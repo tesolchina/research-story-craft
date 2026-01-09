@@ -6,7 +6,6 @@ import {
   GraduationCap, 
   ClipboardList, 
   Target, 
-  Calendar,
   Bot, 
   Monitor, 
   Github, 
@@ -20,8 +19,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import InstructorNotes from "@/components/mccp/InstructorNotes";
-import DiscussionBoard from "@/components/mccp/DiscussionBoard";
 import AIChatDialog from "@/components/mccp/AIChatDialog";
 
 interface CollapsibleModuleProps {
@@ -60,17 +57,6 @@ const CollapsibleModule = ({ title, icon, children, defaultOpen = true, emoji }:
   );
 };
 
-// Instructor notes for each section
-const instructorNotes = {
-  "cilo-1": "Focus on structure first, content second. Students often rush to fill slides with text - encourage visual communication and clear organization.",
-  "cilo-2": "Draw connections to students' own research fields. Ask them to identify 3 articles in their discipline that follow the patterns we discuss.",
-  "cilo-3": "The linguistic features list can feel overwhelming. Prioritize signposts and hedging first - these have the biggest impact on academic writing quality.",
-  "cilo-4": "Many students underestimate citation complexity. Emphasize that citation is not just about avoiding plagiarism - it's about joining the scholarly conversation.",
-  "assessment-presentation1": "Encourage students to practice with peers before the assessment. The 8-minute limit is strict - practice timing!",
-  "assessment-poster": "Poster design matters! Refer students to academic poster design resources. Content should be readable from 1 meter away.",
-  "assessment-writing": "This is the most heavily weighted assessment. Encourage students to start early and use the writing center resources.",
-  "assessment-3mt": "Three Minute Thesis format is challenging. Watch examples from 3MT competitions together. Focus on storytelling and significance.",
-};
 
 const ciloData = [
   { id: "CILO 1", description: "Understand and apply the appropriate structure and format of academic presentations and critically evaluate their own and their peers' presentations." },
@@ -127,11 +113,6 @@ const Week1 = () => {
                 </ul>
               </div>
             </div>
-            <InstructorNotes
-              sectionId="week1-welcome"
-              notes="Welcome to the course! I'm excited to work with you this semester. Our first session will be an orientation where we'll get to know each other and discuss your research interests. Please come prepared to introduce yourself and your research area briefly (1-2 minutes)."
-            />
-            <DiscussionBoard sectionId="week1-overview" sectionTitle="Course Overview" />
           </div>
         </CollapsibleModule>
 
@@ -195,13 +176,8 @@ const Week1 = () => {
               <div key={cilo.id} className="p-4 border-l-4 border-l-primary bg-muted/30 rounded-r-lg">
                 <h4 className="font-bold text-primary mb-2">{cilo.id}</h4>
                 <p className="text-sm text-muted-foreground">{cilo.description}</p>
-                <InstructorNotes
-                  sectionId={`cilo-${index + 1}`}
-                  notes={instructorNotes[`cilo-${index + 1}` as keyof typeof instructorNotes]}
-                />
               </div>
             ))}
-            <DiscussionBoard sectionId="week1-cilos" sectionTitle="Learning Outcomes" />
           </div>
         </CollapsibleModule>
 
@@ -246,10 +222,6 @@ const Week1 = () => {
                 <span className="font-bold text-primary text-lg">20%</span>
               </div>
             </div>
-            <InstructorNotes
-              sectionId="assessment-overview"
-              notes="The writing assignment carries the most weight. Encourage students to start early with their literature review. The oral presentations are spread throughout the semester to allow progressive skill development."
-            />
             <AIChatDialog
               sectionId="assessment"
               sectionTitle="Assessment Methods"
@@ -419,10 +391,6 @@ const Week1 = () => {
                 Configure API Key <Sparkles className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <InstructorNotes
-              sectionId="ai-setup"
-              notes="Remind students that AI should be used as a learning tool, not a shortcut. Emphasize ethical usage and proper attribution of AI-assisted content."
-            />
           </div>
         </CollapsibleModule>
       </div>
