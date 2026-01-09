@@ -29,14 +29,24 @@ const Weeks2to4 = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground">
-              During these three weeks, you will participate in small group meetings focused on:
+              During these three weeks, you will participate in small group meetings focused on developing your <strong>writing skills</strong> and <strong>AI skills</strong> to assist academic writing.
             </p>
-            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-              <li>Collaborative discussions on academic topics</li>
-              <li>Peer learning and feedback sessions</li>
-              <li>Developing oral communication skills</li>
-              <li>Preparing for your research paper presentation</li>
-            </ul>
+            
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 space-y-2">
+              <h4 className="font-semibold text-primary">Main Task</h4>
+              <p className="text-muted-foreground">
+                Choose <strong>1 activity idea from Activity 1.4</strong> and pursue this idea using your AI agent. Document your process, findings, and reflections.
+              </p>
+              <Button variant="outline" size="sm" asChild className="mt-2">
+                <Link to="/mccp/week1/activity-4">View Activity 1.4 →</Link>
+              </Button>
+            </div>
+
+            <div className="bg-muted/50 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground italic">
+                📌 Additional tasks will be assigned in due course during the group meetings.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
