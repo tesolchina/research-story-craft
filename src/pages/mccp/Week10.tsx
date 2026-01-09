@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Presentation, Calendar, Target, Layout, MessageSquare, Info } from "lucide-react";
+import { ArrowLeft, Presentation, Calendar, Target, Layout, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Week10 = () => {
   return (
@@ -29,7 +28,7 @@ const Week10 = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold">Session 10</div>
+              <div className="text-lg font-bold">Week 10</div>
             </CardContent>
           </Card>
           <Card>
@@ -73,62 +72,10 @@ const Week10 = () => {
                   <li>Duration: 2-3 minutes</li>
                   <li>Q&A session follow-up</li>
                   <li>Bring hard copy & upload soft copy</li>
-                  <li>Upload 2 hours before session</li>
+                  <li>Upload 2 hours before the week</li>
                 </ul>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-primary" />
-              Session Rundown
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Activity</TableHead>
-                  <TableHead>Duration</TableHead>
-                  <TableHead>Notes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="text-xs">Setup</TableCell>
-                  <TableCell className="text-xs">10 min</TableCell>
-                  <TableCell className="text-xs">Putting up posters</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-xs">Group A Presentations</TableCell>
-                  <TableCell className="text-xs">30 min</TableCell>
-                  <TableCell className="text-xs">2-3 min each</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-xs">Q&A for Group A</TableCell>
-                  <TableCell className="text-xs">35-40 min</TableCell>
-                  <TableCell className="text-xs">Group B evaluates Group A</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-xs">Break</TableCell>
-                  <TableCell className="text-xs">10 min</TableCell>
-                  <TableCell className="text-xs"></TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-xs">Group B Presentations</TableCell>
-                  <TableCell className="text-xs">30 min</TableCell>
-                  <TableCell className="text-xs">2-3 min each</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="text-xs">Q&A for Group B</TableCell>
-                  <TableCell className="text-xs">35-40 min</TableCell>
-                  <TableCell className="text-xs">Group A evaluates Group B</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
           </CardContent>
         </Card>
 
@@ -149,48 +96,20 @@ const Week10 = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Assessment Rubric (20%)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[150px]">Criteria</TableHead>
-                    <TableHead>Excellent (9-10)</TableHead>
-                    <TableHead>Satisfactory (6-8)</TableHead>
-                    <TableHead>Unsatisfactory (1-5)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Content & Clarity</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Clear, concise, well-organized. Accessible to both specialist/non-specialist.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Main elements covered. Mostly understandable.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Incomplete or inaccurate. Difficult to follow.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Poster Design</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Visually appealing. Professional layout. Easy to understand.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Acceptable, but readability issues. Visuals somewhat helpful.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Poorly designed. Hard to read. Visuals missing/irrelevant.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Oral Delivery</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Confident, fluent. Excellent use of poster as aid.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Hesitations or pacing issues. Aid sometimes ineffective.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Unclear/rushed. Minimal connection to poster.</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium text-xs">Interaction (Q&A)</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Active engagement. Confident answers to all audiences.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">Some uncertainty. Explanations sometimes technical.</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">No engagement. Responses unclear/hardly comprehensible.</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+        {/* Link to full assessment info */}
+        <Card className="bg-primary/5 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold">Full Assessment Details & Rubric</h4>
+                <p className="text-sm text-muted-foreground">View complete instructions, rundown, and grading criteria</p>
+              </div>
+              <Button asChild>
+                <Link to="/mccp/assessment#oral2">
+                  <Presentation className="mr-2 h-4 w-4" />
+                  View Details
+                </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

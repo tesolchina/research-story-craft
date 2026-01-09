@@ -18,7 +18,6 @@ import MCCPLayout from "./pages/mccp/MCCPLayout";
 
 import ApiKeyPage from "./pages/mccp/ApiKeyPage";
 import ResourcesPage from "./pages/mccp/ResourcesPage";
-import WritingComponent from "./pages/mccp/WritingComponent";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
 import StudentParticipation from "./pages/mccp/StudentParticipation";
 import Week1 from "./pages/mccp/Week1";
@@ -66,7 +65,6 @@ const App = () => (
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/tasks" element={<Weeks2to4Tasks />} />
             <Route path="weeks2-4/dashboard" element={<TeacherDashboard />} />
-            <Route path="weeks2-4/writing" element={<WritingComponent />} />
             <Route path="weeks5-6" element={<Weeks5to6 />} />
             <Route path="weeks7-9" element={<Weeks7to9 />} />
             <Route path="week10" element={<Week10 />} />
