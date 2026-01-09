@@ -1,15 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowDown, ArrowRight, FileText, Bot, Code, FolderOpen, Layers, CheckCircle, Lightbulb, Eye, Edit, FileStack, BarChart3, StickyNote } from "lucide-react";
+import { ArrowDown, ArrowRight, FileText, Bot, Code, FolderOpen, Layers, CheckCircle, Lightbulb, Eye, BarChart3, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Week1Activity2 = () => {
-  const issuesToAddress = [
-    "What is the overall organizational pattern of the paper?",
-    "How do sections connect and flow into each other?",
-    "What moves does the author make in each major section?",
-    "How does the macro structure serve the paper's argument?",
-    "What structural patterns can you adopt for your own writing?"
+  const carsModel = [
+    { move: "Move 1", title: "Establishing Territory", description: "Claiming importance and reviewing prior work" },
+    { move: "Move 2", title: "Establishing Niche", description: "Indicating gaps, raising questions, or extending previous work" },
+    { move: "Move 3", title: "Occupying Niche", description: "Outlining purpose, announcing research, and previewing structure" }
   ];
 
   return (
@@ -17,9 +15,43 @@ const Week1Activity2 = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Activity 1.2: Analyzing Macro-Level Structure</h1>
         <p className="text-muted-foreground">
-          Examine the overall organization and structure of published research papers using AI-assisted analysis.
+          Use the CARS model (Swales) to analyze the macro-level structure of published research articles for imitation learning.
         </p>
+        <div className="mt-3">
+          <a 
+            href="https://github.com/tesolchina/mccpSpring2026/tree/main/writing/activity%201.2%20analyze%20macro-level%20structure" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            View source materials on GitHub <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
       </div>
+
+      {/* CARS Model Reference */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-blue-500" />
+            CARS Model Framework (Swales)
+          </CardTitle>
+          <CardDescription>Create A Research Space - Framework for analyzing introductions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {carsModel.map((item, index) => (
+              <div key={index} className="p-4 border rounded-lg space-y-2 bg-muted/30">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold px-2 py-1 bg-primary/10 text-primary rounded">{item.move}</span>
+                </div>
+                <h4 className="font-semibold text-sm">{item.title}</h4>
+                <p className="text-xs text-muted-foreground">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Visual Workflow Diagram */}
       <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
@@ -28,7 +60,7 @@ const Week1Activity2 = () => {
             <Lightbulb className="h-5 w-5 text-primary" />
             Activity Workflow
           </CardTitle>
-          <CardDescription>Use an AI agent to analyze and annotate research paper structures</CardDescription>
+          <CardDescription>Annotate and analyze research papers using AI for imitation learning</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4 py-6">
@@ -38,15 +70,11 @@ const Week1Activity2 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
                   <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span className="text-left">One Published Paper<br/><span className="text-xs text-muted-foreground">(md/html/latex - machine readable)</span></span>
+                  <span className="text-left">Keller.md<br/><span className="text-xs text-muted-foreground">(Research paper - machine readable)</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
-                  <Edit className="h-4 w-4 text-amber-500 flex-shrink-0" />
-                  <span className="text-left">Human Reader Notes<br/><span className="text-xs text-muted-foreground">(macro structure observations & questions)</span></span>
-                </div>
-                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
-                  <FileStack className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-left">Additional Papers<br/><span className="text-xs text-muted-foreground">(machine readable for AI analysis)</span></span>
+                  <Eye className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                  <span className="text-left">sampleNotes.md<br/><span className="text-xs text-muted-foreground">(Annotation framework & guidance)</span></span>
                 </div>
               </div>
             </div>
@@ -60,15 +88,15 @@ const Week1Activity2 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
                   <Bot className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span className="text-left">Process Instructions</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
-                  <Eye className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span className="text-left">Critically Review & Enhance Human Notes</span>
+                  <span className="text-left">Annotate using CARS model</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
                   <Layers className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span className="text-left">Apply Annotation Strategies to More Papers</span>
+                  <span className="text-left">Identify Moves 1-3 features</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
+                  <Eye className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span className="text-left">Find discipline-specific patterns</span>
                 </div>
               </div>
             </div>
@@ -82,42 +110,15 @@ const Week1Activity2 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
                   <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-left">Annotated Papers<br/><span className="text-xs text-muted-foreground">(actionable insights on macro structure)</span></span>
+                  <span className="text-left">KellerInsights.md<br/><span className="text-xs text-muted-foreground">(Detailed analysis with excerpts)</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
                   <BarChart3 className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-left">Structure Visualization<br/><span className="text-xs text-muted-foreground">(visual maps of paper organization)</span></span>
-                </div>
-                <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
-                  <StickyNote className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-left">Writing Notes<br/><span className="text-xs text-muted-foreground">(insights for future writing)</span></span>
+                  <span className="text-left">visualSample.html<br/><span className="text-xs text-muted-foreground">(Structure visualization)</span></span>
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Issues to Address */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-500" />
-            Issues to Address
-          </CardTitle>
-          <CardDescription>Consider these questions in your analysis</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {issuesToAddress.map((issue, index) => (
-              <li key={index} className="flex items-start gap-3 p-2 text-sm">
-                <span className="flex-shrink-0 w-5 h-5 bg-muted text-muted-foreground rounded-full flex items-center justify-center text-xs">
-                  {index + 1}
-                </span>
-                <span>{issue}</span>
-              </li>
-            ))}
-          </ul>
         </CardContent>
       </Card>
 
@@ -138,16 +139,15 @@ const Week1Activity2 = () => {
               1. Prepare Your Activity Folder
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-              <p>Create a folder structure:</p>
               <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
 {`activity-1.2/
 ├── input/
-│   ├── keller.md            # The research paper (e.g., Keller CVPR 2024)
-│   └── macro-framework.md   # Annotation framework and guidance
-├── instructions.md          # Analysis instructions for AI
+│   ├── Keller.md           # Research paper (e.g., Keller CVPR 2024)
+│   └── sampleNotes.md      # Annotation framework with CARS model
+├── instructions.md         # Analysis instructions
 └── output/
-    ├── KellerInsights.md    # AI-generated analysis of specific features
-    └── visualSample.html    # Interactive visualization of structure`}
+    ├── KellerInsights.md   # Detailed analysis with section references
+    └── visualSample.html   # Interactive structure visualization`}
               </pre>
             </div>
           </div>
@@ -156,17 +156,33 @@ const Week1Activity2 = () => {
           <div className="space-y-3">
             <h4 className="font-medium flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-500" />
-              2. Prepare the Instruction File
+              2. Create instructions.md
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-              <p>Your <code className="bg-background px-1 rounded">instructions.md</code> should include:</p>
-              <div className="bg-background p-3 rounded border text-xs font-mono whitespace-pre-wrap">
-{`Task: Annotate and analyze the paper using the provided framework.
-Goal: Learn from the paper's structure to inform future writing through imitation.
-Output:
-1. KellerInsights.md: Notes on specific features with section/subsection references and excerpts.
-2. visualSample.html: A visualization of the macro-level structure.`}
-              </div>
+              <pre className="bg-background p-3 rounded border text-xs overflow-x-auto whitespace-pre-wrap">
+{`## Task: Analyze Macro-Level Structure for Imitation Learning
+
+### Input Files
+- Keller.md: The research paper to analyze
+- sampleNotes.md: Annotation framework with CARS model guidance
+
+### Goal
+Learn from the paper's structure to inform future writing through imitation.
+
+### Instructions
+1. Annotate the paper using the CARS model framework
+2. Identify specific features for each Move (1, 2, 3)
+3. Note section/subsection references with relevant excerpts
+4. Find discipline-specific patterns that can be adopted
+
+### Output
+1. KellerInsights.md: Detailed notes on specific features
+   - Include section references and direct excerpts
+   - Highlight patterns for imitation
+2. visualSample.html: Visualization of the macro-level structure
+   - Show hierarchical organization
+   - Map rhetorical moves to sections`}
+              </pre>
             </div>
           </div>
 
@@ -180,10 +196,9 @@ Output:
               <p>Open the folder in your IDE with AI agent and:</p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                 <li>Point the agent to your instruction file</li>
-                <li>Let it analyze the sample paper and enhance your notes</li>
-                <li>Have it apply the same analysis to additional papers</li>
-                <li>Review the annotated outputs and structure visualizations</li>
-                <li>Add your own reflections to the writing notes</li>
+                <li>Let it analyze the paper using the CARS framework</li>
+                <li>Review the generated insights and visualization</li>
+                <li>Add your own observations and writing notes</li>
               </ul>
             </div>
           </div>

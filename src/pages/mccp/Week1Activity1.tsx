@@ -1,24 +1,26 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowDown, ArrowRight, Target, User, Lightbulb, CheckCircle, FolderOpen, FileText, Bot, Code } from "lucide-react";
+import { ArrowDown, ArrowRight, Target, User, Lightbulb, CheckCircle, FolderOpen, FileText, Bot, Code, ExternalLink, Clock, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Week1Activity1 = () => {
-  const issuesToAddress = [
-    "How do the course learning outcomes connect to each assessment component?",
-    "What writing skills are emphasized across the assessments?",
-    "Where are your current strengths as an academic writer?",
-    "What areas need the most improvement for success in this course?",
-    "How can AI tools support your specific learning needs?"
-  ];
-
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Activity 1.1: Mapping Your Learning Journey</h1>
         <p className="text-muted-foreground">
-          Explore connections between CILOs and assessment, focusing on writing components while considering your strengths and weaknesses.
+          Connect CILOs, assessment requirements, and personal reflection to develop a strategic plan for completing your writing assignment.
         </p>
+        <div className="mt-3">
+          <a 
+            href="https://github.com/tesolchina/mccpSpring2026/tree/main/writing/activity%201.1%20mapping%20learning" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            View source materials on GitHub <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
       </div>
 
       {/* Visual Workflow Diagram */}
@@ -28,78 +30,73 @@ const Week1Activity1 = () => {
             <Lightbulb className="h-5 w-5 text-primary" />
             Activity Workflow
           </CardTitle>
-          <CardDescription>Use an AI agent in your IDE to analyze and develop your action plan</CardDescription>
+          <CardDescription>Strategic planning with AI to connect learning outcomes and personal goals</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-4 py-6">
+          <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4 py-6">
             {/* Input Section */}
-            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-primary/30 min-w-[200px]">
+            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-primary/30 flex-1">
               <div className="text-sm font-semibold text-primary uppercase tracking-wide">Input</div>
-              <div className="flex flex-col gap-2 text-center">
-                <div className="flex items-center gap-2 text-sm">
-                  <Target className="h-4 w-4 text-blue-500" />
-                  <span>CILOs</span>
+              <div className="flex flex-col gap-2 text-center w-full">
+                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
+                  <Target className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                  <span className="text-left">CILOs.md<br/><span className="text-xs text-muted-foreground">(Course learning outcomes)</span></span>
                 </div>
-                <ArrowDown className="h-4 w-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-2 text-sm">
-                  <FileText className="h-4 w-4 text-green-500" />
-                  <span>Assessment Info</span>
+                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
+                  <FileText className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span className="text-left">Writing_Assignment_Brief.md<br/><span className="text-xs text-muted-foreground">(Assessment requirements)</span></span>
                 </div>
-                <ArrowDown className="h-4 w-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4 text-orange-500" />
-                  <span>Self-Assessment</span>
+                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
+                  <User className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                  <span className="text-left">studentReflection-sample1.md<br/><span className="text-xs text-muted-foreground">(Your self-assessment)</span></span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
+                  <Users className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span className="text-left">tutorInfo.md<br/><span className="text-xs text-muted-foreground">(Dr. Wang's approach)</span></span>
                 </div>
               </div>
             </div>
 
-            <ArrowRight className="h-8 w-8 text-primary hidden lg:block" />
-            <ArrowDown className="h-8 w-8 text-primary lg:hidden" />
+            <ArrowRight className="h-8 w-8 text-primary hidden lg:block self-center" />
+            <ArrowDown className="h-8 w-8 text-primary lg:hidden self-center" />
 
             {/* Process Section */}
-            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-secondary/30 min-w-[200px]">
+            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-secondary/30 flex-1">
               <div className="text-sm font-semibold text-secondary uppercase tracking-wide">Process</div>
-              <div className="flex items-center gap-2 text-sm">
-                <Bot className="h-4 w-4 text-purple-500" />
-                <span>AI Agent Analysis</span>
+              <div className="flex flex-col gap-2 text-center w-full">
+                <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
+                  <Bot className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span className="text-left">AI Agent Analysis</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
+                  <Clock className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span className="text-left">Develop 3-hour AI-assisted plan</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
+                  <Users className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span className="text-left">Create tutor collaboration plan</span>
+                </div>
               </div>
             </div>
 
-            <ArrowRight className="h-8 w-8 text-primary hidden lg:block" />
-            <ArrowDown className="h-8 w-8 text-primary lg:hidden" />
+            <ArrowRight className="h-8 w-8 text-primary hidden lg:block self-center" />
+            <ArrowDown className="h-8 w-8 text-primary lg:hidden self-center" />
 
             {/* Output Section */}
-            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-green-500/30 min-w-[200px]">
+            <div className="flex flex-col items-center gap-3 p-4 bg-background rounded-lg border-2 border-dashed border-green-500/30 flex-1">
               <div className="text-sm font-semibold text-green-600 uppercase tracking-wide">Output</div>
-              <div className="flex items-center gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Action Plan</span>
+              <div className="flex flex-col gap-2 text-center w-full">
+                <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
+                  <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span className="text-left">assignmentCompletionPlan.md<br/><span className="text-xs text-muted-foreground">(3-hour AI-assisted plan)</span></span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
+                  <Users className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span className="text-left">tutorCollaborationPlan.md<br/><span className="text-xs text-muted-foreground">(Plan for working with tutor)</span></span>
+                </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Issues to Address */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-500" />
-            Issues to Address
-          </CardTitle>
-          <CardDescription>Consider these questions as you complete the activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            {issuesToAddress.map((issue, index) => (
-              <li key={index} className="flex items-start gap-3 p-2 text-sm">
-                <span className="flex-shrink-0 w-5 h-5 bg-muted text-muted-foreground rounded-full flex items-center justify-center text-xs">
-                  {index + 1}
-                </span>
-                <span>{issue}</span>
-              </li>
-            ))}
-          </ul>
         </CardContent>
       </Card>
 
@@ -124,11 +121,14 @@ const Week1Activity1 = () => {
               <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
 {`activity-1.1/
 ├── input/
-│   ├── cilos.md          # Copy from Week 1 page
-│   ├── assessment.md     # Copy from Week 1 page
-│   └── student-goals.md  # Your reflection/goals
-├── instructions.md       # Activity instructions (see below)
-└── output/               # To be generated by AI`}
+│   ├── CILOs.md                      # Course learning outcomes
+│   ├── Writing_Assignment_Brief.md   # Assessment requirements
+│   ├── studentReflection-sample1.md  # Your self-assessment
+│   └── tutorInfo.md                  # Tutor information
+├── instructions.md                   # Activity instructions
+└── output/
+    ├── assignmentCompletionPlan.md   # 3-hour plan
+    └── tutorCollaborationPlan.md     # Tutor collaboration plan`}
               </pre>
             </div>
           </div>
@@ -137,17 +137,30 @@ const Week1Activity1 = () => {
           <div className="space-y-3">
             <h4 className="font-medium flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-500" />
-              2. Prepare the Instruction File
+              2. Create instructions.md
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-              <p>Your <code className="bg-background px-1 rounded">instructions.md</code> should include:</p>
-              <div className="bg-background p-3 rounded border text-xs font-mono whitespace-pre-wrap">
-{`Task: Analyze the CILOs, assessment brief, and my personal goals.
-Process: Develop a plan to complete the writing assignment (up to 3 hours with AI) and a tutor collaboration plan.
-Output: Create two files in the output/ folder:
-- assignmentCompletionPlan.md: Detailed 3-hour plan with AI assistance
-- tutorCollaborationPlan.md: Plan for working with Dr. Wang (include his focus on personalized learning and AI-human partnership)`}
-              </div>
+              <pre className="bg-background p-3 rounded border text-xs overflow-x-auto whitespace-pre-wrap">
+{`## Task: Strategic Learning Plan Development
+
+### Input Files
+- CILOs.md: Course intended learning outcomes
+- Writing_Assignment_Brief.md: Assessment requirements and criteria
+- studentReflection-sample1.md: Student's self-assessment and goals
+- tutorInfo.md: Dr. Wang's teaching philosophy and approach
+
+### Instructions
+1. Analyze the connections between CILOs and assessment requirements
+2. Consider the student's current strengths and areas for improvement
+3. Develop a 3-hour AI-assisted plan for completing the writing assignment
+4. Create a collaboration plan with the tutor based on their approach
+
+### Output
+1. assignmentCompletionPlan.md: Detailed 3-hour plan with AI assistance milestones
+2. tutorCollaborationPlan.md: Plan for productive tutor collaboration
+   - Include Dr. Wang's focus on personalized learning
+   - Incorporate AI-human partnership philosophy`}
+              </pre>
             </div>
           </div>
 
@@ -160,9 +173,10 @@ Output: Create two files in the output/ folder:
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
               <p>Open the folder in your IDE with AI agent and:</p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Reference the tutor info: <strong>Dr. Simon Wang</strong> (PhD in English, focused on AI-Human-Student partnership and personalized small group meetings).</li>
-                <li>Point the agent to your instruction file.</li>
-                <li>Let it analyze all input files and generate the plans.</li>
+                <li>Point the agent to your instruction file</li>
+                <li>Let it analyze all input files holistically</li>
+                <li>Review the generated plans and refine as needed</li>
+                <li>Add your personal reflections and priorities</li>
               </ul>
             </div>
           </div>

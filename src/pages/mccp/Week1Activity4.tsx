@@ -1,24 +1,102 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowDown, ArrowRight, Lightbulb, Bot, Code, FolderOpen, FileText, Sparkles, MessageSquare, ListTodo, GraduationCap } from "lucide-react";
+import { ArrowDown, ArrowRight, Lightbulb, Bot, FolderOpen, FileText, Sparkles, MessageSquare, ListTodo, GraduationCap, ExternalLink, Search, BookOpen, PenTool, Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Week1Activity4 = () => {
   const activityIdeas = [
-    { title: "Micro-Level Analysis", focus: "CILO 3: Nominalization & Hedging", icon: MessageSquare },
-    { title: "Abstract Move Mapping", focus: "CILO 2: Background to Conclusion", icon: GraduationCap },
-    { title: "Literature Synthesis Matrix", focus: "CILO 2 & 4: Thematic Integration", icon: ListTodo },
-    { title: "Gap-Statement Bank", focus: "CILO 3: Linguistic Repertoire", icon: Sparkles }
+    { 
+      id: "1.5", 
+      title: "Micro-Level Linguistic Analysis", 
+      focus: "CILO 3: Nominalization & Hedging", 
+      icon: MessageSquare,
+      description: "Analyze sentence-level features like nominalization patterns and hedging devices"
+    },
+    { 
+      id: "1.6", 
+      title: "Abstract Move Mapping", 
+      focus: "CILO 2: Background to Conclusion", 
+      icon: GraduationCap,
+      description: "Map rhetorical moves across multiple abstracts in your field"
+    },
+    { 
+      id: "1.7", 
+      title: "Literature Synthesis Matrix", 
+      focus: "CILO 2 & 4: Thematic Integration", 
+      icon: ListTodo,
+      description: "Build a thematic synthesis matrix from multiple sources"
+    },
+    { 
+      id: "1.8", 
+      title: "Move 2 Gap-Statement Bank", 
+      focus: "CILO 3: Linguistic Repertoire", 
+      icon: Search,
+      description: "Collect and categorize gap-indicating statements from published papers"
+    },
+    { 
+      id: "1.9", 
+      title: "Methodology Section Analysis", 
+      focus: "CILO 2: Generic Features", 
+      icon: Layers,
+      description: "Analyze how methodology sections are structured in your discipline"
+    },
+    { 
+      id: "1.10", 
+      title: "AI as Style Consultant", 
+      focus: "CILO 3 & 4: Voice Development", 
+      icon: PenTool,
+      description: "Use AI to analyze and develop your academic writing voice"
+    },
+    { 
+      id: "1.11", 
+      title: "Citation Integration Patterns", 
+      focus: "CILO 3: Reporting Verbs", 
+      icon: BookOpen,
+      description: "Study how citations are integrated linguistically in academic writing"
+    },
+    { 
+      id: "1.12", 
+      title: "Discussion Section Moves", 
+      focus: "CILO 2: Argument Structure", 
+      icon: MessageSquare,
+      description: "Map the rhetorical moves in discussion sections"
+    }
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Activity 1.4: Generate Ideas for More Activities</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Activity 1.4: More Activity Ideas</h1>
         <p className="text-muted-foreground">
-          Brainstorm and develop additional AI-assisted learning activities to target specific CILOs and writing goals.
+          Choose from additional AI-integrated activities to develop your academic writing skills. Select one idea to pursue during Weeks 2-4.
         </p>
+        <div className="mt-3">
+          <a 
+            href="https://github.com/tesolchina/mccpSpring2026/tree/main/writing/Activity%201.4%20Generate%20ideas%20for%20more%20activities" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+          >
+            View source materials on GitHub <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
       </div>
+
+      {/* Key Objective */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-primary mb-1">Key Objective</h3>
+              <p className="text-sm text-muted-foreground">
+                Develop your ability to use AI as a <strong>"style consultant"</strong> rather than a ghostwriter. 
+                Focus on learning from AI-generated insights to improve your own writing skills.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Visual Workflow Diagram */}
       <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
@@ -27,7 +105,7 @@ const Week1Activity4 = () => {
             <Lightbulb className="h-5 w-5 text-primary" />
             Activity Workflow
           </CardTitle>
-          <CardDescription>Collaborate with AI to expand the course learning experience</CardDescription>
+          <CardDescription>Select and pursue one activity idea during Weeks 2-4</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row items-stretch justify-center gap-4 py-6">
@@ -37,11 +115,15 @@ const Week1Activity4 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
                   <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span className="text-left">CILOs & Briefs<br/><span className="text-xs text-muted-foreground">(Course requirements)</span></span>
+                  <span className="text-left">CILOs & Assignment Brief<br/><span className="text-xs text-muted-foreground">(Course requirements)</span></span>
                 </div>
                 <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
                   <GraduationCap className="h-4 w-4 text-amber-500 flex-shrink-0" />
                   <span className="text-left">Session Handouts<br/><span className="text-xs text-muted-foreground">(Learning materials)</span></span>
+                </div>
+                <div className="flex items-center gap-2 text-sm p-2 bg-muted/50 rounded">
+                  <BookOpen className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span className="text-left">Published Papers<br/><span className="text-xs text-muted-foreground">(Your field samples)</span></span>
                 </div>
               </div>
             </div>
@@ -55,11 +137,11 @@ const Week1Activity4 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
                   <Bot className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span className="text-left">Instruction to Brainstorm</span>
+                  <span className="text-left">AI Agent Analysis</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm p-2 bg-purple-500/10 rounded">
                   <Sparkles className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span className="text-left">Map to CILOs & Tutor Info</span>
+                  <span className="text-left">Target Specific CILOs</span>
                 </div>
               </div>
             </div>
@@ -73,7 +155,7 @@ const Week1Activity4 = () => {
               <div className="flex flex-col gap-2 text-center w-full">
                 <div className="flex items-center gap-2 text-sm p-2 bg-green-500/10 rounded">
                   <Sparkles className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span className="text-left">10+ Activity Ideas<br/><span className="text-xs text-muted-foreground">(Objectives, Process, Tutor Role)</span></span>
+                  <span className="text-left">Activity-specific outputs<br/><span className="text-xs text-muted-foreground">(Analysis, patterns, insights)</span></span>
                 </div>
               </div>
             </div>
@@ -81,21 +163,31 @@ const Week1Activity4 = () => {
         </CardContent>
       </Card>
 
-      {/* Idea Preview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {activityIdeas.map((idea, index) => (
-          <Card key={index} className="border-l-4 border-l-primary/30">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <idea.icon className="h-4 w-4 text-primary" />
-                {idea.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-xs text-muted-foreground">{idea.focus}</p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Activity Ideas Grid */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Choose Your Activity</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activityIdeas.map((idea) => (
+            <Card key={idea.id} className="border-l-4 border-l-primary/30 hover:border-l-primary transition-colors">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <idea.icon className="h-4 w-4 text-primary" />
+                    Activity {idea.id}
+                  </CardTitle>
+                  <span className="text-[10px] px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
+                    {idea.focus.split(":")[0]}
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <h4 className="font-medium text-sm mb-1">{idea.title}</h4>
+                <p className="text-xs text-muted-foreground mb-2">{idea.description}</p>
+                <p className="text-[10px] text-primary/70">{idea.focus}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* AI Agent Instructions */}
@@ -103,26 +195,26 @@ const Week1Activity4 = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-purple-500" />
-            Using AI Agent for This Activity
+            Using AI Agent for Your Chosen Activity
           </CardTitle>
-          <CardDescription>Develop new learning pathways with AI</CardDescription>
+          <CardDescription>Each activity follows a similar structure</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-3">
             <h4 className="font-medium flex items-center gap-2">
               <FolderOpen className="h-4 w-4 text-amber-500" />
-              1. Prepare Your Activity Folder
+              General Folder Structure
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
               <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
-{`activity-1.4/
+{`activity-1.X/
 ├── input/
-│   ├── cilos.md
-│   ├── handouts/            # Relevant learning materials
-│   └── tutorInfo.md         # From Activity 1.1
-├── instructions.md          # Brainstorming instructions
+│   ├── CILOs.md              # Course learning outcomes
+│   ├── papers/               # Relevant published papers
+│   └── tutorInfo.md          # Tutor approach
+├── instructions.md           # Activity-specific instructions
 └── output/
-    └── moreActIdeas.md      # 10+ detailed activity ideas`}
+    └── [activity outputs]    # Analysis, patterns, insights`}
               </pre>
             </div>
           </div>
@@ -130,15 +222,16 @@ const Week1Activity4 = () => {
           <div className="space-y-3">
             <h4 className="font-medium flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-500" />
-              2. Instruction Focus
+              Key Elements for Each Activity
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2 text-muted-foreground">
-              <p>Ask the AI agent to:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Generate 10 additional activity ideas for academic writing and AI integration.</li>
-                <li>Define <strong>Objectives</strong>, <strong>Input/Process/Output</strong>, <strong>Learning Insights</strong>, and <strong>Tutor Contribution</strong> for each.</li>
-                <li>Ensure a focus on <strong>CILO 2, 3, or 4</strong> for each idea.</li>
-                <li>Incorporate the <strong>tutor's philosophy</strong> on AI-human partnership.</li>
+                <li><strong>Objectives</strong>: What skills/knowledge will you develop?</li>
+                <li><strong>Input</strong>: What materials do you need?</li>
+                <li><strong>Process</strong>: How will AI assist your analysis?</li>
+                <li><strong>Output</strong>: What will you produce?</li>
+                <li><strong>Learning Insights</strong>: How does this connect to CILOs?</li>
+                <li><strong>Tutor Contribution</strong>: What feedback will you seek?</li>
               </ul>
             </div>
           </div>
