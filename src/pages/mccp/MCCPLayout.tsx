@@ -25,6 +25,7 @@ const weeklySchedule = [
     path: "/mccp/week1", 
     icon: BookOpen,
     subItems: [
+      { id: "week1-activity1", label: "Activity 1.1: Mapping Learning", path: "/mccp/week1/activity-1" },
       { id: "week1-ai", label: "AI Agent Setup", path: "/mccp/week1/ai-agent" }
     ]
   },
