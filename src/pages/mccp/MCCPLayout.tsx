@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronDown, MessageCircle, UserCheck } from "lucide-react";
+import { Home, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronDown, MessageCircle, UserCheck, ClipboardList } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -124,6 +124,15 @@ const MCCPLayout = () => {
                       <Link to="/mccp/feedback">
                         <MessageCircle className="h-4 w-4" />
                         <span>Course Feedback</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/mccp/assessment"}>
+                      <Link to="/mccp/assessment">
+                        <ClipboardList className="h-4 w-4" />
+                        <span>Assessment Info</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
