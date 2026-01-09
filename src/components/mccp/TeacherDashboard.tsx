@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Lock, Eye, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Lock, Eye, CheckCircle2, Clock, AlertCircle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
 interface ProgressData {
   student_id: string;
@@ -32,85 +33,144 @@ interface StudentSummary {
   progress: ProgressData[];
 }
 
-const TEACHER_CODE = "1989";
+// Input validation schemas
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
 const TeacherDashboard = () => {
-  const [code, setCode] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<StudentSummary | null>(null);
+  const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
 
-  const handleLogin = () => {
-    if (code === TEACHER_CODE) {
-      setIsAuthenticated(true);
-      setError(null);
-      loadDashboardData();
-    } else {
-      setError("Incorrect code. Please try again.");
+  const handleLogin = async () => {
+    // Validate input
+    const validation = loginSchema.safeParse({ email, password });
+    if (!validation.success) {
+      setError(validation.error.errors[0].message);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Verify credentials via secure RPC function
+      const { data, error: rpcError } = await supabase.rpc("verify_teacher_login", {
+        p_email: email,
+        p_password: password,
+      });
+
+      if (rpcError) {
+        setError("Authentication failed. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data === true) {
+        setIsAuthenticated(true);
+        setCredentials({ email, password });
+        await loadDashboardData(email, password);
+      } else {
+        setError("Invalid email or password.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (teacherEmail: string, teacherPassword: string) => {
     setIsLoading(true);
 
-    // Get all pseudonyms
-    const { data: pseudonyms } = await supabase
-      .from("student_pseudonyms")
-      .select("pseudonym, last_4_digits");
+    try {
+      // Get dashboard data via secure RPC function
+      const { data, error: rpcError } = await supabase.rpc("get_teacher_dashboard_data", {
+        p_email: teacherEmail,
+        p_password: teacherPassword,
+      });
 
-    // Get all progress data
-    const { data: progress } = await supabase
-      .from("students_progress")
-      .select("*")
-      .order("updated_at", { ascending: false });
+      if (rpcError) {
+        setError("Failed to load data. Please refresh.");
+        setIsLoading(false);
+        return;
+      }
 
-    if (pseudonyms && progress) {
-      const studentMap = new Map<string, StudentSummary>();
+      if (data) {
+        const studentMap = new Map<string, StudentSummary>();
 
-      // Initialize with all students from pseudonyms
-      pseudonyms.forEach((p) => {
-        studentMap.set(p.last_4_digits, {
-          pseudonym: p.pseudonym,
-          studentId: p.last_4_digits,
-          session1McScore: null,
-          session1McTotal: 5,
-          session1WritingDone: false,
-          session2McScore: null,
-          session2McTotal: 5,
-          session2WritingDone: false,
-          lastActive: null,
-          progress: [],
+        // Process the joined data
+        (data as any[]).forEach((row) => {
+          const studentCode = row.last_4_digits;
+          
+          if (!studentMap.has(studentCode)) {
+            studentMap.set(studentCode, {
+              pseudonym: row.pseudonym,
+              studentId: studentCode,
+              session1McScore: null,
+              session1McTotal: 5,
+              session1WritingDone: false,
+              session2McScore: null,
+              session2McTotal: 5,
+              session2WritingDone: false,
+              lastActive: null,
+              progress: [],
+            });
+          }
+
+          const student = studentMap.get(studentCode)!;
+
+          // Only process if there's actual progress data
+          if (row.student_id) {
+            const progressItem: ProgressData = {
+              student_id: row.student_id,
+              task_id: row.task_id,
+              task_type: row.task_type,
+              answer: row.answer,
+              ai_feedback: row.ai_feedback,
+              is_correct: row.is_correct,
+              score: row.score,
+              updated_at: row.updated_at,
+            };
+
+            student.progress.push(progressItem);
+
+            if (!student.lastActive || new Date(row.updated_at) > new Date(student.lastActive)) {
+              student.lastActive = row.updated_at;
+            }
+
+            if (row.task_id === "session1_mc" && row.score !== null) {
+              student.session1McScore = row.score;
+            } else if (row.task_id === "session1_writing" && row.ai_feedback) {
+              student.session1WritingDone = true;
+            } else if (row.task_id === "session2_mc" && row.score !== null) {
+              student.session2McScore = row.score;
+            } else if (row.task_id === "session2_writing" && row.ai_feedback) {
+              student.session2WritingDone = true;
+            }
+          }
         });
-      });
 
-      // Process progress data
-      progress.forEach((p) => {
-        const student = studentMap.get(p.student_id);
-        if (student) {
-          student.progress.push(p);
-
-          if (!student.lastActive || new Date(p.updated_at) > new Date(student.lastActive)) {
-            student.lastActive = p.updated_at;
-          }
-
-          if (p.task_id === "session1_mc" && p.score !== null) {
-            student.session1McScore = p.score;
-          } else if (p.task_id === "session1_writing" && p.ai_feedback) {
-            student.session1WritingDone = true;
-          } else if (p.task_id === "session2_mc" && p.score !== null) {
-            student.session2McScore = p.score;
-          } else if (p.task_id === "session2_writing" && p.ai_feedback) {
-            student.session2WritingDone = true;
-          }
-        }
-      });
-
-      setStudents(Array.from(studentMap.values()));
+        setStudents(Array.from(studentMap.values()));
+      }
+    } catch (err) {
+      setError("Failed to load dashboard data.");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    setIsLoading(false);
+  const handleRefresh = () => {
+    if (credentials) {
+      loadDashboardData(credentials.email, credentials.password);
+    }
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -131,27 +191,54 @@ const TeacherDashboard = () => {
             <Lock className="h-5 w-5" />
             Teacher Dashboard
           </CardTitle>
-          <CardDescription>Enter the access code to view student progress</CardDescription>
+          <CardDescription>Sign in with your teacher credentials</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex gap-3">
-            <Input
-              type="password"
-              placeholder="Enter code"
-              value={code}
-              onChange={(e) => {
-                setCode(e.target.value);
-                setError(null);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleLogin();
-              }}
-              className="max-w-40"
-            />
-            <Button onClick={handleLogin}>Access</Button>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium flex items-center gap-1">
+                <Mail className="h-4 w-4" />
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="teacher@mccp.edu.hk"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleLogin();
+                }}
+              />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium flex items-center gap-1">
+                <Lock className="h-4 w-4" />
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleLogin();
+                }}
+              />
+            </div>
+            <Button onClick={handleLogin} className="w-full" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
           </div>
           {error && (
-            <p className="text-sm text-destructive mt-2 flex items-center gap-1">
+            <p className="text-sm text-destructive flex items-center gap-1">
               <AlertCircle className="h-4 w-4" />
               {error}
             </p>
@@ -168,7 +255,7 @@ const TeacherDashboard = () => {
           <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
           <p className="text-muted-foreground">View student progress for Weeks 2-4 tasks</p>
         </div>
-        <Button variant="outline" onClick={loadDashboardData} disabled={isLoading}>
+        <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
           {isLoading ? "Refreshing..." : "Refresh"}
         </Button>
       </div>
