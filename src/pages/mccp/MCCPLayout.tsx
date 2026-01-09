@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronDown, MessageCircle, UserCheck, ClipboardList } from "lucide-react";
+import { Home, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronDown, MessageCircle, UserCheck, ClipboardList, ArrowLeft } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -67,6 +67,18 @@ const MCCPLayout = () => {
                 </div>
               </SidebarGroupLabel>
               <SidebarGroupContent>
+                {/* Back to UPP Home */}
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <Link to="/" className="text-muted-foreground hover:text-foreground">
+                        <ArrowLeft className="h-4 w-4" />
+                        <span>Back to UPP Home</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+                
                 <SidebarMenu>
                   <Collapsible open={scheduleOpen} onOpenChange={setScheduleOpen} className="group/collapsible">
                     <SidebarMenuItem>
