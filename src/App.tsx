@@ -21,6 +21,7 @@ import ResourcesPage from "./pages/mccp/ResourcesPage";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
 import StudentParticipation from "./pages/mccp/StudentParticipation";
 import Week1 from "./pages/mccp/Week1";
+import Week1AIAgent from "./pages/mccp/Week1AIAgent";
 import Weeks2to4 from "./pages/mccp/Weeks2to4";
 import Weeks2to4Tasks from "./pages/mccp/Weeks2to4Tasks";
 import Weeks5to6 from "./pages/mccp/Weeks5to6";
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="feedback" element={<FeedbackPage />} />
             <Route path="participation" element={<StudentParticipation />} />
             <Route path="week1" element={<Week1 />} />
+            <Route path="week1/ai-agent" element={<Week1AIAgent />} />
             <Route path="weeks2-4" element={<Weeks2to4 />} />
             <Route path="weeks2-4/tasks" element={<Weeks2to4Tasks />} />
             <Route path="weeks2-4/dashboard" element={<TeacherDashboard />} />
