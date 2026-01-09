@@ -30,6 +30,7 @@ import Week10 from "./pages/mccp/Week10";
 import Weeks11to12 from "./pages/mccp/Weeks11to12";
 import Week13 from "./pages/mccp/Week13";
 import TeacherDashboard from "./components/mccp/TeacherDashboard";
+import AssessmentPage from "./pages/mccp/AssessmentPage";
 
 import NotFound from "./pages/NotFound";
 
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="week10" element={<Week10 />} />
             <Route path="weeks11-12" element={<Weeks11to12 />} />
             <Route path="week13" element={<Week13 />} />
+            <Route path="assessment" element={<AssessmentPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
