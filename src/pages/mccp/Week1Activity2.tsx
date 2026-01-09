@@ -142,17 +142,12 @@ const Week1Activity2 = () => {
               <pre className="bg-background p-3 rounded border text-xs overflow-x-auto">
 {`activity-1.2/
 ├── input/
-│   ├── sample-paper.md       # One published paper (machine readable)
-│   ├── human-notes.md        # Your notes on macro structure & questions
-│   └── papers/               # Additional papers for AI analysis
-│       ├── paper-1.md
-│       ├── paper-2.html
-│       └── paper-3.tex
-├── instructions.md           # Analysis instructions for AI
+│   ├── keller.md            # The research paper (e.g., Keller CVPR 2024)
+│   └── macro-framework.md   # Annotation framework and guidance
+├── instructions.md          # Analysis instructions for AI
 └── output/
-    ├── annotated-papers/     # AI-annotated papers
-    ├── visualizations/       # Structure diagrams
-    └── writing-notes.md      # Insights for future writing`}
+    ├── KellerInsights.md    # AI-generated analysis of specific features
+    └── visualSample.html    # Interactive visualization of structure`}
               </pre>
             </div>
           </div>
@@ -165,13 +160,13 @@ const Week1Activity2 = () => {
             </h4>
             <div className="ml-6 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
               <p>Your <code className="bg-background px-1 rounded">instructions.md</code> should include:</p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Review and critically enhance the human-written notes</li>
-                <li>Identify gaps or additional insights in the human analysis</li>
-                <li>Apply the same annotation strategy to additional papers</li>
-                <li>Generate structure visualizations (e.g., Mermaid diagrams)</li>
-                <li>Compile actionable writing notes for future reference</li>
-              </ul>
+              <div className="bg-background p-3 rounded border text-xs font-mono whitespace-pre-wrap">
+{`Task: Annotate and analyze the paper using the provided framework.
+Goal: Learn from the paper's structure to inform future writing through imitation.
+Output:
+1. KellerInsights.md: Notes on specific features with section/subsection references and excerpts.
+2. visualSample.html: A visualization of the macro-level structure.`}
+              </div>
             </div>
           </div>
 

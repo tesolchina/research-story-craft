@@ -179,17 +179,31 @@ const Week1 = () => {
         {/* AI Agent Sub-page Link */}
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3">
                 <Bot className="h-8 w-8 text-primary" />
                 <div>
-                  <h3 className="font-bold">AI Agent Setup & Tools</h3>
-                  <p className="text-sm text-muted-foreground">Set up your AI IDE and get the course materials</p>
+                  <h3 className="font-bold text-lg">AI-Assisted Activities</h3>
+                  <p className="text-sm text-muted-foreground">Complete these activities using your AI Agent in IDE</p>
                 </div>
               </div>
-              <Button asChild>
+              <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/mccp/week1/activity-1">Activity 1.1</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/mccp/week1/activity-2">Activity 1.2</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/mccp/week1/activity-3">Activity 1.3</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/mccp/week1/activity-4">Activity 1.4</Link>
+                </Button>
+              </div>
+              <Button asChild className="w-full md:w-auto">
                 <Link to="/mccp/week1/ai-agent">
-                  Get Started →
+                  Setup Guide →
                 </Link>
               </Button>
             </div>
