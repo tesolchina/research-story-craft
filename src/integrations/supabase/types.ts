@@ -133,12 +133,55 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_credentials: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          password_hash: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          password_hash: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          password_hash?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_teacher_dashboard_data: {
+        Args: { p_email: string; p_password: string }
+        Returns: {
+          ai_feedback: string
+          answer: Json
+          is_correct: boolean
+          last_4_digits: string
+          pseudonym: string
+          score: number
+          student_id: string
+          task_id: string
+          task_type: string
+          updated_at: string
+        }[]
+      }
+      is_valid_student_code: {
+        Args: { p_student_code: string }
+        Returns: boolean
+      }
+      verify_teacher_login: {
+        Args: { p_email: string; p_password: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

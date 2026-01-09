@@ -70,6 +70,7 @@ const WritingTask = ({
           text: text.trim(),
           taskType,
           taskContext: context,
+          studentId,
         },
       });
 

@@ -1,10 +1,16 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation
+const ALLOWED_TASK_TYPES = ['centrality_statement', 'paraphrase'];
+const MIN_TEXT_LENGTH = 10;
+const MAX_TEXT_LENGTH = 5000;
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -13,18 +19,89 @@ serve(async (req) => {
   }
 
   try {
-    const { text, taskType, taskContext } = await req.json();
+    const { text, taskType, taskContext, studentId } = await req.json();
 
-    if (!text || !taskType) {
+    // Validate required fields
+    if (!text || typeof text !== 'string') {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: text and taskType' }),
+        JSON.stringify({ error: 'Missing or invalid required field: text' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    if (!taskType || typeof taskType !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Missing or invalid required field: taskType' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate text length
+    const trimmedText = text.trim();
+    if (trimmedText.length < MIN_TEXT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `Text must be at least ${MIN_TEXT_LENGTH} characters` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (trimmedText.length > MAX_TEXT_LENGTH) {
+      return new Response(
+        JSON.stringify({ error: `Text must be no more than ${MAX_TEXT_LENGTH} characters` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate taskType is in allowed list
+    if (!ALLOWED_TASK_TYPES.includes(taskType)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid task type. Must be one of: ' + ALLOWED_TASK_TYPES.join(', ') }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate studentId if provided (for rate limiting)
+    if (studentId) {
+      // Create Supabase client for validation
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      // Validate student exists
+      const { data: studentExists, error: studentError } = await supabase.rpc('is_valid_student_code', {
+        p_student_code: studentId
+      });
+
+      if (studentError || !studentExists) {
+        console.log('Invalid student code attempted:', studentId);
+        return new Response(
+          JSON.stringify({ error: 'Invalid student code' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Rate limiting: Check recent feedback requests for this student
+      const { count, error: countError } = await supabase
+        .from('students_progress')
+        .select('*', { count: 'exact', head: true })
+        .eq('student_id', studentId)
+        .eq('task_type', 'writing')
+        .not('ai_feedback', 'is', null)
+        .gte('updated_at', new Date(Date.now() - 60000).toISOString()); // Last minute
+
+      if (!countError && count !== null && count >= 5) {
+        console.log('Rate limit exceeded for student:', studentId);
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment before submitting again.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not set');
+      console.error('LOVABLE_API_KEY is not set');
+      throw new Error('Server configuration error');
     }
 
     let systemPrompt = '';
@@ -68,11 +145,14 @@ Keep feedback encouraging but specific. Use simple language suitable for non-nat
       systemPrompt = `You are an academic writing tutor. Provide constructive feedback on the student's writing, focusing on clarity, academic voice, and structure. Be encouraging but specific.`;
     }
 
-    const userPrompt = taskContext 
-      ? `Context: ${taskContext}\n\nStudent's writing:\n"${text}"\n\nPlease provide detailed feedback.`
-      : `Student's writing:\n"${text}"\n\nPlease provide detailed feedback.`;
+    // Sanitize taskContext if provided
+    const sanitizedContext = taskContext ? String(taskContext).slice(0, 2000) : undefined;
+    
+    const userPrompt = sanitizedContext 
+      ? `Context: ${sanitizedContext}\n\nStudent's writing:\n"${trimmedText}"\n\nPlease provide detailed feedback.`
+      : `Student's writing:\n"${trimmedText}"\n\nPlease provide detailed feedback.`;
 
-    console.log('Sending request to Lovable AI Gateway...');
+    console.log('Processing feedback request for taskType:', taskType, 'textLength:', trimmedText.length);
     
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -92,8 +172,8 @@ Keep feedback encouraging but specific. Use simple language suitable for non-nat
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('AI Gateway error:', errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      console.error('AI Gateway error:', response.status, errorText);
+      throw new Error('AI service temporarily unavailable');
     }
 
     const data = await response.json();
@@ -107,9 +187,9 @@ Keep feedback encouraging but specific. Use simple language suitable for non-nat
     );
   } catch (error: unknown) {
     console.error('Error in generate-writing-feedback:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    // Return generic error message to client
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'An error occurred while generating feedback. Please try again.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
