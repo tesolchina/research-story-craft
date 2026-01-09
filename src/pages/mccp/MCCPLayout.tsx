@@ -27,8 +27,8 @@ const weeklySchedule = [
     subItems: [
       { id: "week1-activity1", label: "Activity 1.1: Mapping Learning", path: "/mccp/week1/activity-1" },
       { id: "week1-activity2", label: "Activity 1.2: Macro Structure", path: "/mccp/week1/activity-2" },
-      { id: "week1-activity3", label: "Activity 1.3: Micro Structure", path: "/mccp/week1/activity-3" },
-      { id: "week1-activity4", label: "Activity 1.4: Language Features", path: "/mccp/week1/activity-4" },
+      { id: "week1-activity3", label: "Activity 1.3: Review AI Results", path: "/mccp/week1/activity-3" },
+      { id: "week1-activity4", label: "Activity 1.4: More Activity Ideas", path: "/mccp/week1/activity-4" },
       { id: "week1-ai", label: "AI Agent Setup", path: "/mccp/week1/ai-agent" }
     ]
   },
