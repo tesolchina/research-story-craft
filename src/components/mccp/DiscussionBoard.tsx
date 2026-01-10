@@ -18,10 +18,6 @@ interface Discussion {
   created_at: string;
 }
 
-interface Student {
-  student_code: string;
-  name: string;
-}
 
 interface DiscussionBoardProps {
   sectionId: string;
@@ -42,29 +38,42 @@ const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: Discussion
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  // Load discussions and student names when opened
+  // Load discussions when opened
   useEffect(() => {
     if (isOpen) {
       loadDiscussions();
-      loadStudents();
     }
   }, [isOpen, sectionId]);
 
-  const loadStudents = async () => {
+  // Load student names when discussions change
+  useEffect(() => {
+    if (discussions.length > 0) {
+      const studentIds = [...new Set(discussions.map((d) => d.student_id))];
+      const unknownIds = studentIds.filter((id) => !students[id] && id !== TEACHER_CODE);
+      if (unknownIds.length > 0) {
+        loadStudentNames(unknownIds);
+      }
+    }
+  }, [discussions]);
+
+  const loadStudentNames = async (studentIds: string[]) => {
+    if (studentIds.length === 0) return;
+    
     try {
-      const { data, error } = await supabase
-        .from("students")
-        .select("student_code, name");
+      // Use secure RPC to fetch only needed student names
+      const { data, error } = await supabase.rpc("get_student_names_for_discussions", {
+        p_student_ids: studentIds,
+      });
 
       if (error) throw error;
       
-      const studentMap: Record<string, string> = {};
-      data?.forEach((s: Student) => {
+      const studentMap: Record<string, string> = { ...students };
+      data?.forEach((s: { student_code: string; name: string }) => {
         studentMap[s.student_code] = s.name;
       });
       setStudents(studentMap);
     } catch (error) {
-      console.error("Error loading students:", error);
+      console.error("Error loading student names:", error);
     }
   };
 
