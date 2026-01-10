@@ -3,27 +3,55 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QrCode, ExternalLink, Video } from "lucide-react";
+import { QrCode, ExternalLink, Video, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Zhou = () => {
   const [showQR, setShowQR] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [password, setPassword] = useState("");
   const [isVideoUnlocked, setIsVideoUnlocked] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   
   const qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://ERPP.hkbu.me/zhou";
   const slideUrl = "https://docs.google.com/presentation/d/1GzStRmUkK-gz9m5f5Xge3rr1K0PPWn4QaVJdyyJN_1k/edit";
-  const zoomVideoUrl = "https://hkbu.zoom.us/rec/play/4fPUp7FaEK0od8d5cft5TrteM-YvyodWi5_3KkvXFNMngu5yJzw2zwV2optxd8NpGz3jOVbTHBLM6qAY.PsbJUaIDggJvu402";
   
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "zhou2025!") {
-      setIsVideoUnlocked(true);
-      toast.success("Access granted!");
-    } else {
-      toast.error("Incorrect password");
+    
+    if (!password.trim()) {
+      toast.error("Please enter a password");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-zhou-access', {
+        body: { password }
+      });
+      
+      if (error) {
+        console.error('Error verifying password:', error);
+        toast.error("Incorrect password");
+        return;
+      }
+      
+      if (data?.success && data?.videoUrl) {
+        setVideoUrl(data.videoUrl);
+        setIsVideoUnlocked(true);
+        toast.success("Access granted!");
+      } else {
+        toast.error("Incorrect password");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to verify password");
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -93,29 +121,41 @@ const Zhou = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Password"
+                      disabled={isLoading}
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Unlock Video
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      "Unlock Video"
+                    )}
                   </Button>
                 </form>
               ) : (
                 <div className="space-y-2">
                   <p className="text-sm font-medium">Zoom Recording</p>
-                  <iframe
-                    src={zoomVideoUrl}
-                    className="w-full h-48"
-                    allowFullScreen
-                    title="Zoom Recording"
-                  />
-                  <Button
-                    onClick={() => window.open(zoomVideoUrl, '_blank')}
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                  >
-                    Open in New Window
-                  </Button>
+                  {videoUrl && (
+                    <>
+                      <iframe
+                        src={videoUrl}
+                        className="w-full h-48"
+                        allowFullScreen
+                        title="Zoom Recording"
+                      />
+                      <Button
+                        onClick={() => window.open(videoUrl, '_blank')}
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                      >
+                        Open in New Window
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
             </Card>
