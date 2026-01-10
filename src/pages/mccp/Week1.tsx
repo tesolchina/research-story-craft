@@ -9,17 +9,76 @@ import {
   Bot,
   ChevronDown,
   MessageCircle,
-  ExternalLink
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 // Slide images
+import slideErpp from "@/assets/opening-slide-0-erpp.png";
 import slideSlm from "@/assets/opening-slide-1-slm.png";
 import slideCollab from "@/assets/opening-slide-2-collab.png";
 import slideLiterature from "@/assets/opening-slide-3-literature.png";
 import slideFuture from "@/assets/opening-slide-4-future.png";
+
+// Slide data for carousel
+const openingSlides = [
+  {
+    image: slideErpp,
+    title: "ERPP: Do You Still Need Me?",
+    bullets: [
+      "English for Research Publication Purposes",
+      "Years of helping PhD students publish papers",
+      "Editing, polishing, structuring manuscripts",
+      "But now with AI... do you still need a human editor?"
+    ],
+    link: { label: "Read: Author's Editor (2016)", href: "#" }
+  },
+  {
+    image: slideSlm,
+    title: 'Teacher as "Small LM"',
+    bullets: [
+      "Human teachers = small language models",
+      "Built from decades of language exposure",
+      "AI can now polish writing & analyze texts",
+      "So what's the teacher's new role?"
+    ]
+  },
+  {
+    image: slideCollab,
+    title: "Human + AI Partnership",
+    bullets: [
+      "Work together, not compete",
+      "Learn AI techniques you don't know yet",
+      "Small group meetings (1 hr each)",
+      "Please show up — I want to know you!"
+    ]
+  },
+  {
+    image: slideLiterature,
+    title: "Nature Column (2019) Revisited",
+    bullets: [
+      "Manage literature — Zotero, Mendeley",
+      "Consult teachers → Train AI to teach",
+      "Learn from texts — \"textual mentors\"",
+      "Use API, not copy-paste to ChatGPT"
+    ],
+    link: { label: "Read the Nature article", href: "#" }
+  },
+  {
+    image: slideFuture,
+    title: "Looking Ahead",
+    bullets: [
+      "Am I losing my job? Probably not me...",
+      "But some colleagues? Not so sure",
+      "Focus: human + AI working together",
+      "Make your academic journey effective"
+    ]
+  }
+];
 
 interface CollapsibleModuleProps {
   title: string;
@@ -65,6 +124,17 @@ const ciloData = [
 ];
 
 const Week1 = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % openingSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + openingSlides.length) % openingSlides.length);
+  };
+
+  const currentSlideData = openingSlides[currentSlide];
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -89,65 +159,74 @@ const Week1 = () => {
           icon={<MessageCircle className="h-5 w-5 text-primary" />}
           defaultOpen={false}
         >
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Slide 1: Small vs Large LM */}
+          {/* Slide Carousel */}
+          <div className="relative">
             <div className="rounded-lg overflow-hidden border bg-card">
-              <img src={slideSlm} alt="Teacher as Small Language Model" className="w-full h-32 object-cover" />
-              <div className="p-3">
-                <h4 className="font-semibold text-sm mb-2">Teacher as "Small LM"</h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Human teachers = small language models</li>
-                  <li>• Built from decades of language exposure</li>
-                  <li>• AI can now polish writing & analyze texts</li>
-                  <li>• So what's the teacher's new role?</li>
+              <img 
+                src={currentSlideData.image} 
+                alt={currentSlideData.title} 
+                className="w-full h-48 md:h-64 object-cover"
+              />
+              <div className="p-4 md:p-6">
+                <h4 className="font-semibold text-lg mb-3">{currentSlideData.title}</h4>
+                <ul className="text-sm text-muted-foreground space-y-2">
+                  {currentSlideData.bullets.map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
                 </ul>
+                {currentSlideData.link && (
+                  <a 
+                    href={currentSlideData.link.href} 
+                    className="inline-flex items-center gap-1 text-sm text-primary mt-4 hover:underline"
+                  >
+                    <ExternalLink className="h-4 w-4" /> {currentSlideData.link.label}
+                  </a>
+                )}
               </div>
             </div>
 
-            {/* Slide 2: Human + AI Collaboration */}
-            <div className="rounded-lg overflow-hidden border bg-card">
-              <img src={slideCollab} alt="Human AI Collaboration" className="w-full h-32 object-cover" />
-              <div className="p-3">
-                <h4 className="font-semibold text-sm mb-2">Human + AI Partnership</h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Work together, not compete</li>
-                  <li>• Learn AI techniques you don't know yet</li>
-                  <li>• Small group meetings (1 hr each)</li>
-                  <li>• Please show up — I want to know you!</li>
-                </ul>
+            {/* Navigation Controls */}
+            <div className="flex items-center justify-between mt-4">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={prevSlide}
+                className="flex items-center gap-1"
+              >
+                <ChevronLeft className="h-4 w-4" /> Previous
+              </Button>
+              
+              {/* Slide Indicators */}
+              <div className="flex items-center gap-2">
+                {openingSlides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                      idx === currentSlide ? "bg-primary" : "bg-muted-foreground/30"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
               </div>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={nextSlide}
+                className="flex items-center gap-1"
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
 
-            {/* Slide 3: Nature Career Article */}
-            <div className="rounded-lg overflow-hidden border bg-card">
-              <img src={slideLiterature} alt="Literature Management" className="w-full h-32 object-cover" />
-              <div className="p-3">
-                <h4 className="font-semibold text-sm mb-2">Nature Column (2019) Revisited</h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• <strong>Manage literature</strong> — Zotero, Mendeley</li>
-                  <li>• <strong>Consult teachers</strong> → Train AI to teach</li>
-                  <li>• <strong>Learn from texts</strong> — "textual mentors"</li>
-                  <li>• Use API, not copy-paste to ChatGPT</li>
-                </ul>
-                <a href="#" className="inline-flex items-center gap-1 text-xs text-primary mt-2 hover:underline">
-                  <ExternalLink className="h-3 w-3" /> Read the article
-                </a>
-              </div>
-            </div>
-
-            {/* Slide 4: Looking Ahead */}
-            <div className="rounded-lg overflow-hidden border bg-card">
-              <img src={slideFuture} alt="Future of Teaching" className="w-full h-32 object-cover" />
-              <div className="p-3">
-                <h4 className="font-semibold text-sm mb-2">Looking Ahead</h4>
-                <ul className="text-xs text-muted-foreground space-y-1">
-                  <li>• Am I losing my job? Probably not me...</li>
-                  <li>• But some colleagues? Not so sure</li>
-                  <li>• Focus: human + AI working together</li>
-                  <li>• Make your academic journey effective</li>
-                </ul>
-              </div>
-            </div>
+            {/* Slide Counter */}
+            <p className="text-center text-xs text-muted-foreground mt-2">
+              Slide {currentSlide + 1} of {openingSlides.length}
+            </p>
           </div>
 
           {/* Quick Discussion Prompt */}
