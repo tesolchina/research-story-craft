@@ -166,22 +166,22 @@ const Week1 = () => {
             
             {/* QR Code Popup */}
             {showQR && (
-              <div className="absolute right-0 top-full mt-2 z-50 bg-white p-4 rounded-lg shadow-lg border">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pageUrl)}`}
-                  alt="QR Code for this page"
-                  className="w-[150px] h-[150px]"
-                />
-                <p className="text-xs text-center text-muted-foreground mt-2 max-w-[150px] break-all">
+              <div className="absolute right-0 top-full mt-2 z-50 bg-white p-4 rounded-lg shadow-lg border min-w-[180px]">
+                <div className="flex justify-center">
+                  <img 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pageUrl)}`}
+                    alt="QR Code for this page"
+                    width={150}
+                    height={150}
+                    style={{ width: 150, height: 150, minWidth: 150, minHeight: 150 }}
+                  />
+                </div>
+                <p className="text-xs text-center text-muted-foreground mt-2 break-all">
                   {pageUrl}
                 </p>
               </div>
             )}
           </div>
-        </div>
-        <div className="mb-6">
-          <p className="text-sm text-muted-foreground">Week 1</p>
-          <h1 className="text-2xl font-bold">Course Introduction</h1>
         </div>
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">Week 1</p>
