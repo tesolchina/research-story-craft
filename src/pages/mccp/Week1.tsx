@@ -11,7 +11,9 @@ import {
   MessageCircle,
   ExternalLink,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  QrCode,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +37,7 @@ const openingSlides = [
       "Editing, polishing, structuring manuscripts",
       "But now with AI... do you still need a human editor?"
     ],
-    link: { label: "Read: Author's Editor (2016)", href: "#" }
+    link: { label: "Read: Flowerdew & Wang (2016)", href: "https://www.sciencedirect.com/science/article/abs/pii/S1060374316300091" }
   },
   {
     image: slideSlm,
@@ -125,6 +127,9 @@ const ciloData = [
 
 const Week1 = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showQR, setShowQR] = useState(false);
+
+  const pageUrl = "https://erpp.hkbu.me/mccp/week1";
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % openingSlides.length);
@@ -138,14 +143,45 @@ const Week1 = () => {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        {/* Header with QR Toggle */}
+        <div className="flex items-center justify-between mb-6">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/mccp" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
               <span>ERPP Home</span>
             </Link>
           </Button>
+          
+          {/* QR Code Toggle Button */}
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowQR(!showQR)}
+              className="flex items-center gap-2"
+            >
+              {showQR ? <X className="h-4 w-4" /> : <QrCode className="h-4 w-4" />}
+              <span className="hidden sm:inline">{showQR ? "Close" : "QR Code"}</span>
+            </Button>
+            
+            {/* QR Code Popup */}
+            {showQR && (
+              <div className="absolute right-0 top-full mt-2 z-50 bg-white p-4 rounded-lg shadow-lg border">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(pageUrl)}`}
+                  alt="QR Code for this page"
+                  className="w-[150px] h-[150px]"
+                />
+                <p className="text-xs text-center text-muted-foreground mt-2 max-w-[150px] break-all">
+                  {pageUrl}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="mb-6">
+          <p className="text-sm text-muted-foreground">Week 1</p>
+          <h1 className="text-2xl font-bold">Course Introduction</h1>
         </div>
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">Week 1</p>
