@@ -52,6 +52,27 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          attempted_at: string
+          email: string
+          id: string
+          success: boolean
+        }
+        Insert: {
+          attempted_at?: string
+          email: string
+          id?: string
+          success?: boolean
+        }
+        Update: {
+          attempted_at?: string
+          email?: string
+          id?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       student_pseudonyms: {
         Row: {
           created_at: string
@@ -159,6 +180,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_student_names_for_discussions: {
+        Args: { p_student_ids: string[] }
+        Returns: {
+          name: string
+          student_code: string
+        }[]
+      }
       get_teacher_dashboard_data: {
         Args: { p_email: string; p_password: string }
         Returns: {
