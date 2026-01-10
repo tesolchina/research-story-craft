@@ -167,11 +167,11 @@ const DiscussionBoard = ({ sectionId, sectionTitle, className = "" }: Discussion
   };
 
   const handleDelete = async (discussionId: string, posterStudentId: string) => {
-    // Only allow deletion if the current studentId matches
-    if (studentId !== posterStudentId && studentId !== TEACHER_CODE) {
+    // Only teacher can delete messages (enforced by RLS policy)
+    if (studentId !== TEACHER_CODE) {
       toast({
         title: "Cannot delete",
-        description: "You can only delete your own messages",
+        description: "Only the instructor can delete messages",
         variant: "destructive",
       });
       return;

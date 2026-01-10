@@ -2,3 +2,6 @@ project_id = "qafryipdswggvykqampf"
 
 [functions.generate-writing-feedback]
 verify_jwt = false
+
+[functions.verify-zhou-access]
+verify_jwt = false
