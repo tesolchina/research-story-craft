@@ -61,14 +61,14 @@ const openingSlides = [
   },
   {
     image: slideLiterature,
-    title: "Nature Column (2019) Revisited",
+    title: "Nature Career Column (2019) Revisited",
     bullets: [
       "Manage literature — Zotero, Mendeley",
       "Consult teachers → Train AI to teach",
       "Learn from texts — \"textual mentors\"",
       "Use API, not copy-paste to ChatGPT"
     ],
-    link: { label: "Read the Nature article", href: "#" }
+    link: { label: "Read the Nature Career Column", href: "https://www.nature.com/articles/d41586-019-00359-8" }
   },
   {
     image: slideFuture,
