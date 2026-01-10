@@ -9,15 +9,17 @@ import {
   Bot,
   ChevronDown,
   MessageCircle,
-  Brain,
-  Users,
-  Lightbulb,
-  BookMarked,
   ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
+// Slide images
+import slideSlm from "@/assets/opening-slide-1-slm.png";
+import slideCollab from "@/assets/opening-slide-2-collab.png";
+import slideLiterature from "@/assets/opening-slide-3-literature.png";
+import slideFuture from "@/assets/opening-slide-4-future.png";
 
 interface CollapsibleModuleProps {
   title: string;
@@ -68,15 +70,16 @@ const Week1 = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link to="/mccp">
-              <ArrowLeft className="h-5 w-5" />
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/mccp" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>ERPP Home</span>
             </Link>
           </Button>
-          <div>
-            <p className="text-sm text-muted-foreground">Week 1</p>
-            <h1 className="text-2xl font-bold">Course Introduction</h1>
-          </div>
+        </div>
+        <div className="mb-6">
+          <p className="text-sm text-muted-foreground">Week 1</p>
+          <h1 className="text-2xl font-bold">Course Introduction</h1>
         </div>
 
         {/* Opening Remarks Module */}
@@ -86,110 +89,73 @@ const Week1 = () => {
           icon={<MessageCircle className="h-5 w-5 text-primary" />}
           defaultOpen={false}
         >
-          <div className="space-y-6">
-            {/* Point 1: Small vs Large Language Model */}
-            <div className="p-4 rounded-lg border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/50">
-                  <Brain className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">The Teacher as a "Small Language Model"</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Compared to Large Language Models, a language teacher is more like a <span className="font-medium text-foreground">small language model</span> — or even a tiny one. 
-                    Through decades of education and exposure, we develop proficiency by building our own internal "corpus" of language patterns.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    But now that LLMs are available, do you still need a human teacher? If you want to polish writing or analyze article structure, 
-                    AI can help. So what's the teacher's role?
-                  </p>
-                </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Slide 1: Small vs Large LM */}
+            <div className="rounded-lg overflow-hidden border bg-card">
+              <img src={slideSlm} alt="Teacher as Small Language Model" className="w-full h-32 object-cover" />
+              <div className="p-3">
+                <h4 className="font-semibold text-sm mb-2">Teacher as "Small LM"</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Human teachers = small language models</li>
+                  <li>• Built from decades of language exposure</li>
+                  <li>• AI can now polish writing & analyze texts</li>
+                  <li>• So what's the teacher's new role?</li>
+                </ul>
               </div>
             </div>
 
-            {/* Point 2: Working Together with AI */}
-            <div className="p-4 rounded-lg border bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-emerald-100 dark:bg-emerald-900/50">
-                  <Users className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-2">Human + AI Collaboration</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    The answer is <span className="font-medium text-foreground">partnership</span>. I acknowledge the power of AI, but perhaps I can show you 
-                    ways of using AI that you don't know yet, or help improve your workflow.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Honestly, I don't need 24 hours to lecture — which is why this course uses <span className="font-medium text-foreground">modules and small group meetings</span>. 
-                    Starting next week, you'll meet in smaller groups (1 hour each) for a more personalized experience. 
-                    <span className="font-medium text-primary"> Please show up — I really want to get to know you!</span>
-                  </p>
-                </div>
+            {/* Slide 2: Human + AI Collaboration */}
+            <div className="rounded-lg overflow-hidden border bg-card">
+              <img src={slideCollab} alt="Human AI Collaboration" className="w-full h-32 object-cover" />
+              <div className="p-3">
+                <h4 className="font-semibold text-sm mb-2">Human + AI Partnership</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Work together, not compete</li>
+                  <li>• Learn AI techniques you don't know yet</li>
+                  <li>• Small group meetings (1 hr each)</li>
+                  <li>• Please show up — I want to know you!</li>
+                </ul>
               </div>
             </div>
 
-            {/* Point 3: Revisiting the Nature Career Article */}
-            <div className="p-4 rounded-lg border bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
-                  <BookMarked className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">Revisiting the 2019 Nature Career Column</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Seven years ago, I published a column in <span className="italic">Nature</span> about academic writing strategies. 
-                    The points are still relevant — but now with AI, they take on new meaning:
-                  </p>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 font-bold">1.</span>
-                      <span><span className="font-medium text-foreground">Manage your literature</span> — using Zotero, Mendeley, or other tools. With AI, this is even more important: to partner with AI, you need to give it your materials and database.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 font-bold">2.</span>
-                      <span><span className="font-medium text-foreground">Consult language teachers</span> — but now we can turn human teaching into AI teaching. If I identify something helpful, I can teach AI to teach you more efficiently.</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 font-bold">3.</span>
-                      <span><span className="font-medium text-foreground">Learn from published articles</span> — treat texts as "textual mentors." Use AI to analyze structure, word choice, and patterns — but via API, not copy-paste to ChatGPT!</span>
-                    </li>
-                  </ul>
-                  <div className="mt-4 p-3 rounded bg-amber-100/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                    <p className="text-xs text-amber-800 dark:text-amber-200 flex items-center gap-2">
-                      <ExternalLink className="h-3 w-3" />
-                      <a href="#" className="underline hover:no-underline">Read the Nature Career Column (2019)</a>
-                      <span className="text-amber-600">— Link placeholder</span>
-                    </p>
-                  </div>
-                </div>
+            {/* Slide 3: Nature Career Article */}
+            <div className="rounded-lg overflow-hidden border bg-card">
+              <img src={slideLiterature} alt="Literature Management" className="w-full h-32 object-cover" />
+              <div className="p-3">
+                <h4 className="font-semibold text-sm mb-2">Nature Column (2019) Revisited</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• <strong>Manage literature</strong> — Zotero, Mendeley</li>
+                  <li>• <strong>Consult teachers</strong> → Train AI to teach</li>
+                  <li>• <strong>Learn from texts</strong> — "textual mentors"</li>
+                  <li>• Use API, not copy-paste to ChatGPT</li>
+                </ul>
+                <a href="#" className="inline-flex items-center gap-1 text-xs text-primary mt-2 hover:underline">
+                  <ExternalLink className="h-3 w-3" /> Read the article
+                </a>
               </div>
             </div>
 
-            {/* Point 4: The Bigger Picture */}
-            <div className="p-4 rounded-lg border bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-purple-100 dark:bg-purple-900/50">
-                  <Lightbulb className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">A Note on the Future</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Am I losing my job? Honestly, I don't think <span className="italic">I</span> will — but some of my colleagues? I'm not so sure. 
-                    That's a discussion for another time. For now, let's focus on how we can work <span className="font-medium text-foreground">together</span> — 
-                    human intelligence and artificial intelligence — to make your academic journey more effective.
-                  </p>
-                </div>
+            {/* Slide 4: Looking Ahead */}
+            <div className="rounded-lg overflow-hidden border bg-card">
+              <img src={slideFuture} alt="Future of Teaching" className="w-full h-32 object-cover" />
+              <div className="p-3">
+                <h4 className="font-semibold text-sm mb-2">Looking Ahead</h4>
+                <ul className="text-xs text-muted-foreground space-y-1">
+                  <li>• Am I losing my job? Probably not me...</li>
+                  <li>• But some colleagues? Not so sure</li>
+                  <li>• Focus: human + AI working together</li>
+                  <li>• Make your academic journey effective</li>
+                </ul>
               </div>
             </div>
+          </div>
 
-            {/* Quick Discussion Prompt */}
-            <div className="p-4 rounded-lg bg-muted/50 border-l-4 border-l-primary">
-              <h4 className="font-semibold mb-2">💭 Quick Reflection</h4>
-              <p className="text-sm text-muted-foreground">
-                How do <span className="font-medium text-foreground">you</span> currently manage your literature? Do you use Zotero, Mendeley, or something else? 
-                Or do you just save files in folders? Let's discuss how AI might change your workflow.
-              </p>
-            </div>
+          {/* Quick Discussion Prompt */}
+          <div className="p-4 rounded-lg bg-muted/50 border-l-4 border-l-primary mt-4">
+            <h4 className="font-semibold text-sm mb-1">💭 Quick Reflection</h4>
+            <p className="text-xs text-muted-foreground">
+              How do you manage your literature? Zotero, Mendeley, or just folders? Let's discuss how AI might change your workflow.
+            </p>
           </div>
         </CollapsibleModule>
 
