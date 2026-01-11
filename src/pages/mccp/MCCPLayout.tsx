@@ -85,7 +85,7 @@ const MCCPLayout = () => {
                     <SidebarMenuButton asChild size={isMobile ? "lg" : "default"}>
                       <Link to="/" className="text-muted-foreground hover:text-foreground">
                         <ArrowLeft className={cn(isMobile ? "h-5 w-5" : "h-4 w-4")} />
-                        <span className={cn(isMobile && "text-base")}>Back to UPP Home</span>
+                        <span className={cn(isMobile && "text-base")}>Back to ERPP Home</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

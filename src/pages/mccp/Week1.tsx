@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
-  ArrowLeft, 
   BookOpen, 
   GraduationCap, 
   ClipboardList, 
@@ -144,14 +143,7 @@ const Week1 = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header with QR Toggle */}
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/mccp" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span>ERPP Home</span>
-            </Link>
-          </Button>
-          
+        <div className="flex items-center justify-end mb-6">
           {/* QR Code Toggle Button */}
           <div className="relative">
             <Button 
