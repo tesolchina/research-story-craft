@@ -35,7 +35,7 @@ const weeklySchedule = [
     path: "/mccp/weeks2-4", 
     icon: Users,
     items: [
-      { id: "weeks2-4-writing", label: "Writing Component (Take-home)", path: "/mccp/weeks2-4/writing" }
+      { id: "weeks2-4-writing", label: "Writing Component (Take-home)", path: "/mccp/weeks2-4/writing-materials" }
     ]
   },
   { id: "weeks5-6", label: "Weeks 5-6: Research Paper Presentation", path: "/mccp/weeks5-6", icon: Mic },
