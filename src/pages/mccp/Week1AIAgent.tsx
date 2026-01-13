@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Bot, Monitor, Github, Code, Sparkles } from "lucide-react";
+import { ArrowLeft, Bot, Monitor, Github, Code, Sparkles, FileText, Target, Brain, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -114,6 +114,63 @@ const Week1AIAgent = () => {
                 View Repository on GitHub <Code className="ml-2 h-4 w-4" />
               </a>
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Week 1 Activities */}
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="text-xl">📝</span>
+              <FileText className="h-5 w-5 text-primary" />
+              Week 1 Activities
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              Complete these AI-assisted activities to practice the Input → Process → Output workflow:
+            </p>
+            <div className="grid gap-3">
+              <Link to="/mccp/week1/activity-1" className="block p-4 border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                <div className="flex items-start gap-3">
+                  <Target className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold">Activity 1.1: Mapping Instruction</h4>
+                    <p className="text-sm text-muted-foreground">Create a personalized learning plan with AI by providing your goals and reflections</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/mccp/week1/activity-2" className="block p-4 border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                <div className="flex items-start gap-3">
+                  <Brain className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold">Activity 1.2: Macro-Level Structure Analysis</h4>
+                    <p className="text-sm text-muted-foreground">Analyze published articles for structure and generate notes with HTML visualizations</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/mccp/week1/activity-3" className="block p-4 border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                <div className="flex items-start gap-3">
+                  <Code className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold">Activity 1.3: LLM API Integration</h4>
+                    <p className="text-sm text-muted-foreground">Use HKBU API key to run external AI compute for assessment reports</p>
+                  </div>
+                </div>
+              </Link>
+              
+              <Link to="/mccp/week1/activity-4" className="block p-4 border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold">Activity 1.4: Generate Additional Ideas</h4>
+                    <p className="text-sm text-muted-foreground">Brainstorm additional activity ideas with objectives, I/O, and learning outcomes</p>
+                  </div>
+                </div>
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
