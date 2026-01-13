@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   QrCode,
-  X
+  X,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -265,6 +266,26 @@ const Week1 = () => {
             </p>
           </div>
         </CollapsibleModule>
+
+        {/* Key Points Summary Link */}
+        <Card className="border-amber-200 bg-amber-50/50 overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <FileText className="h-8 w-8 text-amber-600 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-bold text-lg">Week 1 Key Points Summary</h3>
+                <p className="text-sm text-muted-foreground">
+                  A comprehensive summary of the key concepts covered by Dr. Simon Wong in Week 1
+                </p>
+              </div>
+              <Button asChild className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
+                <Link to="/mccp/week1/key-points">
+                  View Summary →
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Module 1: Course Overview (consolidated) */}
         <CollapsibleModule 
