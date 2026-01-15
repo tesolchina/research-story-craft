@@ -2,18 +2,29 @@
  * NeedsAnalysis.tsx
  * 
  * Index page for Needs Analysis / Use Cases Exploration
- * Provides three main pathways:
+ * Provides three main pathways with toggleable content:
  * 1. General Questionnaire - for gathering student needs
  * 2. AI Learning App Template - for testing use cases
  * 3. Collaborative Chat - for student discussions
  */
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ClipboardList, Bot, MessageSquare, Users, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ClipboardList, Bot, MessageSquare, Users, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Module type for type safety
+type ModuleId = "questionnaire" | "ai-template" | "chat" | null;
 
 const NeedsAnalysis = () => {
+  // Track which module is currently expanded (null = none)
+  const [activeModule, setActiveModule] = useState<ModuleId>(null);
+
+  // Toggle handler - closes if same module clicked, opens new one otherwise
+  const handleToggle = (moduleId: ModuleId) => {
+    setActiveModule(prev => prev === moduleId ? null : moduleId);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Page Header */}
@@ -22,128 +33,216 @@ const NeedsAnalysis = () => {
           Needs Analysis & Use Cases Exploration
         </h1>
         <p className="text-muted-foreground text-lg">
-          Explore different pathways to understand your research needs and test AI-assisted learning tools.
+          Click on a card to explore that module. Toggle between different pathways below.
         </p>
       </div>
 
       {/* Feature Cards Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-4 mb-6">
         
         {/* Card 1: General Questionnaire */}
-        <Card className="hover:shadow-lg transition-shadow border-2 hover:border-primary/50">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <ClipboardList className="w-6 h-6 text-primary" />
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all hover:shadow-lg border-2",
+            activeModule === "questionnaire" 
+              ? "border-primary bg-primary/5 shadow-lg" 
+              : "hover:border-primary/50"
+          )}
+          onClick={() => handleToggle("questionnaire")}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-primary" />
+              </div>
+              <ChevronDown className={cn(
+                "w-5 h-5 text-muted-foreground transition-transform",
+                activeModule === "questionnaire" && "rotate-180"
+              )} />
             </div>
-            <CardTitle className="text-xl">General Questionnaire</CardTitle>
-            <CardDescription>
-              Answer questions to help identify your research needs and learning preferences.
+            <CardTitle className="text-lg mt-3">General Questionnaire</CardTitle>
+            <CardDescription className="text-sm">
+              Identify your research needs and learning preferences
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                This questionnaire will help us understand your background, research interests, 
-                and areas where AI tools could assist your academic journey.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-md">
-                <span>📋</span>
-                <span>Questions coming soon</span>
-              </div>
-              <Link to="/mccp/needs-analysis/questionnaire">
-                <Button className="w-full" variant="outline" disabled>
-                  Start Questionnaire
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
         </Card>
 
         {/* Card 2: AI Learning App Template */}
-        <Card className="hover:shadow-lg transition-shadow border-2 hover:border-primary/50">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-lg bg-secondary/50 flex items-center justify-center mb-4">
-              <Bot className="w-6 h-6 text-secondary-foreground" />
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all hover:shadow-lg border-2",
+            activeModule === "ai-template" 
+              ? "border-primary bg-primary/5 shadow-lg" 
+              : "hover:border-primary/50"
+          )}
+          onClick={() => handleToggle("ai-template")}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-secondary-foreground" />
+              </div>
+              <ChevronDown className={cn(
+                "w-5 h-5 text-muted-foreground transition-transform",
+                activeModule === "ai-template" && "rotate-180"
+              )} />
             </div>
-            <CardTitle className="text-xl">AI Learning App Template</CardTitle>
-            <CardDescription>
-              Test and explore AI-powered learning tools with our interactive template.
+            <CardTitle className="text-lg mt-3">AI Learning App Template</CardTitle>
+            <CardDescription className="text-sm">
+              Test AI-powered tools with interactive demos
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Experience a hands-on demo of how AI can enhance your research workflow. 
-                Try different use cases and see AI assistance in action.
-              </p>
-              <ul className="text-sm space-y-1 text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                  Literature review assistance
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                  Writing feedback & suggestions
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                  Research methodology guidance
-                </li>
-              </ul>
-              <Link to="/mccp/needs-analysis/ai-template">
-                <Button className="w-full">
-                  Try AI Template
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
         </Card>
 
         {/* Card 3: Collaborative Chat */}
-        <Card className="hover:shadow-lg transition-shadow border-2 hover:border-primary/50">
-          <CardHeader>
-            <div className="w-12 h-12 rounded-lg bg-accent flex items-center justify-center mb-4">
-              <MessageSquare className="w-6 h-6 text-accent-foreground" />
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all hover:shadow-lg border-2",
+            activeModule === "chat" 
+              ? "border-primary bg-primary/5 shadow-lg" 
+              : "hover:border-primary/50"
+          )}
+          onClick={() => handleToggle("chat")}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-accent-foreground" />
+              </div>
+              <ChevronDown className={cn(
+                "w-5 h-5 text-muted-foreground transition-transform",
+                activeModule === "chat" && "rotate-180"
+              )} />
             </div>
-            <CardTitle className="text-xl">Collaborative Chat</CardTitle>
-            <CardDescription>
-              Start or join a discussion room with fellow students.
+            <CardTitle className="text-lg mt-3">Collaborative Chat</CardTitle>
+            <CardDescription className="text-sm">
+              Start or join discussions with fellow students
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Create a new chat room for collaborative discussions. 
-                Other signed-in students can join your room to share ideas and learn together.
-              </p>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                <Users className="w-4 h-4" />
-                <span>Sign in required to participate</span>
-              </div>
-              <Link to="/mccp/needs-analysis/chat">
-                <Button className="w-full" variant="secondary">
-                  Start New Chat
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
         </Card>
-
       </div>
 
-      {/* Info Section */}
-      <div className="mt-12 p-6 bg-muted/50 rounded-lg border">
-        <h2 className="text-lg font-semibold mb-2">How to Use This Section</h2>
-        <p className="text-muted-foreground">
-          This exploration hub is designed to help you discover how AI tools can support your 
-          research and academic writing. Start with the questionnaire to identify your needs, 
-          then explore the AI template to see practical applications. Use the collaborative 
-          chat to discuss ideas with your peers.
-        </p>
+      {/* Expanded Content Area */}
+      <div className={cn(
+        "transition-all duration-300 overflow-hidden",
+        activeModule ? "opacity-100" : "opacity-0 h-0"
+      )}>
+        {/* Questionnaire Module */}
+        {activeModule === "questionnaire" && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ClipboardList className="w-5 h-5 text-primary" />
+                General Questionnaire
+              </CardTitle>
+              <CardDescription>
+                Answer questions to help identify your research needs and learning preferences.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 text-center">
+                <span className="text-3xl mb-3 block">📋</span>
+                <p className="text-amber-800 dark:text-amber-200 font-medium">
+                  Questionnaire Coming Soon
+                </p>
+                <p className="text-sm text-amber-600 dark:text-amber-300 mt-2">
+                  Questions will be added here to gather information about your research background, 
+                  interests, and areas where AI tools could assist your academic journey.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* AI Template Module */}
+        {activeModule === "ai-template" && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="w-5 h-5 text-primary" />
+                AI Learning App Template
+              </CardTitle>
+              <CardDescription>
+                Experience hands-on demos of how AI can enhance your research workflow.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">📚 Literature Review</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Get AI assistance in summarizing and analyzing research papers.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">✍️ Writing Feedback</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Receive suggestions to improve your academic writing.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h4 className="font-medium mb-2">🔬 Methodology Guide</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Explore research methodology guidance and best practices.
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-muted/30 border rounded-lg p-6 text-center">
+                  <p className="text-muted-foreground">
+                    Interactive AI template interface will be available here.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Collaborative Chat Module */}
+        {activeModule === "chat" && (
+          <Card className="border-2 border-primary/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-primary" />
+                Collaborative Chat
+              </CardTitle>
+              <CardDescription>
+                Create a new chat room or join an existing discussion with classmates.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted p-3 rounded-md">
+                  <Users className="w-4 h-4" />
+                  <span>Sign in required to participate in collaborative chats</span>
+                </div>
+                <div className="bg-muted/30 border rounded-lg p-6 text-center min-h-[200px] flex flex-col items-center justify-center">
+                  <MessageSquare className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground">
+                    Collaborative chat interface will appear here.
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Students can create rooms and invite others to join discussions.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      {/* Info Section - only show when no module is active */}
+      {!activeModule && (
+        <div className="mt-8 p-6 bg-muted/50 rounded-lg border">
+          <h2 className="text-lg font-semibold mb-2">How to Use This Section</h2>
+          <p className="text-muted-foreground">
+            Click on any card above to expand its content. This exploration hub helps you discover 
+            how AI tools can support your research and academic writing. Start with the questionnaire 
+            to identify your needs, explore the AI template for practical applications, or use the 
+            collaborative chat to discuss ideas with peers.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
