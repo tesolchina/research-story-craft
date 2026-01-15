@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Home, Key, BookOpen, GraduationCap, Users, Mic, MessageSquare, Presentation, ChevronDown, MessageCircle, UserCheck, Compass } from "lucide-react";
+import { AuthProvider, UserMenu } from "@/features/auth";
 import {
   Sidebar,
   SidebarContent,
@@ -152,12 +153,15 @@ const MCCPLayout = () => {
         </Sidebar>
 
         <main className="flex-1 overflow-auto">
-          <header className="border-b bg-card px-6 py-4 flex items-center gap-4">
-            <SidebarTrigger />
-            <div>
-              <h1 className="text-xl font-bold text-primary">MCCP 6020: Advanced EAP</h1>
-              <p className="text-sm text-muted-foreground">Dr. Simon Wang • Spring 2026</p>
+          <header className="border-b bg-card px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger />
+              <div>
+                <h1 className="text-xl font-bold text-primary">MCCP 6020: Advanced EAP</h1>
+                <p className="text-sm text-muted-foreground">Dr. Simon Wang • Spring 2026</p>
+              </div>
             </div>
+            <UserMenu />
           </header>
 
           <div className="p-6">
@@ -169,4 +173,10 @@ const MCCPLayout = () => {
   );
 };
 
-export default MCCPLayout;
+const MCCPLayoutWithAuth = () => (
+  <AuthProvider>
+    <MCCPLayout />
+  </AuthProvider>
+);
+
+export default MCCPLayoutWithAuth;
