@@ -20,6 +20,7 @@ import ApiKeyPage from "./pages/mccp/ApiKeyPage";
 import ResourcesPage from "./pages/mccp/ResourcesPage";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
 import StudentParticipation from "./pages/mccp/StudentParticipation";
+import { AuthPage } from "./features/auth";
 import Week1 from "./pages/mccp/Week1";
 import Week1KeyPoints from "./pages/mccp/Week1KeyPoints";
 import Week1AIAgent from "./pages/mccp/Week1AIAgent";
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="week13" element={<Week13 />} />
             <Route path="assessment" element={<AssessmentPage />} />
             <Route path="needs-analysis" element={<NeedsAnalysis />} />
+            <Route path="auth" element={<AuthPage />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
