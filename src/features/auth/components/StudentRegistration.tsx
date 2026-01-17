@@ -183,6 +183,9 @@ export function StudentRegistration({ onComplete, onBack }: StudentRegistrationP
             <p className="text-muted-foreground">
               Enter the first letter of your first and last name
             </p>
+            <p className="text-sm text-muted-foreground italic">
+              Example: If your name is <strong>Yuxing Chen</strong>, enter <strong>Y</strong> and <strong>C</strong>
+            </p>
           </div>
 
           <div className="flex justify-center gap-4">
@@ -194,7 +197,7 @@ export function StudentRegistration({ onComplete, onBack }: StudentRegistrationP
                 value={firstInitial}
                 onChange={(e) => setFirstInitial(e.target.value.replace(/[^a-zA-Z]/g, ''))}
                 className="w-20 text-center text-2xl font-bold uppercase"
-                placeholder="S"
+                placeholder="Y"
               />
             </div>
             <div className="space-y-2">
@@ -205,7 +208,7 @@ export function StudentRegistration({ onComplete, onBack }: StudentRegistrationP
                 value={lastInitial}
                 onChange={(e) => setLastInitial(e.target.value.replace(/[^a-zA-Z]/g, ''))}
                 className="w-20 text-center text-2xl font-bold uppercase"
-                placeholder="W"
+                placeholder="C"
               />
             </div>
           </div>
