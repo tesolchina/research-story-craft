@@ -73,6 +73,45 @@ export type Database = {
         }
         Relationships: []
       }
+      mccp_students: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          first_initial: string
+          id: string
+          last_4_digits: string
+          last_initial: string
+          section: string | null
+          unique_id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          first_initial: string
+          id?: string
+          last_4_digits: string
+          last_initial: string
+          section?: string | null
+          unique_id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          first_initial?: string
+          id?: string
+          last_4_digits?: string
+          last_initial?: string
+          section?: string | null
+          unique_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
