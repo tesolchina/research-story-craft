@@ -2,26 +2,30 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
-type AppRole = 'admin' | 'teacher' | 'student';
+type UserType = 'student' | 'teacher' | null;
 
-interface Profile {
-  id: string;
-  email: string | null;
+interface MCCPStudent {
+  unique_id: string;
   display_name: string | null;
-  created_at: string;
-  updated_at: string;
+  avatar_url: string | null;
+  section: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: Profile | null;
-  roles: AppRole[];
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
-  hasRole: (role: AppRole) => boolean;
+  userType: UserType;
+  studentId: string | null;
+  teacherEmail: string | null;
+  studentData: MCCPStudent | null;
+  loginAsStudent: (uniqueId: string) => Promise<void>;
+  loginAsTeacher: (email: string) => void;
+  signOut: () => void;
+  refreshStudentData: () => Promise<void>;
+  isAuthenticated: boolean;
+  displayName: string;
+  avatarEmoji: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,117 +33,112 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [roles, setRoles] = useState<AppRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userType, setUserType] = useState<UserType>(null);
+  const [studentId, setStudentId] = useState<string | null>(null);
+  const [teacherEmail, setTeacherEmail] = useState<string | null>(null);
+  const [studentData, setStudentData] = useState<MCCPStudent | null>(null);
 
-  const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data as Profile);
+  useEffect(() => {
+    const storedStudentId = localStorage.getItem('mccp_student_id');
+    const storedTeacherEmail = localStorage.getItem('mccp_teacher_email');
+    const storedUserType = localStorage.getItem('mccp_user_type') as UserType;
+    
+    if (storedUserType === 'student' && storedStudentId) {
+      setUserType('student');
+      setStudentId(storedStudentId);
+      fetchStudentData(storedStudentId);
+    } else if (storedUserType === 'teacher' && storedTeacherEmail) {
+      setUserType('teacher');
+      setTeacherEmail(storedTeacherEmail);
     }
-  }, []);
-
-  const fetchRoles = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId);
-
-    if (!error && data) {
-      setRoles(data.map((r) => r.role as AppRole));
-    }
+    
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        // Defer Supabase calls with setTimeout to prevent deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-            fetchRoles(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRoles([]);
-        }
-        
-        setIsLoading(false);
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        fetchProfile(session.user.id);
-        fetchRoles(session.user.id);
-      }
-      
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [fetchProfile, fetchRoles]);
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+  const fetchStudentData = async (uniqueId: string) => {
+    try {
+      const { data, error } = await (supabase
+        .from('mccp_students' as any)
+        .select('unique_id, display_name, avatar_url, section')
+        .eq('unique_id', uniqueId)
+        .single() as any);
+
+      if (!error && data) {
+        setStudentData(data as MCCPStudent);
+      }
+    } catch (err) {
+      console.error('Error fetching student data:', err);
+    }
   };
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `${window.location.origin}/mccp`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          display_name: displayName,
-        },
-      },
-    });
-    return { error };
+  const refreshStudentData = useCallback(async () => {
+    if (studentId) {
+      await fetchStudentData(studentId);
+    }
+  }, [studentId]);
+
+  const loginAsStudent = async (uniqueId: string) => {
+    localStorage.setItem('mccp_student_id', uniqueId);
+    localStorage.setItem('mccp_user_type', 'student');
+    localStorage.removeItem('mccp_teacher_email');
+    setStudentId(uniqueId);
+    setUserType('student');
+    setTeacherEmail(null);
+    await fetchStudentData(uniqueId);
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
-    setRoles([]);
+  const loginAsTeacher = (email: string) => {
+    localStorage.setItem('mccp_teacher_email', email);
+    localStorage.setItem('mccp_user_type', 'teacher');
+    localStorage.removeItem('mccp_student_id');
+    setTeacherEmail(email);
+    setUserType('teacher');
+    setStudentId(null);
+    setStudentData(null);
   };
 
-  const hasRole = (role: AppRole) => roles.includes(role);
+  const signOut = () => {
+    localStorage.removeItem('mccp_student_id');
+    localStorage.removeItem('mccp_teacher_email');
+    localStorage.removeItem('mccp_user_type');
+    setStudentId(null);
+    setTeacherEmail(null);
+    setUserType(null);
+    setStudentData(null);
+    supabase.auth.signOut();
+  };
+
+  const isAuthenticated = userType !== null;
+  const displayName = userType === 'teacher' 
+    ? 'Dr. Simon Wang'
+    : studentData?.display_name || studentId || '';
+  const avatarEmoji = userType === 'teacher'
+    ? '👨‍🏫'
+    : studentData?.avatar_url || '🎓';
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        session,
-        profile,
-        roles,
-        isLoading,
-        signIn,
-        signUp,
-        signOut,
-        hasRole,
+        user, session, isLoading, userType, studentId, teacherEmail, studentData,
+        loginAsStudent, loginAsTeacher, signOut, refreshStudentData,
+        isAuthenticated, displayName, avatarEmoji,
       }}
     >
       {children}

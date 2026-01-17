@@ -2,16 +2,13 @@
  * NeedsAnalysis.tsx
  * 
  * Index page for Needs Analysis / Use Cases Exploration
- * Provides three main pathways with toggleable content:
- * 1. General Questionnaire - for gathering student needs
- * 2. AI Learning App Template - for testing use cases
- * 3. Collaborative Chat - for student discussions
  */
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClipboardList, Bot, MessageSquare, Users, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AIWritingSurvey } from "@/components/mccp/surveys/AIWritingSurvey";
 
 // Module type for type safety
 type ModuleId = "questionnaire" | "ai-template" | "chat" | null;
@@ -129,29 +126,7 @@ const NeedsAnalysis = () => {
       )}>
         {/* Questionnaire Module */}
         {activeModule === "questionnaire" && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-primary" />
-                General Questionnaire
-              </CardTitle>
-              <CardDescription>
-                Answer questions to help identify your research needs and learning preferences.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6 text-center">
-                <span className="text-3xl mb-3 block">📋</span>
-                <p className="text-amber-800 dark:text-amber-200 font-medium">
-                  Questionnaire Coming Soon
-                </p>
-                <p className="text-sm text-amber-600 dark:text-amber-300 mt-2">
-                  Questions will be added here to gather information about your research background, 
-                  interests, and areas where AI tools could assist your academic journey.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <AIWritingSurvey />
         )}
 
         {/* AI Template Module */}
