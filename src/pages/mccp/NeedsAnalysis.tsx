@@ -6,16 +6,20 @@
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ClipboardList, Bot, MessageSquare, Users, ChevronDown } from "lucide-react";
+import { ClipboardList, Bot, MessageSquare, Users, ChevronDown, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIWritingSurvey } from "@/components/mccp/surveys/AIWritingSurvey";
+import { SurveyDashboard } from "@/components/mccp/surveys/SurveyDashboard";
 
 // Module type for type safety
-type ModuleId = "questionnaire" | "ai-template" | "chat" | null;
+type ModuleId = "questionnaire" | "ai-template" | "chat" | "dashboard" | null;
 
 const NeedsAnalysis = () => {
   // Track which module is currently expanded (null = none)
   const [activeModule, setActiveModule] = useState<ModuleId>(null);
+  
+  const userType = localStorage.getItem('mccp_user_type');
+  const isTeacher = userType === 'teacher';
 
   // Toggle handler - closes if same module clicked, opens new one otherwise
   const handleToggle = (moduleId: ModuleId) => {
@@ -33,6 +37,35 @@ const NeedsAnalysis = () => {
           Click on a card to explore that module. Toggle between different pathways below.
         </p>
       </div>
+
+      {/* Teacher Dashboard Card - only visible for teachers */}
+      {isTeacher && (
+        <Card 
+          className={cn(
+            "cursor-pointer transition-all hover:shadow-lg border-2 mb-6",
+            activeModule === "dashboard" 
+              ? "border-primary bg-primary/5 shadow-lg" 
+              : "hover:border-primary/50"
+          )}
+          onClick={() => handleToggle("dashboard")}
+        >
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+              </div>
+              <ChevronDown className={cn(
+                "w-5 h-5 text-muted-foreground transition-transform",
+                activeModule === "dashboard" && "rotate-180"
+              )} />
+            </div>
+            <CardTitle className="text-lg mt-3">📊 Survey Dashboard (Teacher Only)</CardTitle>
+            <CardDescription className="text-sm">
+              View and analyze all student survey responses
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
       {/* Feature Cards Grid */}
       <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -124,6 +157,11 @@ const NeedsAnalysis = () => {
         "transition-all duration-300 overflow-hidden",
         activeModule ? "opacity-100" : "opacity-0 h-0"
       )}>
+        {/* Teacher Dashboard */}
+        {activeModule === "dashboard" && isTeacher && (
+          <SurveyDashboard />
+        )}
+
         {/* Questionnaire Module */}
         {activeModule === "questionnaire" && (
           <AIWritingSurvey />
