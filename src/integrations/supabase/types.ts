@@ -217,6 +217,45 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_responses: {
+        Row: {
+          ai_frequency: number
+          ai_tools_used: string
+          ai_wishlist: string
+          created_at: string
+          field_of_study: string
+          helpful_stages: string[]
+          id: string
+          student_id: string
+          updated_at: string
+          workflow_description: string
+        }
+        Insert: {
+          ai_frequency: number
+          ai_tools_used: string
+          ai_wishlist: string
+          created_at?: string
+          field_of_study: string
+          helpful_stages?: string[]
+          id?: string
+          student_id: string
+          updated_at?: string
+          workflow_description: string
+        }
+        Update: {
+          ai_frequency?: number
+          ai_tools_used?: string
+          ai_wishlist?: string
+          created_at?: string
+          field_of_study?: string
+          helpful_stages?: string[]
+          id?: string
+          student_id?: string
+          updated_at?: string
+          workflow_description?: string
+        }
+        Relationships: []
+      }
       teacher_credentials: {
         Row: {
           created_at: string
