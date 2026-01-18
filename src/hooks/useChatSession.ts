@@ -207,10 +207,13 @@ export function useChatSession(sessionId: string | null, studentId: string) {
   // Check if current user is teacher
   const isTeacher = studentId === '1989';
 
-  // Check if student-led session allows AI access
-  const canAccessAI = session?.is_student_led 
-    ? participants.filter(p => !p.is_teacher).length < 5
-    : isTeacher;
+  // Allow AI access for:
+  // - Teachers always
+  // - Student-led sessions (practice) with less than 5 students
+  // - All users in teacher-led sessions (to allow @mention)
+  const canAccessAI = isTeacher || 
+    (session?.is_student_led && participants.filter(p => !p.is_teacher).length < 5) ||
+    (!session?.is_student_led && session?.status === 'active');
 
   // Get active (non-teacher) participant count
   const studentCount = participants.filter(p => !p.is_teacher).length;
