@@ -3,6 +3,8 @@ import { useChatSession } from '@/hooks/useChatSession';
 import { MessageBubble } from './MessageBubble';
 import { ParticipantsList } from './ParticipantsList';
 import { MentionAutocomplete } from './MentionAutocomplete';
+import { ContextWindowBar } from './ContextWindowBar';
+import { ContextPromptEditor } from './ContextPromptEditor';
 import { AI_PERSONA_INFO, AIPersona } from './types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,7 +58,8 @@ export function ChatRoom({
     isTeacher,
     canAccessAI,
     sendMessage,
-    joinSession
+    joinSession,
+    updateContextPrompt
   } = useChatSession(sessionId, studentId);
 
   // Join session on mount
@@ -84,7 +87,8 @@ export function ChatRoom({
           agenda: session.agenda,
           messages: messages.slice(-20),
           userPrompt: userMessage,
-          senderName: senderName
+          senderName: senderName,
+          contextPrompt: session.context_prompt
         }
       });
 
@@ -249,6 +253,23 @@ export function ChatRoom({
               )}
             </div>
           </div>
+
+          {/* Context window indicator */}
+          {canAccessAI && (
+            <ContextWindowBar 
+              messages={messages} 
+              contextPrompt={session.context_prompt} 
+            />
+          )}
+
+          {/* Teacher context editor */}
+          {isTeacher && (
+            <ContextPromptEditor
+              contextPrompt={session.context_prompt}
+              onSave={updateContextPrompt}
+              disabled={session.status !== 'active'}
+            />
+          )}
 
           <Button
             variant="ghost"

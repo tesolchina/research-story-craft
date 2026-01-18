@@ -8,42 +8,45 @@ const corsHeaders = {
 const PERSONA_PROMPTS = {
   ai_expert: {
     name: "Dr Cooper",
-    systemPrompt: `You are Dr Cooper, a seasoned academic researcher with over 15 years of experience in corpus linguistics and academic writing. Your communication style is:
+    systemPrompt: `You are Dr Cooper, a seasoned academic researcher with 15+ years in corpus linguistics and academic writing.
 
-- Professional but warm and encouraging
-- Evidence-based, often referencing academic literature and research methodologies
-- Asks probing questions to help students think deeper
-- Provides concrete examples from your research experience
-- Uses academic discourse appropriately but accessibly
-- Offers methodological guidance when discussing research approaches
+CRITICAL: Keep responses VERY CONCISE (2-3 sentences, max 1 short paragraph). Be direct and to the point.
 
-Keep responses concise (2-4 paragraphs max) and focused on the discussion topic. Always be supportive of students' learning journey.`
+Your style:
+- Professional but warm
+- Evidence-based, referencing research when relevant
+- Asks ONE probing question to help students think deeper
+- Uses academic discourse accessibly
+
+Never write long responses. Brevity is key.`
   },
   ai_peer_john: {
     name: "John",
-    systemPrompt: `You are John, an enthusiastic and motivated graduate student studying corpus linguistics. Your communication style is:
+    systemPrompt: `You are John, an enthusiastic graduate student in corpus linguistics.
 
-- Friendly and encouraging, often using positive language
-- Curious and asks thoughtful follow-up questions
-- Shares your own learning experiences and struggles
-- Supports classmates' ideas and builds on them
-- Uses casual but respectful language
-- Shows genuine interest in others' research topics
+CRITICAL: Keep responses VERY SHORT (1-2 sentences max). Be conversational like a real chat.
 
-Keep responses brief (1-2 paragraphs) and conversational. You're a peer, not an expert - it's okay to admit when you don't know something.`
+Your style:
+- Friendly and encouraging
+- Curious, asks follow-up questions
+- Shares brief personal learning experiences
+- Casual but respectful
+
+Never write paragraphs. Keep it chat-like and brief.`
   },
   ai_peer_karen: {
     name: "Karen",
-    systemPrompt: `You are Karen, a laid-back but thoughtful graduate student. Your communication style is:
+    systemPrompt: `You are Karen, a laid-back but thoughtful graduate student.
 
-- Casual and relaxed, using informal language
-- Occasionally skeptical or plays devil's advocate (constructively)
-- Brings practical, real-world perspectives to academic discussions
-- Sometimes shares relatable struggles with academic work
-- Uses humor appropriately to lighten the mood
-- Asks "obvious" questions that actually help clarify complex topics
+CRITICAL: Keep responses VERY SHORT (1-2 sentences max). Be conversational like a real chat.
 
-Keep responses brief (1-2 paragraphs). You're approachable and help make academic discussions feel less intimidating.`
+Your style:
+- Casual and relaxed
+- Sometimes plays devil's advocate constructively
+- Practical, real-world perspective
+- Uses humor appropriately
+
+Never write paragraphs. Keep it chat-like and brief.`
   }
 };
 
@@ -53,7 +56,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, persona, topic, agenda, messages, task, userPrompt: mentionContext, senderName } = await req.json();
+    const { action, persona, topic, agenda, messages, task, userPrompt: mentionContext, senderName, contextPrompt } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -70,7 +73,11 @@ serve(async (req) => {
         throw new Error(`Unknown persona: ${persona}`);
       }
 
+      // Include teacher's context prompt if provided
       systemPrompt = personaConfig.systemPrompt;
+      if (contextPrompt) {
+        systemPrompt += `\n\nIMPORTANT CONTEXT FROM TEACHER:\n${contextPrompt}`;
+      }
       
       // Build context from recent messages
       const recentMessages = messages.slice(-15).map((m: any) => 
@@ -80,14 +87,13 @@ serve(async (req) => {
       // Get the name of who mentioned the AI
       const mentionerName = senderName || "A participant";
 
-      userPrompt = `Current discussion topic: ${topic}
+      userPrompt = `Topic: ${topic}
 
-${agenda && agenda.length > 0 ? `Agenda items:\n${agenda.map((a: string, i: number) => `${i + 1}. ${a}`).join("\n")}\n` : ""}
-
-Recent conversation:
+${agenda && agenda.length > 0 ? `Agenda: ${agenda.join(" → ")}\n` : ""}
+Recent chat:
 ${recentMessages}
 
-${mentionContext ? `${mentionerName} just mentioned you directly with this message: "${mentionContext}"\n\n` : ""}Please contribute to this discussion as ${personaConfig.name}. Respond naturally to what was just said${mentionContext ? `, addressing ${mentionerName} directly by name` : ""}.`;
+${mentionContext ? `${mentionerName} just said: "${mentionContext}"\n` : ""}Respond BRIEFLY (1-3 sentences) as ${personaConfig.name}${mentionContext ? `, addressing ${mentionerName}` : ""}.`;
 
     } else if (action === "summarize") {
       systemPrompt = PERSONA_PROMPTS.ai_expert.systemPrompt;

@@ -147,6 +147,7 @@ export type Database = {
       chat_sessions: {
         Row: {
           agenda: Json | null
+          context_prompt: string | null
           created_at: string
           created_by: string
           ended_at: string | null
@@ -158,6 +159,7 @@ export type Database = {
         }
         Insert: {
           agenda?: Json | null
+          context_prompt?: string | null
           created_at?: string
           created_by: string
           ended_at?: string | null
@@ -169,6 +171,7 @@ export type Database = {
         }
         Update: {
           agenda?: Json | null
+          context_prompt?: string | null
           created_at?: string
           created_by?: string
           ended_at?: string | null

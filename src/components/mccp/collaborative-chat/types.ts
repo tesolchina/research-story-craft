@@ -3,12 +3,17 @@ export interface ChatSession {
   created_by: string;
   topic: string;
   agenda: string[];
+  context_prompt: string | null;
   status: 'active' | 'paused' | 'ended';
   is_student_led: boolean;
   max_participants: number;
   created_at: string;
   ended_at: string | null;
 }
+
+// Context window constants (characters, approximate)
+export const CONTEXT_WINDOW_MAX = 8000; // ~2000 tokens worth of context
+export const CONTEXT_WARNING_THRESHOLD = 0.75; // 75% usage shows warning
 
 export interface ChatMessage {
   id: string;

@@ -28,7 +28,8 @@ export function useChatSession(sessionId: string | null, studentId: string) {
 
     setSession({
       ...data,
-      agenda: Array.isArray(data.agenda) ? data.agenda : []
+      agenda: Array.isArray(data.agenda) ? data.agenda : [],
+      context_prompt: data.context_prompt || null
     } as ChatSession);
   }, [sessionId]);
 
@@ -140,6 +141,31 @@ export function useChatSession(sessionId: string | null, studentId: string) {
       .eq('student_id', studentId);
   }, [sessionId, studentId]);
 
+  // Update context prompt (teacher only)
+  const updateContextPrompt = useCallback(async (contextPrompt: string) => {
+    if (!sessionId) return;
+
+    const { error } = await supabase
+      .from('chat_sessions')
+      .update({ context_prompt: contextPrompt || null })
+      .eq('id', sessionId);
+
+    if (error) {
+      console.error('Error updating context prompt:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update context. Please try again.',
+        variant: 'destructive'
+      });
+      throw error;
+    }
+
+    toast({
+      title: 'Context updated',
+      description: 'AI personas will now use the new context.',
+    });
+  }, [sessionId, toast]);
+
   // Setup realtime subscription
   useEffect(() => {
     if (!sessionId) {
@@ -193,7 +219,8 @@ export function useChatSession(sessionId: string | null, studentId: string) {
           const updated = payload.new;
           setSession({
             ...updated,
-            agenda: Array.isArray(updated.agenda) ? updated.agenda : []
+            agenda: Array.isArray(updated.agenda) ? updated.agenda : [],
+            context_prompt: updated.context_prompt || null
           } as ChatSession);
         }
       )
@@ -233,6 +260,7 @@ export function useChatSession(sessionId: string | null, studentId: string) {
     sendMessage,
     joinSession,
     leaveSession,
+    updateContextPrompt,
     refetch: () => {
       fetchSession();
       fetchMessages();
