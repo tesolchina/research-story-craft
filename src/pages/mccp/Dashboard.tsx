@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot, LogOut } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot, LogOut, Users, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { exportSurveyResponsesAsCSV } from "@/utils/exportSurveyData";
 import { toast } from "sonner";
+import { SurveyDashboard } from "@/components/mccp/surveys/SurveyDashboard";
 
 interface StudentInfo {
   uniqueId: string;
@@ -789,24 +791,41 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
-          <p className="text-muted-foreground">View all student progress</p>
+          <p className="text-muted-foreground">View all student progress and survey responses</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportSurveys} disabled={isExporting}>
-            <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
-            {isExporting ? 'Exporting...' : 'Export Surveys'}
-          </Button>
           <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <Button variant="outline" onClick={onLogout}>
+            <LogOut className="h-4 w-4 mr-2" />
             Sign Out
           </Button>
         </div>
       </div>
 
-      <Card>
+      <Tabs defaultValue="progress" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="progress" className="gap-2">
+            <Users className="h-4 w-4" />
+            Student Progress
+          </TabsTrigger>
+          <TabsTrigger value="surveys" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Survey Responses
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="progress" className="mt-6">
+          <div className="flex justify-end mb-4">
+            <Button variant="outline" onClick={handleExportSurveys} disabled={isExporting}>
+              <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
+              {isExporting ? 'Exporting...' : 'Export All Surveys'}
+            </Button>
+          </div>
+
+          <Card>
         <CardHeader>
           <CardTitle>Student Progress Overview</CardTitle>
           <CardDescription>
@@ -1062,6 +1081,12 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="surveys" className="mt-6">
+          <SurveyDashboard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

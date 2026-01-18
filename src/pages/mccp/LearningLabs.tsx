@@ -9,17 +9,18 @@ import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ClipboardList, MessageSquare, Users, ChevronDown, BarChart3, GraduationCap, CheckCircle2, RotateCcw } from "lucide-react";
+import { ClipboardList, MessageSquare, Users, ChevronDown, GraduationCap, CheckCircle2, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIWritingSurvey } from "@/components/mccp/surveys/AIWritingSurvey";
-import { SurveyDashboard } from "@/components/mccp/surveys/SurveyDashboard";
+import QuestionnaireTeacherPreview from "@/components/mccp/surveys/QuestionnaireTeacherPreview";
 import CarsCoachApp from "@/components/mccp/cars-coach/CarsCoachApp";
+import CarsCoachTeacherPreview from "@/components/mccp/cars-coach/CarsCoachTeacherPreview";
 import { CollaborativeChat } from "@/components/mccp/collaborative-chat/CollaborativeChat";
 import { useSidebar } from "@/components/ui/sidebar";
 import { supabase } from "@/integrations/supabase/client";
 
 // Module type for type safety
-type ModuleId = "questionnaire" | "cars-coach" | "chat" | "dashboard" | null;
+type ModuleId = "questionnaire" | "cars-coach" | "chat" | null;
 
 const LearningLabs = () => {
   const location = useLocation();
@@ -37,21 +38,25 @@ const LearningLabs = () => {
     }
   }, [location.hash]);
 
-  // Auto-collapse sidebar when a module is active
+  // Auto-collapse sidebar when a module becomes active (only on initial expand)
+  const [lastModule, setLastModule] = useState<ModuleId>(null);
   useEffect(() => {
-    if (activeModule) {
+    if (activeModule && activeModule !== lastModule) {
       setOpen(false);
+      setLastModule(activeModule);
+    } else if (!activeModule) {
+      setLastModule(null);
     }
-  }, [activeModule, setOpen]);
+  }, [activeModule, lastModule, setOpen]);
   
   const userType = localStorage.getItem('mccp_user_type');
   const isTeacher = userType === 'teacher';
   const studentId = localStorage.getItem('mccp_student_id');
 
-  // Check if CARS Coach is completed
+  // Check if CARS Coach is completed (only for students)
   useEffect(() => {
     const checkCarsCoachStatus = async () => {
-      if (!studentId) return;
+      if (!studentId || isTeacher) return;
       
       const { data } = await supabase
         .from("cars_coach_sessions")
@@ -64,7 +69,7 @@ const LearningLabs = () => {
     };
     
     checkCarsCoachStatus();
-  }, [studentId]);
+  }, [studentId, isTeacher]);
 
   // Toggle handler - closes if same module clicked, opens new one otherwise
   const handleToggle = (moduleId: ModuleId) => {
@@ -85,36 +90,12 @@ const LearningLabs = () => {
         <p className="text-muted-foreground text-lg">
           Interactive modules to enhance your academic writing skills
         </p>
+        {isTeacher && (
+          <Badge variant="secondary" className="mt-2">
+            Teacher View - Preview student modules
+          </Badge>
+        )}
       </div>
-
-      {/* Teacher Dashboard Card - only visible for teachers */}
-      {isTeacher && (
-        <Card 
-          className={cn(
-            "cursor-pointer transition-all hover:shadow-lg border-2 mb-6",
-            activeModule === "dashboard" 
-              ? "border-primary bg-primary/5 shadow-lg" 
-              : "hover:border-primary/50"
-          )}
-          onClick={() => handleToggle("dashboard")}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-green-600" />
-              </div>
-              <ChevronDown className={cn(
-                "w-5 h-5 text-muted-foreground transition-transform",
-                activeModule === "dashboard" && "rotate-180"
-              )} />
-            </div>
-            <CardTitle className="text-lg mt-3">📊 Survey Dashboard (Teacher Only)</CardTitle>
-            <CardDescription className="text-sm">
-              View and analyze all student survey responses
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      )}
 
       {/* Feature Cards Grid */}
       <div className="grid md:grid-cols-3 gap-4 mb-6">
@@ -141,7 +122,9 @@ const LearningLabs = () => {
             </div>
             <CardTitle className="text-lg mt-3">General Questionnaire</CardTitle>
             <CardDescription className="text-sm">
-              Identify your research needs and learning preferences
+              {isTeacher 
+                ? "Preview survey questions (view responses in Dashboard)" 
+                : "Identify your research needs and learning preferences"}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -162,7 +145,7 @@ const LearningLabs = () => {
                 <GraduationCap className="w-5 h-5 text-primary" />
               </div>
               <div className="flex items-center gap-2">
-                {carsCoachCompleted && (
+                {!isTeacher && carsCoachCompleted && (
                   <Badge variant="secondary" className="bg-green-100 text-green-700">
                     <CheckCircle2 className="w-3 h-3 mr-1" />
                     Completed
@@ -176,7 +159,9 @@ const LearningLabs = () => {
             </div>
             <CardTitle className="text-lg mt-3">🎓 CARS Coach</CardTitle>
             <CardDescription className="text-sm">
-              Learn genre analysis with an AI tutor using the CARS model
+              {isTeacher 
+                ? "Preview task flow (view student progress in Dashboard)" 
+                : "Learn genre analysis with an AI tutor using the CARS model"}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -203,7 +188,9 @@ const LearningLabs = () => {
             </div>
             <CardTitle className="text-lg mt-3">Collaborative Chat</CardTitle>
             <CardDescription className="text-sm">
-              Start or join discussions with fellow students
+              {isTeacher 
+                ? "Create and manage discussion sessions" 
+                : "Start or join discussions with fellow students"}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -214,19 +201,16 @@ const LearningLabs = () => {
         "transition-all duration-300 overflow-hidden",
         activeModule ? "opacity-100" : "opacity-0 h-0"
       )}>
-        {/* Teacher Dashboard */}
-        {activeModule === "dashboard" && isTeacher && (
-          <SurveyDashboard />
-        )}
-
         {/* Questionnaire Module */}
         {activeModule === "questionnaire" && (
-          <AIWritingSurvey />
+          isTeacher ? <QuestionnaireTeacherPreview /> : <AIWritingSurvey />
         )}
 
         {/* CARS Coach Module */}
         {activeModule === "cars-coach" && (
-          studentId ? (
+          isTeacher ? (
+            <CarsCoachTeacherPreview />
+          ) : studentId ? (
             carsCoachCompleted ? (
               <Card className="border-2 border-green-200 bg-green-50/50">
                 <CardHeader>
