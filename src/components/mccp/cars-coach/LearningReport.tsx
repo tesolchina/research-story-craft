@@ -23,10 +23,45 @@ export default function LearningReport({ session, studentId }: LearningReportPro
 
   const generateAndSaveInsights = async () => {
     try {
-      // Save completion to session
+      const completedAtIso = new Date().toISOString();
+
+      // Persist completion + a compact learning_report so it can be shown on dashboards
+      const chatHistoryJson = (session.chatHistory || []).map((m: any) => ({
+        id: m.id || crypto.randomUUID(),
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : String(m.timestamp),
+      }));
+
+      const computedAccuracy = calculateAccuracy();
+      const finalReflection = [...(session.chatHistory || [])]
+        .reverse()
+        .find((m: any) => m.role === "user")?.content;
+
+      const learningReport = {
+        discipline: session.discipline || "",
+        mcAccuracy: computedAccuracy,
+        mcTotal: session.mcResponses?.length || 0,
+        mcCorrect: session.mcResponses?.filter((r: any) => r.isCorrect).length || 0,
+        shortAnswerCount: session.shortAnswers?.length || 0,
+        keyTakeaways: [
+          "Move 1 establishes importance and territory (centrality + background)",
+          "Move 2 creates a niche using gap/contrast language (e.g., however, yet)",
+          "Move 3 occupies the niche by stating aims, questions, or approach",
+        ],
+        actionableInsights: sampleInsights,
+        finalReflection: finalReflection || null,
+        completedAt: completedAtIso,
+      };
+
+      // Save completion + report to session
       await supabase
         .from("cars_coach_sessions")
-        .update({ completed_at: new Date().toISOString() })
+        .update({
+          completed_at: completedAtIso,
+          learning_report: learningReport as any,
+          chat_history: chatHistoryJson as any,
+        })
         .eq("id", session.id);
 
       // Generate sample insights based on session
