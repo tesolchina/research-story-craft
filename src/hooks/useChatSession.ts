@@ -277,7 +277,7 @@ export function useChatSessions() {
     const { data, error } = await supabase
       .from('chat_sessions')
       .select('*')
-      .eq('status', 'active')
+      .in('status', ['active', 'ended'])
       .order('created_at', { ascending: false });
 
     if (error) {
