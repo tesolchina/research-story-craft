@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useChatSession } from '@/hooks/useChatSession';
 import { MessageBubble } from './MessageBubble';
 import { ParticipantsList } from './ParticipantsList';
+import { MentionAutocomplete } from './MentionAutocomplete';
 import { AI_PERSONA_INFO, AIPersona } from './types';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,10 +39,13 @@ export function ChatRoom({
   onEndSession 
 }: ChatRoomProps) {
   const [message, setMessage] = useState('');
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [showMentions, setShowMentions] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
   const [sending, setSending] = useState(false);
   const [aiLoading, setAiLoading] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
   const {
@@ -66,7 +70,7 @@ export function ChatRoom({
   }, [messages]);
 
   // Invoke AI persona
-  const invokeAI = useCallback(async (persona: AIPersona, userMessage: string) => {
+  const invokeAI = useCallback(async (persona: AIPersona, userMessage: string, senderName: string) => {
     if (aiLoading || !session) return;
 
     setAiLoading(persona);
@@ -79,7 +83,8 @@ export function ChatRoom({
           topic: session.topic,
           agenda: session.agenda,
           messages: messages.slice(-20),
-          userPrompt: userMessage
+          userPrompt: userMessage,
+          senderName: senderName
         }
       });
 
@@ -139,7 +144,11 @@ export function ChatRoom({
       }
     }
 
+    // Get actual sender name (for teacher it's Simon)
+    const senderName = isTeacher ? 'Simon' : displayName;
+
     setSending(true);
+    setShowMentions(false);
     await sendMessage(trimmedMessage, displayName);
     setMessage('');
     setSending(false);
@@ -148,15 +157,47 @@ export function ChatRoom({
     if (mentionedPersona && canAccessAI) {
       // Small delay to let the message appear first
       setTimeout(() => {
-        invokeAI(mentionedPersona!, trimmedMessage);
+        invokeAI(mentionedPersona!, trimmedMessage, senderName);
       }, 500);
     }
+  };
+
+  // Handle mention autocomplete
+  const handleMentionSelect = (mention: string, persona: AIPersona) => {
+    const textBeforeCursor = message.slice(0, cursorPosition);
+    const textAfterCursor = message.slice(cursorPosition);
+    
+    // Find and replace the @... pattern
+    const newTextBefore = textBeforeCursor.replace(/@\w*$/, mention + ' ');
+    setMessage(newTextBefore + textAfterCursor);
+    setShowMentions(false);
+    
+    // Focus back on textarea
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
+  };
+
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    const position = e.target.selectionStart || 0;
+    setMessage(value);
+    setCursorPosition(position);
+    
+    // Check if we should show mention autocomplete
+    const textBeforeCursor = value.slice(0, position);
+    const shouldShowMentions = /@\w*$/.test(textBeforeCursor) && canAccessAI;
+    setShowMentions(shouldShowMentions);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+    // Close mentions on Escape
+    if (e.key === 'Escape') {
+      setShowMentions(false);
     }
   };
 
@@ -285,14 +326,25 @@ export function ChatRoom({
         </ScrollArea>
 
         {/* Message input */}
-        <div className="p-2 border-t bg-muted/20">
+        <div className="p-2 border-t bg-muted/20 relative">
+          {/* Mention autocomplete */}
+          {showMentions && canAccessAI && (
+            <MentionAutocomplete
+              inputValue={message}
+              cursorPosition={cursorPosition}
+              onSelect={handleMentionSelect}
+              onClose={() => setShowMentions(false)}
+            />
+          )}
+          
           <div className="flex gap-2 items-end">
             <Textarea
+              ref={textareaRef}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
               placeholder={canAccessAI 
-                ? "Type message... Use @DrCooper @John @Karen for AI help"
+                ? "Type @ to mention AI personas..."
                 : "Type your message..."
               }
               disabled={session.status !== 'active' || sending}

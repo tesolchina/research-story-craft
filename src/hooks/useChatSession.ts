@@ -73,6 +73,8 @@ export function useChatSession(sessionId: string | null, studentId: string) {
     if (!sessionId || !content.trim()) return;
 
     const isTeacher = studentId === '1989';
+    // Use actual display name for teacher (Simon)
+    const senderName = isTeacher ? 'Simon' : displayName;
     
     const { error } = await supabase
       .from('chat_messages')
@@ -80,7 +82,7 @@ export function useChatSession(sessionId: string | null, studentId: string) {
         session_id: sessionId,
         sender_type: isTeacher ? 'teacher' : 'student',
         sender_id: studentId,
-        sender_name: isTeacher ? 'Teacher' : displayName,
+        sender_name: senderName,
         content: content.trim()
       });
 
@@ -99,13 +101,15 @@ export function useChatSession(sessionId: string | null, studentId: string) {
     if (!sessionId) return false;
 
     const isTeacher = studentId === '1989';
+    // Use actual display name for teacher (Simon)
+    const participantName = isTeacher ? 'Simon' : displayName;
 
     const { error } = await supabase
       .from('chat_participants')
       .upsert({
         session_id: sessionId,
         student_id: studentId,
-        display_name: isTeacher ? 'Teacher' : displayName,
+        display_name: participantName,
         is_teacher: isTeacher,
         left_at: null
       }, {
