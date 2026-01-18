@@ -39,6 +39,14 @@ interface ProgressData {
   updated_at: string;
 }
 
+interface CarsCoachSessionData {
+  id: string;
+  discipline: string;
+  chatHistory: { role: string; content: string }[];
+  completedAt: string;
+  currentPhase: string;
+}
+
 interface StudentSummary {
   pseudonym: string;
   studentId: string;
@@ -50,6 +58,7 @@ interface StudentSummary {
   session2WritingDone: boolean;
   carsCoachDone: boolean;
   carsCoachSessions: number;
+  carsCoachData: CarsCoachSessionData[];
   lastActive: string | null;
   progress: ProgressData[];
 }
@@ -411,6 +420,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
               session2WritingDone: false,
               carsCoachDone: false,
               carsCoachSessions: 0,
+              carsCoachData: [],
               lastActive: null,
               progress: [],
             });
@@ -448,10 +458,10 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
           }
         });
 
-        // Now fetch CARS Coach sessions for all students
+        // Now fetch CARS Coach sessions for all students with full details
         const { data: carsData } = await supabase
           .from("cars_coach_sessions")
-          .select("student_id, completed_at")
+          .select("id, student_id, completed_at, discipline, chat_history, current_phase")
           .not("completed_at", "is", null);
 
         if (carsData) {
@@ -464,7 +474,14 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
             if (student) {
               student.carsCoachDone = true;
               student.carsCoachSessions += 1;
-              if (!student.lastActive || new Date(session.completed_at) > new Date(student.lastActive)) {
+              student.carsCoachData.push({
+                id: session.id,
+                discipline: session.discipline,
+                chatHistory: (session.chat_history as any[]) || [],
+                completedAt: session.completed_at!,
+                currentPhase: session.current_phase,
+              });
+              if (!student.lastActive || new Date(session.completed_at!) > new Date(student.lastActive)) {
                 student.lastActive = session.completed_at;
               }
             }
@@ -653,38 +670,93 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
                             <Eye className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>{student.pseudonym}'s Responses</DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-4">
-                            {student.progress.map((p, idx) => (
-                              <div key={idx} className="p-4 border rounded-lg">
-                                <p className="font-medium text-sm mb-2">
-                                  {p.task_id.replace(/_/g, " ").toUpperCase()}
-                                </p>
-                                {p.task_type === "writing" && p.answer && (
-                                  <div className="space-y-2">
-                                    <p className="text-sm"><strong>Response:</strong></p>
-                                    <p className="text-sm bg-muted p-2 rounded whitespace-pre-wrap">
-                                      {(p.answer as { text: string }).text}
-                                    </p>
-                                    {p.ai_feedback && (
-                                      <>
-                                        <p className="text-sm"><strong>AI Feedback:</strong></p>
-                                        <p className="text-sm bg-purple-50 p-2 rounded whitespace-pre-wrap">
-                                          {p.ai_feedback}
+                          <div className="space-y-6">
+                            {/* CARS Coach Sessions */}
+                            {student.carsCoachData.length > 0 && (
+                              <div className="space-y-4">
+                                <h3 className="font-semibold flex items-center gap-2">
+                                  <Bot className="h-4 w-4" />
+                                  CARS Coach Sessions ({student.carsCoachData.length})
+                                </h3>
+                                {student.carsCoachData.map((session, idx) => (
+                                  <Collapsible key={session.id} className="border rounded-lg">
+                                    <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50">
+                                      <div className="flex items-center gap-3">
+                                        <Badge variant="default">Session {idx + 1}</Badge>
+                                        <span className="text-sm text-muted-foreground">
+                                          {session.discipline}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <span>{new Date(session.completedAt).toLocaleDateString()}</span>
+                                        <ChevronDown className="h-4 w-4" />
+                                      </div>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="px-4 pb-4">
+                                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                                        <p className="text-xs text-muted-foreground">
+                                          {session.chatHistory.length} messages in conversation
                                         </p>
-                                      </>
+                                        {session.chatHistory.map((msg, msgIdx) => (
+                                          <div 
+                                            key={msgIdx} 
+                                            className={`p-3 rounded-lg text-sm ${
+                                              msg.role === 'assistant' 
+                                                ? 'bg-primary/10 border-l-2 border-primary' 
+                                                : 'bg-muted ml-8'
+                                            }`}
+                                          >
+                                            <p className="text-xs font-medium mb-1 text-muted-foreground">
+                                              {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student'}
+                                            </p>
+                                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </CollapsibleContent>
+                                  </Collapsible>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Other Progress Items */}
+                            {student.progress.length > 0 && (
+                              <div className="space-y-4">
+                                <h3 className="font-semibold">Other Tasks</h3>
+                                {student.progress.map((p, idx) => (
+                                  <div key={idx} className="p-4 border rounded-lg">
+                                    <p className="font-medium text-sm mb-2">
+                                      {p.task_id.replace(/_/g, " ").toUpperCase()}
+                                    </p>
+                                    {p.task_type === "writing" && p.answer && (
+                                      <div className="space-y-2">
+                                        <p className="text-sm"><strong>Response:</strong></p>
+                                        <p className="text-sm bg-muted p-2 rounded whitespace-pre-wrap">
+                                          {(p.answer as { text: string }).text}
+                                        </p>
+                                        {p.ai_feedback && (
+                                          <>
+                                            <p className="text-sm"><strong>AI Feedback:</strong></p>
+                                            <p className="text-sm bg-purple-50 p-2 rounded whitespace-pre-wrap">
+                                              {p.ai_feedback}
+                                            </p>
+                                          </>
+                                        )}
+                                      </div>
+                                    )}
+                                    {p.task_type === "mc" && (
+                                      <p className="text-sm">Score: {p.score}/5</p>
                                     )}
                                   </div>
-                                )}
-                                {p.task_type === "mc" && (
-                                  <p className="text-sm">Score: {p.score}/5</p>
-                                )}
+                                ))}
                               </div>
-                            ))}
-                            {student.progress.length === 0 && (
+                            )}
+
+                            {student.progress.length === 0 && student.carsCoachData.length === 0 && (
                               <p className="text-muted-foreground text-center py-4">
                                 No responses yet
                               </p>
