@@ -19,7 +19,7 @@ const Week1KeyPoints = () => {
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-primary">Week 1 Key Points</h1>
         <p className="text-muted-foreground max-w-3xl mx-auto">
-          Summary of key concepts covered by Dr. Simon Wong in the Week 1 session
+          Summary of key concepts covered by Dr. Simon Wang in the Week 1 session
         </p>
       </div>
 

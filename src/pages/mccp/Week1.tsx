@@ -275,7 +275,7 @@ const Week1 = () => {
               <div className="flex-1">
                 <h3 className="font-bold text-lg">Week 1 Key Points Summary</h3>
                 <p className="text-sm text-muted-foreground">
-                  A comprehensive summary of the key concepts covered by Dr. Simon Wong in Week 1
+                  A comprehensive summary of the key concepts covered by Dr. Simon Wang in Week 1
                 </p>
               </div>
               <Button asChild className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700">
