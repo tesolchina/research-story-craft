@@ -49,13 +49,8 @@ interface StudentSummary {
   progress: ProgressData[];
 }
 
-// Define all tasks students need to complete
-const ALL_TASKS = [
-  { id: "session1_mc", type: "mc", label: "Session 1: Multiple Choice Quiz", week: "Weeks 2-4" },
-  { id: "session1_writing", type: "writing", label: "Session 1: Writing Task", week: "Weeks 2-4" },
-  { id: "session2_mc", type: "mc", label: "Session 2: Multiple Choice Quiz", week: "Weeks 2-4" },
-  { id: "session2_writing", type: "writing", label: "Session 2: Writing Task", week: "Weeks 2-4" },
-];
+// Define all tasks students need to complete (empty for now - tasks will be added later)
+const ALL_TASKS: { id: string; type: string; label: string; week: string }[] = [];
 
 
 // ===== STUDENT DASHBOARD =====
