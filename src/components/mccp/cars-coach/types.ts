@@ -94,6 +94,102 @@ export interface CarsCoachSession {
   completedAt: Date | null;
 }
 
+export const DISCIPLINE_CATEGORIES = [
+  {
+    category: "STEM",
+    fields: [
+      "Computer Science",
+      "Cybersecurity",
+      "Data Science / AI / Machine Learning",
+      "Software Engineering",
+      "Electrical Engineering",
+      "Mechanical Engineering",
+      "Civil Engineering",
+      "Chemical Engineering",
+      "Biomedical Engineering",
+      "Physics",
+      "Chemistry",
+      "Biology",
+      "Mathematics",
+      "Environmental Science",
+    ],
+  },
+  {
+    category: "Health Sciences",
+    fields: [
+      "Nursing",
+      "Public Health",
+      "Medicine",
+      "Pharmacy",
+      "Physical Therapy",
+      "Nutrition / Dietetics",
+      "Psychology (Clinical)",
+      "Epidemiology",
+    ],
+  },
+  {
+    category: "Social Sciences",
+    fields: [
+      "Psychology (Research)",
+      "Sociology",
+      "Anthropology",
+      "Political Science",
+      "Economics",
+      "Geography",
+      "Communication Studies",
+      "Criminology",
+    ],
+  },
+  {
+    category: "Education",
+    fields: [
+      "TESOL / Applied Linguistics",
+      "Curriculum & Instruction",
+      "Educational Psychology",
+      "Higher Education",
+      "Special Education",
+      "Educational Technology",
+      "Educational Leadership",
+    ],
+  },
+  {
+    category: "Business & Management",
+    fields: [
+      "Business Administration",
+      "Marketing",
+      "Finance",
+      "Accounting",
+      "Human Resource Management",
+      "Operations Management",
+      "Entrepreneurship",
+      "Information Systems",
+    ],
+  },
+  {
+    category: "Humanities",
+    fields: [
+      "English Literature",
+      "History",
+      "Philosophy",
+      "Religious Studies",
+      "Linguistics",
+      "Art History",
+      "Music",
+      "Cultural Studies",
+    ],
+  },
+  {
+    category: "Law & Policy",
+    fields: [
+      "Law",
+      "Public Policy",
+      "International Relations",
+      "Public Administration",
+    ],
+  },
+] as const;
+
+// Legacy - for backwards compatibility
 export const DISCIPLINES = [
   { value: "applied_linguistics", label: "Applied Linguistics" },
   { value: "education", label: "Education" },
