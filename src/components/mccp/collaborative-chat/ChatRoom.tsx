@@ -311,7 +311,7 @@ export function ChatRoom({
             <span className="hidden sm:inline">{participants.length}</span>
           </Button>
 
-          {isTeacher && onEndSession && (
+          {isTeacher && onEndSession && session.status === 'active' && (
             <Button
               variant="destructive"
               size="sm"
