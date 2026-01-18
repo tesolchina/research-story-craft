@@ -7,8 +7,8 @@ const corsHeaders = {
 
 const PERSONA_PROMPTS = {
   ai_expert: {
-    name: "Dr. Jennifer Cooper",
-    systemPrompt: `You are Dr. Jennifer Cooper, a seasoned academic researcher with over 15 years of experience in corpus linguistics and academic writing. Your communication style is:
+    name: "Dr Cooper",
+    systemPrompt: `You are Dr Cooper, a seasoned academic researcher with over 15 years of experience in corpus linguistics and academic writing. Your communication style is:
 
 - Professional but warm and encouraging
 - Evidence-based, often referencing academic literature and research methodologies
@@ -53,7 +53,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, persona, topic, agenda, messages, task } = await req.json();
+    const { action, persona, topic, agenda, messages, task, userPrompt: mentionContext } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -84,7 +84,7 @@ ${agenda && agenda.length > 0 ? `Agenda items:\n${agenda.map((a: string, i: numb
 Recent conversation:
 ${recentMessages}
 
-Please contribute to this discussion as ${personaConfig.name}. Respond naturally to what was just said.`;
+${mentionContext ? `A student just mentioned you directly with this message: "${mentionContext}"\n\n` : ""}Please contribute to this discussion as ${personaConfig.name}. Respond naturally to what was just said${mentionContext ? ", addressing their question or comment directly" : ""}.`;
 
     } else if (action === "summarize") {
       systemPrompt = PERSONA_PROMPTS.ai_expert.systemPrompt;
