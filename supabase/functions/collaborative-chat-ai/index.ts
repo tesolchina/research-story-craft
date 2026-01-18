@@ -96,23 +96,56 @@ ${recentMessages}
 ${mentionContext ? `${mentionerName} just said: "${mentionContext}"\n` : ""}Respond BRIEFLY (1-3 sentences) as ${personaConfig.name}${mentionContext ? `, addressing ${mentionerName}` : ""}.`;
 
     } else if (action === "summarize") {
-      systemPrompt = PERSONA_PROMPTS.ai_expert.systemPrompt;
+      // Use a more thorough summarization prompt for Dr Cooper
+      systemPrompt = `You are Dr Cooper, a seasoned academic researcher with 15+ years in corpus linguistics and academic writing.
+
+For this summarization task, you should be THOROUGH and COMPREHENSIVE. Take your time to analyze the ENTIRE discussion carefully.
+
+Your summarization style:
+- Analytical and structured
+- Evidence-based, citing specific contributions from participants
+- Highlights both agreements and disagreements
+- Identifies patterns in the discussion
+- Notes the progression of ideas
+- Professional academic tone`;
       
-      const allMessages = messages.map((m: any) => 
-        `${m.sender_name}: ${m.content}`
+      const allMessages = messages.map((m: any, idx: number) => 
+        `[${idx + 1}] ${m.sender_name}: ${m.content}`
       ).join("\n");
 
-      userPrompt = `Please summarize the key points from this discussion:
+      const messageCount = messages.length;
+      const uniqueParticipants = [...new Set(messages.map((m: any) => m.sender_name))];
+
+      userPrompt = `Please provide a THOROUGH and COMPREHENSIVE summary of this discussion.
 
 Topic: ${topic}
+${agenda && agenda.length > 0 ? `Agenda Items: ${agenda.join(", ")}\n` : ""}
+Total Messages: ${messageCount}
+Participants: ${uniqueParticipants.join(", ")}
 
-Discussion:
+=== COMPLETE DISCUSSION TRANSCRIPT ===
 ${allMessages}
+=== END OF TRANSCRIPT ===
 
-Provide a concise summary highlighting:
-1. Main topics discussed
-2. Key insights or conclusions
-3. Any questions that remain open`;
+Please analyze the ENTIRE discussion above and provide a detailed summary that includes:
+
+1. **Overview**: Brief context of what this discussion was about
+
+2. **Key Discussion Points**: The main topics that were discussed, with specific examples of what participants said
+
+3. **Notable Contributions**: Highlight significant insights or arguments made by specific participants
+
+4. **Areas of Agreement**: Where participants found common ground
+
+5. **Areas of Debate or Disagreement**: Any points of contention or differing perspectives
+
+6. **Questions Raised**: Important questions that came up during the discussion
+
+7. **Conclusions or Outcomes**: What the group seemed to conclude or decide
+
+8. **Open Items**: Any unresolved topics or questions that may need further discussion
+
+Take care to represent all participants fairly and capture the full breadth of the conversation.`;
 
     } else if (action === "task") {
       // Handle specific tasks like "encourage participation"
