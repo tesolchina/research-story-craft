@@ -19,7 +19,7 @@ import MCCPLayout from "./pages/mccp/MCCPLayout";
 import ApiKeyPage from "./pages/mccp/ApiKeyPage";
 import ResourcesPage from "./pages/mccp/ResourcesPage";
 import FeedbackPage from "./pages/mccp/FeedbackPage";
-import StudentParticipation from "./pages/mccp/StudentParticipation";
+import Dashboard from "./pages/mccp/Dashboard";
 import { AuthPage, SettingsPage } from "./features/auth";
 import Week1 from "./pages/mccp/Week1";
 import Week1KeyPoints from "./pages/mccp/Week1KeyPoints";
@@ -69,7 +69,7 @@ const App = () => (
             <Route path="api-key" element={<ApiKeyPage />} />
             <Route path="resources" element={<ResourcesPage />} />
             <Route path="feedback" element={<FeedbackPage />} />
-            <Route path="participation" element={<StudentParticipation />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="week1" element={<Week1 />} />
             <Route path="week1/key-points" element={<Week1KeyPoints />} />
             <Route path="week1/ai-agent" element={<Week1AIAgent />} />
