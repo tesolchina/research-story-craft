@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
@@ -49,8 +49,10 @@ interface StudentSummary {
   progress: ProgressData[];
 }
 
-// Define all tasks students need to complete (empty for now - tasks will be added later)
-const ALL_TASKS: { id: string; type: string; label: string; week: string }[] = [];
+// Define all tasks students need to complete
+const ALL_TASKS: { id: string; type: string; label: string; week: string; link?: string }[] = [
+  { id: "needs_analysis_survey", type: "survey", label: "Complete Needs Analysis Survey", week: "Pre-course", link: "/mccp/needs-analysis#questionnaire" },
+];
 
 
 // ===== STUDENT DASHBOARD =====
@@ -140,51 +142,73 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
             <p className="text-center text-muted-foreground py-4">Loading tasks...</p>
           ) : (
             <div className="space-y-3">
-              {tasks.map((task) => {
-                const taskInfo = getTaskInfo(task.taskId);
-                return (
-                  <div 
-                    key={task.taskId} 
-                    className={`p-4 rounded-lg border ${task.completed ? "bg-green-50 border-green-200" : "bg-muted/50"}`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {task.taskType === "mc" ? (
-                          <BookOpen className="h-5 w-5 text-muted-foreground" />
-                        ) : (
-                          <PenTool className="h-5 w-5 text-muted-foreground" />
-                        )}
-                        <div>
-                          <p className="font-medium">{taskInfo?.label}</p>
-                          <p className="text-xs text-muted-foreground">{taskInfo?.week}</p>
+              {tasks.length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">No tasks assigned yet.</p>
+              ) : (
+                tasks.map((task) => {
+                  const taskInfo = getTaskInfo(task.taskId);
+                  const taskContent = (
+                    <div 
+                      className={`p-4 rounded-lg border transition-colors ${
+                        task.completed 
+                          ? "bg-green-50 border-green-200" 
+                          : taskInfo?.link 
+                            ? "bg-muted/50 hover:bg-muted cursor-pointer" 
+                            : "bg-muted/50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {task.taskType === "mc" ? (
+                            <BookOpen className="h-5 w-5 text-muted-foreground" />
+                          ) : task.taskType === "survey" ? (
+                            <ClipboardList className="h-5 w-5 text-muted-foreground" />
+                          ) : (
+                            <PenTool className="h-5 w-5 text-muted-foreground" />
+                          )}
+                          <div>
+                            <p className="font-medium flex items-center gap-2">
+                              {taskInfo?.label}
+                              {taskInfo?.link && !task.completed && (
+                                <ExternalLink className="h-3 w-3 text-primary" />
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{taskInfo?.week}</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {task.completed ? (
-                          <>
+                        <div className="flex items-center gap-2">
+                          {task.completed ? (
                             <Badge variant="default" className="bg-green-600">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               {task.taskType === "mc" ? `Score: ${task.score}/5` : "Completed"}
                             </Badge>
-                          </>
-                        ) : (
-                          <Badge variant="outline">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Pending
-                          </Badge>
-                        )}
+                          ) : (
+                            <Badge variant="outline">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pending
+                            </Badge>
+                          )}
+                        </div>
                       </div>
+                      {task.completed && task.updatedAt && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Completed: {new Date(task.updatedAt).toLocaleDateString("en-HK", {
+                            month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                          })}
+                        </p>
+                      )}
                     </div>
-                    {task.completed && task.updatedAt && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Completed: {new Date(task.updatedAt).toLocaleDateString("en-HK", {
-                          month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
-                        })}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+
+                  return taskInfo?.link && !task.completed ? (
+                    <Link key={task.taskId} to={taskInfo.link}>
+                      {taskContent}
+                    </Link>
+                  ) : (
+                    <div key={task.taskId}>{taskContent}</div>
+                  );
+                })
+              )}
             </div>
           )}
         </CardContent>
