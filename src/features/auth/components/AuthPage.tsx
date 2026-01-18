@@ -22,7 +22,7 @@ export function AuthPage() {
 
   // Redirect if already authenticated
   if (isAuthenticated) {
-    navigate('/mccp');
+    navigate('/mccp/dashboard');
     return null;
   }
 
@@ -44,17 +44,17 @@ export function AuthPage() {
 
   const handleStudentRegistrationComplete = async (uniqueId: string) => {
     await loginAsStudent(uniqueId);
-    navigate('/mccp');
+    navigate('/mccp/dashboard');
   };
 
   const handleStudentLogin = async (uniqueId: string) => {
     await loginAsStudent(uniqueId);
-    navigate('/mccp');
+    navigate('/mccp/dashboard');
   };
 
   const handleTeacherLogin = (email: string) => {
     loginAsTeacher(email);
-    navigate('/mccp');
+    navigate('/mccp/dashboard');
   };
 
   const handleBackToRoleSelection = () => {

@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  User, Hash, AlertCircle, CheckCircle2, Clock, Eye, Lock, 
-  GraduationCap, ClipboardList, BookOpen, PenTool, Mail, RefreshCw
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { z } from "zod";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface StudentInfo {
   uniqueId: string;
@@ -61,10 +57,6 @@ const ALL_TASKS = [
   { id: "session2_writing", type: "writing", label: "Session 2: Writing Task", week: "Weeks 2-4" },
 ];
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
 
 // ===== STUDENT DASHBOARD =====
 const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo; onLogout: () => void }) => {
@@ -118,7 +110,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-6 w-6 text-primary" />
+            <GraduationCap className="h-6 w-6 text-primary" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">{studentInfo.displayName}</h1>
@@ -499,241 +491,77 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
 
 // ===== MAIN DASHBOARD PAGE =====
 const Dashboard = () => {
-  const [userType, setUserType] = useState<"student" | "teacher" | null>(null);
+  const navigate = useNavigate();
+  const { isAuthenticated, userType, studentId, studentData, signOut, isLoading } = useAuth();
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [uniqueId, setUniqueId] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Teacher login state
-  const [teacherEmail, setTeacherEmail] = useState("");
-  const [teacherPassword, setTeacherPassword] = useState("");
+  const [loadingStudent, setLoadingStudent] = useState(false);
 
-  // Check for stored session on mount
+  // Redirect to auth if not authenticated
   useEffect(() => {
-    const storedUniqueId = localStorage.getItem("mccp_unique_id");
-    const storedTeacherCreds = sessionStorage.getItem("teacher_creds");
-    
-    if (storedUniqueId) {
-      // Auto-login student
-      fetchStudentByUniqueId(storedUniqueId);
-    } else if (storedTeacherCreds) {
-      setUserType("teacher");
+    if (!isLoading && !isAuthenticated) {
+      navigate('/auth');
     }
-  }, []);
+  }, [isLoading, isAuthenticated, navigate]);
 
-  const fetchStudentByUniqueId = async (id: string) => {
-    setIsLoading(true);
-    setError(null);
-    
+  // Fetch student info when studentId is available
+  useEffect(() => {
+    if (userType === 'student' && studentId && !studentInfo) {
+      fetchStudentInfo(studentId);
+    }
+  }, [userType, studentId, studentInfo]);
+
+  const fetchStudentInfo = async (uniqueId: string) => {
+    setLoadingStudent(true);
     try {
-      const { data, error: fetchError } = await supabase
+      const { data, error } = await supabase
         .from("mccp_students")
         .select("unique_id, display_name, last_4_digits")
-        .eq("unique_id", id.toUpperCase().trim())
+        .eq("unique_id", uniqueId.toUpperCase().trim())
         .maybeSingle();
-      
-      if (fetchError) {
-        console.error("Error fetching student:", fetchError);
-        setError("Error looking up your ID. Please try again.");
-        localStorage.removeItem("mccp_unique_id");
-        return;
-      }
-      
-      if (!data) {
-        setError("Unique ID not found. Please check your ID.");
-        localStorage.removeItem("mccp_unique_id");
-        return;
-      }
 
-      // Set both states together to ensure they're in sync
-      const info: StudentInfo = { 
-        uniqueId: data.unique_id, 
-        displayName: data.display_name || data.unique_id,
-        last4Digits: data.last_4_digits
-      };
-      setStudentInfo(info);
-      setUserType("student");
-      localStorage.setItem("mccp_unique_id", data.unique_id);
+      if (!error && data) {
+        setStudentInfo({
+          uniqueId: data.unique_id,
+          displayName: data.display_name || data.unique_id,
+          last4Digits: data.last_4_digits
+        });
+      }
     } catch (err) {
-      console.error("Unexpected error:", err);
-      setError("An unexpected error occurred. Please try again.");
-      localStorage.removeItem("mccp_unique_id");
+      console.error("Error fetching student info:", err);
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleStudentLogin = async () => {
-    if (uniqueId.trim().length >= 4) {
-      setError(null);
-      await fetchStudentByUniqueId(uniqueId.trim());
-    }
-  };
-
-  const handleTeacherLogin = async () => {
-    const validation = loginSchema.safeParse({ email: teacherEmail, password: teacherPassword });
-    if (!validation.success) {
-      setError(validation.error.errors[0].message);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { data, error: rpcError } = await supabase.rpc("verify_teacher_login", {
-        p_email: teacherEmail,
-        p_password: teacherPassword,
-      });
-
-      if (rpcError || data !== true) {
-        setError("Invalid email or password.");
-        setIsLoading(false);
-        return;
-      }
-
-      sessionStorage.setItem("teacher_creds", JSON.stringify({ email: teacherEmail, password: teacherPassword }));
-      setUserType("teacher");
-    } catch (err) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setLoadingStudent(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("mccp_unique_id");
-    sessionStorage.removeItem("teacher_creds");
-    setUserType(null);
-    setStudentInfo(null);
-    setUniqueId("");
-    setTeacherEmail("");
-    setTeacherPassword("");
-    setError(null);
+    signOut();
+    navigate('/auth');
   };
 
-  // Show appropriate dashboard based on user type
+  // Show loading state
+  if (isLoading || loadingStudent) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <GraduationCap className="h-12 w-12 mx-auto text-primary mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show student dashboard
   if (userType === "student" && studentInfo) {
     return <StudentDashboard studentInfo={studentInfo} onLogout={handleLogout} />;
   }
 
+  // Show teacher dashboard
   if (userType === "teacher") {
     return <TeacherDashboardView onLogout={handleLogout} />;
   }
 
-  // Login selection screen
-  return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <GraduationCap className="h-12 w-12 mx-auto text-primary mb-4" />
-        <h1 className="text-3xl font-bold">MCCP Dashboard</h1>
-        <p className="text-muted-foreground">View your tasks and progress</p>
-      </div>
-
-      <Tabs defaultValue="student" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="student" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Student
-          </TabsTrigger>
-          <TabsTrigger value="teacher" className="flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Teacher
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="student">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Hash className="h-5 w-5" />
-                Student Login
-              </CardTitle>
-              <CardDescription>
-                Enter your unique ID to view your tasks (e.g., 1234-AB-XY)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-3 items-center">
-                <Input
-                  type="text"
-                  placeholder="e.g., 1234-AB-XY"
-                  maxLength={12}
-                  value={uniqueId}
-                  onChange={(e) => {
-                    setUniqueId(e.target.value.toUpperCase());
-                    setError(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && uniqueId.trim().length >= 4) {
-                      handleStudentLogin();
-                    }
-                  }}
-                  className="max-w-48 text-center text-lg font-mono"
-                />
-                <Button onClick={handleStudentLogin} disabled={uniqueId.trim().length < 4 || isLoading}>
-                  {isLoading ? "Loading..." : "View Dashboard"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="teacher">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Teacher Login
-              </CardTitle>
-              <CardDescription>
-                Sign in with your teacher credentials
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </label>
-                <Input
-                  type="email"
-                  placeholder="teacher@mccp.edu.hk"
-                  value={teacherEmail}
-                  onChange={(e) => { setTeacherEmail(e.target.value); setError(null); }}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleTeacherLogin(); }}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-1">
-                  <Lock className="h-4 w-4" />
-                  Password
-                </label>
-                <Input
-                  type="password"
-                  placeholder="Enter password"
-                  value={teacherPassword}
-                  onChange={(e) => { setTeacherPassword(e.target.value); setError(null); }}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleTeacherLogin(); }}
-                />
-              </div>
-              <Button onClick={handleTeacherLogin} className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {error && (
-        <div className="p-3 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">
-          <AlertCircle className="h-4 w-4" />
-          {error}
-        </div>
-      )}
-    </div>
-  );
+  // Fallback - redirect to auth
+  return null;
 };
 
 export default Dashboard;
