@@ -232,33 +232,30 @@ const downloadTextFile = (content: string, filename: string) => {
           </Button>
         </div>
 
-        {/* Chat History Display */}
+        {/* Chat History Display - Full and Comprehensive */}
         {chatHistory.length > 0 && (
-          <Collapsible className="border rounded-lg mt-3">
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 text-sm">
-              <span className="font-medium">View Chat History ({chatHistory.length} messages)</span>
-              <ChevronDown className="h-4 w-4" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="px-3 pb-3">
-              <div className="space-y-2 max-h-80 overflow-y-auto">
-                {chatHistory.map((msg, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`p-2 rounded-lg text-xs ${
-                      msg.role === 'assistant' 
-                        ? 'bg-primary/10 border-l-2 border-primary' 
-                        : 'bg-muted ml-4'
-                    }`}
-                  >
-                    <p className="font-medium mb-1 text-muted-foreground">
-                      {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 You'}
-                    </p>
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          <div className="border rounded-lg mt-3">
+            <div className="p-3 border-b bg-muted/30">
+              <span className="font-medium text-sm">Full Chat History ({chatHistory.length} messages)</span>
+            </div>
+            <div className="p-3 space-y-3 max-h-[500px] overflow-y-auto">
+              {chatHistory.map((msg, idx) => (
+                <div 
+                  key={idx} 
+                  className={`p-3 rounded-lg text-sm ${
+                    msg.role === 'assistant' 
+                      ? 'bg-primary/10 border-l-3 border-primary' 
+                      : 'bg-muted ml-6'
+                  }`}
+                >
+                  <p className="font-semibold mb-2 text-xs uppercase tracking-wide text-muted-foreground">
+                    {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student Response'}
+                  </p>
+                  <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
         {!lr && (
