@@ -1,8 +1,47 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Users, ExternalLink } from "lucide-react";
+import { ArrowLeft, Users, LogIn, ClipboardList, Gamepad2, MessageSquare, CheckCircle2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+const agendaItems = [
+  {
+    number: 1,
+    title: "Login with Your Unique ID",
+    description: "Use the unique ID provided by your teacher to access the course platform and track your progress.",
+    icon: LogIn,
+    link: "/mccp/auth",
+    linkText: "Go to Login",
+    status: "required",
+  },
+  {
+    number: 2,
+    title: "Complete the Needs Analysis Questionnaire",
+    description: "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
+    icon: ClipboardList,
+    link: "/mccp/needs-analysis#questionnaire",
+    linkText: "Start Questionnaire",
+    status: "required",
+  },
+  {
+    number: 3,
+    title: "Test a Learning App",
+    description: "Explore an interactive learning application designed to enhance your understanding of academic writing concepts.",
+    icon: Gamepad2,
+    link: null, // Link to be provided
+    linkText: "Coming Soon",
+    status: "upcoming",
+  },
+  {
+    number: 4,
+    title: "Join the Collaborative Chat",
+    description: "Participate in a real-time discussion with your peers and instructor to share ideas and get feedback.",
+    icon: MessageSquare,
+    link: null, // Link to be provided
+    linkText: "Coming Soon",
+    status: "upcoming",
+  },
+];
 
 const Weeks2to4 = () => {
   return (
@@ -24,100 +63,87 @@ const Weeks2to4 = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Overview
+              Session Agenda
             </CardTitle>
+            <CardDescription>
+              Complete the following activities during your group meeting session.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              During these three weeks, you will participate in small group meetings focused on developing your <strong>writing skills</strong> and <strong>AI skills</strong> to assist academic writing.
-            </p>
-            
-            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 space-y-2">
-              <h4 className="font-semibold text-primary">Main Task</h4>
-              <p className="text-muted-foreground">
-                Choose <strong>1 activity idea from Activity 1.4</strong> and pursue this idea using your AI agent. Document your process, findings, and reflections.
-              </p>
-              <Button variant="outline" size="sm" asChild className="mt-2">
-                <Link to="/mccp/week1/activity-4">View Activity 1.4 →</Link>
-              </Button>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
-              <h4 className="font-semibold text-blue-700 dark:text-blue-300">Writing Materials Reference</h4>
-              <p className="text-sm text-muted-foreground">
-                Access all writing-related course materials organized by topic for flexible use during meetings.
-              </p>
-              <Button variant="outline" size="sm" asChild className="mt-2">
-                <Link to="/mccp/weeks2-4/writing-materials">View Writing Materials →</Link>
-              </Button>
-            </div>
-
-            <div className="bg-muted/50 rounded-lg p-4">
-              <p className="text-sm text-muted-foreground italic">
-                📌 Additional tasks will be assigned in due course during the group meetings.
-              </p>
-            </div>
+            {agendaItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <div
+                  key={item.number}
+                  className={`p-4 rounded-lg border transition-colors ${
+                    item.status === "upcoming"
+                      ? "bg-muted/30 border-dashed"
+                      : "bg-card hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div
+                        className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                          item.status === "upcoming"
+                            ? "bg-muted text-muted-foreground"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
+                        <span className="font-bold">{item.number}</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <IconComponent className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="font-semibold">{item.title}</h3>
+                        {item.status === "required" && (
+                          <Badge variant="secondary" className="text-xs">
+                            Required
+                          </Badge>
+                        )}
+                        {item.status === "upcoming" && (
+                          <Badge variant="outline" className="text-xs">
+                            Coming Soon
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {item.description}
+                      </p>
+                      {item.link ? (
+                        <Button size="sm" asChild>
+                          <Link to={item.link}>
+                            {item.linkText}
+                            <ExternalLink className="h-3 w-3 ml-1" />
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button size="sm" variant="outline" disabled>
+                          {item.linkText}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Group Meeting Schedule</span>
-              <a 
-                href="https://buelearning.hkbu.edu.hk/mod/forum/discuss.php?d=345213" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm font-normal text-primary hover:underline inline-flex items-center gap-1"
-              >
-                View on Moodle <ExternalLink className="h-3 w-3" />
-              </a>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5" />
+              Quick Links
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Week</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Session 1</TableHead>
-                  <TableHead>Session 2</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Week 2</TableCell>
-                  <TableCell>19 Jan</TableCell>
-                  <TableCell>2.1: 10:30 - 11:20</TableCell>
-                  <TableCell>2.2: 11:30 - 12:20</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Week 3</TableCell>
-                  <TableCell>26 Jan</TableCell>
-                  <TableCell>3.1: 10:30 - 11:20</TableCell>
-                  <TableCell>3.2: 11:30 - 12:20</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Week 4</TableCell>
-                  <TableCell>2 Feb</TableCell>
-                  <TableCell>4.1: 10:30 - 11:20</TableCell>
-                  <TableCell>4.2: 11:30 - 12:20</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Pre-Meeting Tasks</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Complete the MC quizzes and writing tasks before your small group meeting.
-            </p>
-            <Button asChild>
-              <Link to="/mccp/weeks2-4/tasks">Start Tasks</Link>
+          <CardContent className="flex gap-3 flex-wrap">
+            <Button variant="outline" asChild>
+              <Link to="/mccp/dashboard">View Your Dashboard</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/mccp/weeks2-4/writing-materials">Writing Materials</Link>
             </Button>
           </CardContent>
         </Card>
