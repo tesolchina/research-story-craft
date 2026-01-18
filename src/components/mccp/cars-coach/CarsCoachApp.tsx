@@ -38,10 +38,14 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
         .maybeSingle();
 
       if (existing) {
-        // Parse chat_history from JSON, casting through unknown for type safety
-        const chatHistory = Array.isArray(existing.chat_history) 
-          ? (existing.chat_history as unknown as Message[]) 
+        // Parse chat_history from JSON, converting timestamp strings to Date objects
+        const rawHistory = Array.isArray(existing.chat_history) 
+          ? (existing.chat_history as unknown as any[]) 
           : [];
+        const chatHistory: Message[] = rawHistory.map(m => ({
+          ...m,
+          timestamp: new Date(m.timestamp),
+        }));
         
         setSession({
           id: existing.id,
