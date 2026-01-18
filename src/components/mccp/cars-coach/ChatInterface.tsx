@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -176,7 +177,13 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
             <div className={`max-w-[80%] rounded-lg p-3 ${
               msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
             }`}>
-              <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+              {msg.role === "assistant" ? (
+                <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-lg [&>h2]:text-base [&>h3]:text-sm [&>strong]:font-semibold">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+              )}
             </div>
             {msg.role === "user" && (
               <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
