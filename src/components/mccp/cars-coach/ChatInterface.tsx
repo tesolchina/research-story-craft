@@ -18,7 +18,7 @@ interface ChatInterfaceProps {
   studentId: string;
 }
 
-const PHASE_ORDER: Phase[] = ["introduction", "mc_questions", "examples", "short_answers", "paragraph_analysis", "completion"];
+const PHASE_ORDER: Phase[] = ["introduction", "mc_questions", "examples", "short_answers", "paragraph_analysis", "final_reflection", "completion"];
 
 const PHASE_LABELS: Record<Phase, string> = {
   discipline_selection: "Select Discipline",
@@ -27,6 +27,7 @@ const PHASE_LABELS: Record<Phase, string> = {
   examples: "Analyze Examples",
   short_answers: "Practice Writing",
   paragraph_analysis: "Analyze Your Paragraph",
+  final_reflection: "Final Reflection",
   completion: "Learning Summary",
 };
 
@@ -80,6 +81,7 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
           shortAnswers: session.shortAnswers,
           mcCorrect: session.mcResponses?.filter((r: any) => r.isCorrect).length || 0,
           mcTotal: session.mcResponses?.length || 0,
+          messageCount: chatMessages.length,
         },
       }),
     });

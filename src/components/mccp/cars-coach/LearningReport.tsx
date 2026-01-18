@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Lightbulb, Trophy, Download } from "lucide-react";
+import { CheckCircle2, Lightbulb, Trophy, Download, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { CarsCoachSession, Insight } from "./types";
@@ -75,7 +75,7 @@ export default function LearningReport({ session, studentId }: LearningReportPro
         task_id: "cars_coach_learning",
         task_type: "ai_tutor",
         answer: { sessionId: session.id, discipline: session.discipline },
-        score: Math.round(((session.mcResponses?.filter((r: any) => r.isCorrect).length || 0) / Math.max(session.mcResponses?.length || 1, 1)) * 100),
+        score: calculateAccuracy(),
         is_correct: true,
       }, { onConflict: "student_id,task_id" });
 
@@ -87,9 +87,110 @@ export default function LearningReport({ session, studentId }: LearningReportPro
     }
   };
 
-  const mcCorrect = session.mcResponses?.filter((r: any) => r.isCorrect).length || 0;
-  const mcTotal = session.mcResponses?.length || 0;
-  const accuracy = mcTotal > 0 ? Math.round((mcCorrect / mcTotal) * 100) : 0;
+  // Calculate accuracy from chat history by analyzing MC question patterns
+  const calculateAccuracy = () => {
+    const chatHistory = session.chatHistory || [];
+    let correctCount = 0;
+    let totalQuestions = 0;
+
+    // Look through messages for MC patterns and answers
+    for (let i = 0; i < chatHistory.length; i++) {
+      const msg = chatHistory[i];
+      if (msg.role === "assistant" && msg.content) {
+        // Check if this message contains feedback for a correct answer
+        const content = msg.content.toLowerCase();
+        if (content.includes("correct") || content.includes("well done") || content.includes("that's right") || content.includes("exactly")) {
+          // Check if previous message was from user (their answer)
+          if (i > 0 && chatHistory[i - 1]?.role === "user") {
+            correctCount++;
+            totalQuestions++;
+          }
+        } else if (content.includes("incorrect") || content.includes("not quite") || content.includes("actually") || content.includes("the correct answer")) {
+          if (i > 0 && chatHistory[i - 1]?.role === "user") {
+            totalQuestions++;
+          }
+        }
+      }
+    }
+
+    // Also check mcResponses if available
+    if (session.mcResponses && session.mcResponses.length > 0) {
+      const mcCorrect = session.mcResponses.filter((r: any) => r.isCorrect).length;
+      const mcTotal = session.mcResponses.length;
+      return mcTotal > 0 ? Math.round((mcCorrect / mcTotal) * 100) : 0;
+    }
+
+    return totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+  };
+
+  const accuracy = calculateAccuracy();
+  const questionsAnswered = session.chatHistory?.filter(m => m.role === "user").length || 0;
+  const reflections = session.shortAnswers?.length || 0;
+
+  const handleExportReport = () => {
+    const reportContent = generateReportContent();
+    const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `CARS_Coach_Report_${new Date().toISOString().split("T")[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Report Downloaded!", description: "Your learning report has been saved." });
+  };
+
+  const generateReportContent = () => {
+    const divider = "=".repeat(60);
+    const lines = [
+      divider,
+      "CARS COACH LEARNING REPORT",
+      divider,
+      "",
+      `Date: ${new Date().toLocaleDateString()}`,
+      `Student ID: ${studentId}`,
+      `Discipline: ${session.discipline || "Not specified"}`,
+      "",
+      divider,
+      "PERFORMANCE SUMMARY",
+      divider,
+      "",
+      `Quiz Accuracy: ${accuracy}%`,
+      `Questions Answered: ${questionsAnswered}`,
+      `Writing Reflections: ${reflections}`,
+      `Insights Generated: ${insights.length}`,
+      "",
+      divider,
+      "ACTIONABLE INSIGHTS",
+      divider,
+      "",
+    ];
+
+    insights.forEach((insight, index) => {
+      lines.push(`${index + 1}. [${insight.category.toUpperCase()}]`);
+      lines.push(`   ${insight.insightText}`);
+      lines.push("");
+    });
+
+    lines.push(divider);
+    lines.push("CONVERSATION HISTORY");
+    lines.push(divider);
+    lines.push("");
+
+    session.chatHistory?.forEach((msg) => {
+      const role = msg.role === "assistant" ? "CARS Coach" : "You";
+      lines.push(`[${role}]:`);
+      lines.push(msg.content);
+      lines.push("");
+    });
+
+    lines.push(divider);
+    lines.push("END OF REPORT");
+    lines.push(divider);
+
+    return lines.join("\n");
+  };
 
   if (isLoading) {
     return <Card className="p-8 text-center text-muted-foreground">Generating your learning report...</Card>;
@@ -113,8 +214,8 @@ export default function LearningReport({ session, studentId }: LearningReportPro
             <p className="text-sm text-muted-foreground">Quiz Accuracy</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-primary">{session.shortAnswers?.length || 0}</p>
-            <p className="text-sm text-muted-foreground">Reflections</p>
+            <p className="text-2xl font-bold text-primary">{questionsAnswered}</p>
+            <p className="text-sm text-muted-foreground">Questions Answered</p>
           </div>
           <div>
             <p className="text-2xl font-bold text-primary">{insights.length}</p>
@@ -144,9 +245,12 @@ export default function LearningReport({ session, studentId }: LearningReportPro
         </CardContent>
       </Card>
 
-      <div className="flex justify-center">
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" /> Export Report
+      <div className="flex justify-center gap-3">
+        <Button onClick={handleExportReport} variant="outline">
+          <Download className="h-4 w-4 mr-2" /> Download Report
+        </Button>
+        <Button onClick={() => window.print()} variant="ghost">
+          <FileText className="h-4 w-4 mr-2" /> Print Report
         </Button>
       </div>
     </div>

@@ -5,6 +5,7 @@ export type Phase =
   | "examples"
   | "short_answers"
   | "paragraph_analysis"
+  | "final_reflection"
   | "completion";
 
 export interface Task {
@@ -208,5 +209,6 @@ export const TASKS: Task[] = [
   { id: "examples", number: 4, title: "Study CARS model examples", phase: "examples", completed: false },
   { id: "short_answers", number: 5, title: "Complete guided learning questions", phase: "short_answers", completed: false },
   { id: "analysis", number: 6, title: "Analyze your own paragraph", phase: "paragraph_analysis", completed: false },
-  { id: "summary", number: 7, title: "View learning summary", phase: "completion", completed: false },
+  { id: "reflection", number: 7, title: "Share your reflections", phase: "final_reflection", completed: false },
+  { id: "summary", number: 8, title: "View learning summary", phase: "completion", completed: false },
 ];

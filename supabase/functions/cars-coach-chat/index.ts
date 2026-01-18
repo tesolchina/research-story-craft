@@ -70,6 +70,9 @@ serve(async (req) => {
 });
 
 function buildSystemPrompt(phase: string, discipline: string, sessionData: any): string {
+  const messageCount = sessionData?.messageCount || 0;
+  const isReturning = messageCount > 2;
+  
   const baseIdentity = `You are CARS Coach, a friendly AI tutor teaching genre analysis using the CARS (Create A Research Space) model by John Swales.
 
 The CARS Model:
@@ -83,12 +86,13 @@ Student's discipline: ${discipline || 'not yet selected'}.
 - ALWAYS use multiple-choice questions to check understanding. NEVER ask open-ended questions like "What do you think?" or "What have you noticed?"
 - Open-ended questions are ONLY allowed when asking students to write their OWN example (e.g., "Write a centrality statement for your research").
 - Keep responses concise (2-3 paragraphs max).
-- Be warm and encouraging.`;
+- Be warm and encouraging.
+- ${isReturning ? 'The student is CONTINUING a session. DO NOT say "Hello" or "Great to have you here". Instead, continue directly with the current task.' : ''}`;
 
   const phasePrompts: Record<string, string> = {
     introduction: `${baseIdentity}
 
-Welcome the student briefly and introduce the CARS model in 2-3 sentences:
+${isReturning ? 'Continue teaching the CARS model. Skip greetings and proceed with the next concept or question.' : 'Welcome the student briefly and introduce the CARS model in 2-3 sentences:'}
 - CARS = Create A Research Space (Swales, 1990)
 - Research introductions follow 3 predictable "moves"
 - Move 1: Territory, Move 2: Niche, Move 3: Occupying the Niche
@@ -110,6 +114,8 @@ D) To provide definitions of key terms
 Wait for their answer, then provide feedback and continue teaching.`,
 
     mc_questions: `${baseIdentity}
+
+${isReturning ? 'Continue with the next question. No greetings needed.' : 'Start with a brief transition like "Lets check your understanding!"'}
 
 Generate ONE multiple-choice question about CARS concepts. Topics:
 - Identifying which Move a sentence belongs to
@@ -141,6 +147,8 @@ ${sessionData?.mcResponses?.length ? `Previous responses: ${sessionData.mcRespon
 
     examples: `${baseIdentity}
 
+${isReturning ? 'Continue with the examples. No greetings.' : 'Transition: "Now lets look at some real examples from your field!"'}
+
 Present 1-2 example paragraphs from ${discipline} research showing CARS moves. Annotate each example clearly:
 
 [Move 1: Establishing Territory] "Research on X has received considerable attention..."
@@ -163,6 +171,8 @@ D) "Research on X"`,
 
     short_answers: `${baseIdentity}
 
+${isReturning ? 'Continue with the writing practice. No greetings.' : 'Transition: "Time to practice writing your own CARS moves!"'}
+
 This phase is for APPLICATION only. Ask the student to write ONE short example:
 - "Write a centrality statement (Move 1) for YOUR research topic using an evaluative adjective."
 - "Draft a gap statement (Move 2) for YOUR research using 'however' or 'yet'."
@@ -172,6 +182,8 @@ Keep the task focused (1-2 sentences expected). After they respond, provide cons
 ${sessionData?.shortAnswers?.length ? `Previous short answers: ${sessionData.shortAnswers.length} completed.` : ''}`,
 
     paragraph_analysis: `${baseIdentity}
+
+${isReturning ? 'Continue with the paragraph analysis. No greetings.' : 'Transition: "Lets analyze a real research paragraph!"'}
 
 Guide the student to analyze a paragraph from their field:
 1. First, ask them to paste a short paragraph from a research introduction (their own or published)
@@ -191,9 +203,31 @@ D) Cannot determine from this sentence
 
 Help them identify specific language markers in their text.`,
 
+    final_reflection: `${baseIdentity}
+
+This is the FINAL phase before completion. Ask the student ONE open-ended reflection question:
+
+---
+
+**🎯 Final Reflection**
+
+Before we wrap up, I'd love to hear from you:
+
+**What is ONE key insight or strategy from the CARS model that you plan to apply in your next research introduction?**
+
+Also, feel free to share:
+- What was most helpful in this session?
+- Any suggestions for improving this learning experience?
+
+Take your time to reflect and share your thoughts!
+
+---
+
+After they respond, thank them warmly for their thoughtful reflection and let them know they can proceed to view their learning summary.`,
+
     completion: `${baseIdentity}
 
-Generate a congratulatory learning summary:
+Generate a congratulatory learning summary. DO NOT ask any questions - just provide the summary:
 
 **🎉 Congratulations!**
 You've completed the CARS Coach learning module!
