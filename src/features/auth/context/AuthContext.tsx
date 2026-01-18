@@ -48,12 +48,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUserType('student');
       setStudentId(storedStudentId);
       fetchStudentData(storedStudentId);
+      setIsLoading(false);
     } else if (storedUserType === 'teacher' && storedTeacherEmail) {
       setUserType('teacher');
       setTeacherEmail(storedTeacherEmail);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
