@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { exportSurveyResponsesAsCSV } from "@/utils/exportSurveyData";
@@ -151,12 +151,51 @@ const downloadTextFile = (content: string, filename: string) => {
     if (!answer || typeof answer !== "object") return null;
     const data = answer as Record<string, any>;
 
+    // Handle multiple sessions if available
+    const sessions = data.sessions as any[] | undefined;
+    
+    if (sessions && sessions.length > 0) {
+      return (
+        <div className="mt-3 space-y-4">
+          <p className="text-sm font-medium text-muted-foreground">
+            {sessions.length} CARS Coach Session{sessions.length > 1 ? 's' : ''}
+          </p>
+          {sessions.map((session, idx) => (
+            <div key={session.sessionId || idx} className="p-4 bg-muted/30 rounded-lg text-sm space-y-3 border">
+              <div className="flex items-center justify-between">
+                <Badge variant={session.completedAt ? "default" : "secondary"}>
+                  Session {idx + 1}: {session.discipline}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {session.completedAt 
+                    ? new Date(session.completedAt).toLocaleDateString("en-HK")
+                    : "In Progress"
+                  }
+                </span>
+              </div>
+              
+              {renderSingleSession(session)}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Fallback for single session (backward compatibility)
+    return (
+      <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm space-y-3">
+        {renderSingleSession(data)}
+      </div>
+    );
+  };
+
+  const renderSingleSession = (data: Record<string, any>) => {
     const chatHistory = (data.chatHistory as CarsCoachChatMsg[]) || [];
     const accuracy = calculateCarsCoachAccuracyFromChat(chatHistory);
     const lr = data.learningReport as any;
 
     return (
-      <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm space-y-3">
+      <>
         <div>
           <span className="font-medium text-muted-foreground">Discipline:</span>{" "}
           <span>{String(data.discipline || "-")}</span>
@@ -224,7 +263,7 @@ const downloadTextFile = (content: string, filename: string) => {
             onClick={() =>
               downloadTextFile(
                 buildCarsCoachTranscriptText(chatHistory),
-                `CARS_Coach_Transcript_${new Date().toISOString().split("T")[0]}.txt`
+                `CARS_Coach_Transcript_${data.discipline || 'Session'}_${new Date().toISOString().split("T")[0]}.txt`
               )
             }
           >
@@ -258,12 +297,12 @@ const downloadTextFile = (content: string, filename: string) => {
           </div>
         )}
 
-        {!lr && (
+        {!lr && chatHistory.length === 0 && (
           <p className="text-xs text-muted-foreground">
-            No saved learning report yet (it will appear after the student reaches the end screen).
+            No chat history or learning report available yet.
           </p>
         )}
-      </div>
+      </>
     );
   };
 
@@ -299,14 +338,12 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       .eq("student_id", uniqueId || '')
       .maybeSingle();
 
-    // Check CARS Coach sessions
+    // Check CARS Coach sessions - get ALL sessions, not just completed ones
     const { data: carsCoachData } = await supabase
       .from("cars_coach_sessions")
-      .select("id, completed_at, discipline, current_phase, chat_history, learning_report")
+      .select("id, completed_at, discipline, current_phase, chat_history, learning_report, created_at")
       .eq("student_id", uniqueId || '')
-      .not("completed_at", "is", null)
-      .order("completed_at", { ascending: false })
-      .limit(1);
+      .order("created_at", { ascending: false });
 
     // Map all tasks with their completion status
     const taskProgress: TaskProgress[] = ALL_TASKS.map((task) => {
@@ -326,23 +363,39 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       }
 
       // Special handling for CARS Coach - check cars_coach_sessions table
+      // Include ALL sessions (completed and in-progress) for comprehensive history
       if (task.id === "cars_coach" && carsCoachData && carsCoachData.length > 0) {
-        const session = carsCoachData[0] as any;
+        const completedSessions = carsCoachData.filter((s: any) => s.completed_at);
+        const latestSession = carsCoachData[0] as any;
+        const isCompleted = completedSessions.length > 0;
+        
         return {
           taskId: task.id,
           taskType: task.type,
-          completed: true,
+          completed: isCompleted,
           score: null,
-          aiFeedback: `Completed ${session.discipline} session`,
+          aiFeedback: isCompleted 
+            ? `Completed ${completedSessions.length} session(s)` 
+            : `In progress: ${latestSession.discipline}`,
           answer: {
-            sessionId: session.id,
-            discipline: session.discipline,
-            completedAt: session.completed_at,
-            currentPhase: session.current_phase,
-            chatHistory: (session.chat_history as any[]) || [],
-            learningReport: session.learning_report ?? null,
+            sessions: carsCoachData.map((session: any) => ({
+              sessionId: session.id,
+              discipline: session.discipline,
+              completedAt: session.completed_at,
+              createdAt: session.created_at,
+              currentPhase: session.current_phase,
+              chatHistory: (session.chat_history as any[]) || [],
+              learningReport: session.learning_report ?? null,
+            })),
+            // Keep backward compatibility
+            sessionId: latestSession.id,
+            discipline: latestSession.discipline,
+            completedAt: latestSession.completed_at,
+            currentPhase: latestSession.current_phase,
+            chatHistory: (latestSession.chat_history as any[]) || [],
+            learningReport: latestSession.learning_report ?? null,
           },
-          updatedAt: session.completed_at,
+          updatedAt: latestSession.completed_at || latestSession.created_at,
         };
       }
       
@@ -445,7 +498,8 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={onLogout}>
-          Switch User
+          <LogOut className="h-4 w-4 mr-2" />
+          Sign Out
         </Button>
       </div>
 
