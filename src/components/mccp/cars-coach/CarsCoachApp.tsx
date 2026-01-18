@@ -38,18 +38,23 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
         .maybeSingle();
 
       if (existing) {
+        // Parse chat_history from JSON, casting through unknown for type safety
+        const chatHistory = Array.isArray(existing.chat_history) 
+          ? (existing.chat_history as unknown as Message[]) 
+          : [];
+        
         setSession({
           id: existing.id,
           studentId: existing.student_id,
           discipline: existing.discipline,
           currentPhase: existing.current_phase as Phase,
-          tasksCompleted: (existing.tasks_completed as string[]) || [],
-          chatHistory: (existing.chat_history as Message[]) || [],
-          mcResponses: (existing.mc_responses as any[]) || [],
-          shortAnswers: (existing.short_answers as any[]) || [],
+          tasksCompleted: (existing.tasks_completed as unknown as string[]) || [],
+          chatHistory,
+          mcResponses: (existing.mc_responses as unknown as any[]) || [],
+          shortAnswers: (existing.short_answers as unknown as any[]) || [],
         });
         setCurrentPhase(existing.current_phase as Phase);
-        setTasksCompleted((existing.tasks_completed as string[]) || []);
+        setTasksCompleted((existing.tasks_completed as unknown as string[]) || []);
       }
     } catch (error) {
       console.error("Error loading session:", error);
