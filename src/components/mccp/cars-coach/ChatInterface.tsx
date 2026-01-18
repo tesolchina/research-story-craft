@@ -54,6 +54,7 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
 
   const startConversation = async () => {
     setIsLoading(true);
+    setCanAdvance(false); // Don't allow advancing on initial greeting
     try {
       await streamMessage([{ role: "user", content: "Hello, I'm ready to learn!" }], true);
     } finally {
@@ -132,8 +133,22 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
       }
     }
 
-    setCanAdvance(true);
-    setShowPhaseComplete(true);
+    // Only allow advancing if this is NOT the initial greeting
+    // Student must have at least 1 real exchange (their message + AI response)
+    if (!isStart) {
+      // Count user messages (excluding the automatic "Hello, I'm ready to learn!")
+      const userMessages = chatMessages.filter(m => 
+        m.role === "user" && m.content !== "Hello, I'm ready to learn!"
+      );
+      
+      // Require at least 2 real exchanges before allowing phase advance
+      // This ensures student actually answered questions
+      if (userMessages.length >= 2) {
+        setCanAdvance(true);
+        setShowPhaseComplete(true);
+      }
+    }
+    
     await saveMessages();
     setLastSaved(new Date());
   };
