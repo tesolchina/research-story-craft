@@ -1,6 +1,16 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Users, LogIn, ClipboardList, Gamepad2, MessageSquare, CheckCircle2, ExternalLink, Check } from "lucide-react";
+import { useEffect, useState, type ComponentType } from "react";
+import {
+  ArrowLeft,
+  Users,
+  LogIn,
+  ClipboardList,
+  Gamepad2,
+  MessageSquare,
+  CheckCircle2,
+  ExternalLink,
+  Check,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +21,7 @@ interface AgendaItem {
   number: number;
   title: string;
   description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   link: string | null;
   linkText: string;
   completedLinkText?: string;
@@ -21,19 +31,18 @@ interface AgendaItem {
 const Weeks2to4 = () => {
   const { isAuthenticated, studentId } = useAuth();
   const [questionnaireCompleted, setQuestionnaireCompleted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
+  const storedUserType = localStorage.getItem("mccp_user_type");
+  const effectiveStudentId = studentId ?? localStorage.getItem("mccp_student_id");
+  const isStudentLoggedIn = storedUserType === "student" && !!effectiveStudentId;
 
   useEffect(() => {
-    const checkQuestionnaireStatus = async () => {
-      if (!isAuthenticated) {
-        setIsLoading(false);
-        return;
-      }
+    let cancelled = false;
 
-      // Get unique_id from localStorage
-      const uniqueId = localStorage.getItem("mccp_unique_id");
-      if (!uniqueId) {
-        setIsLoading(false);
+    const checkQuestionnaireStatus = async () => {
+      // Questionnaire completion is only meaningful for logged-in students
+      if (!isStudentLoggedIn || !effectiveStudentId) {
+        if (!cancelled) setQuestionnaireCompleted(false);
         return;
       }
 
@@ -41,37 +50,42 @@ const Weeks2to4 = () => {
         const { data, error } = await supabase
           .from("survey_responses")
           .select("id")
-          .eq("student_id", uniqueId)
+          .eq("student_id", effectiveStudentId)
           .maybeSingle();
 
-        if (!error && data) {
-          setQuestionnaireCompleted(true);
+        if (!cancelled) {
+          setQuestionnaireCompleted(!error && !!data);
         }
-      } catch (err) {
-        console.error("Error checking questionnaire status:", err);
-      } finally {
-        setIsLoading(false);
+      } catch {
+        if (!cancelled) setQuestionnaireCompleted(false);
       }
     };
 
     checkQuestionnaireStatus();
-  }, [isAuthenticated]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isStudentLoggedIn, effectiveStudentId, isAuthenticated]);
+
 
   const getAgendaItems = (): AgendaItem[] => [
     {
       number: 1,
       title: "Login with Your Unique ID",
-      description: "Use the unique ID provided by your teacher to access the course platform and track your progress.",
+      description:
+        "Use the unique ID provided by your teacher to access the course platform and track your progress.",
       icon: LogIn,
       link: "/mccp/auth",
       linkText: "Go to Login",
       completedLinkText: "Already Logged In",
-      status: isAuthenticated ? "completed" : "required",
+      status: isStudentLoggedIn ? "completed" : "required",
     },
     {
       number: 2,
       title: "Complete the Needs Analysis Questionnaire",
-      description: "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
+      description:
+        "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
       icon: ClipboardList,
       link: "/mccp/needs-analysis#questionnaire",
       linkText: "Start Questionnaire",
@@ -81,7 +95,8 @@ const Weeks2to4 = () => {
     {
       number: 3,
       title: "Test a Learning App",
-      description: "Explore an interactive learning application designed to enhance your understanding of academic writing concepts.",
+      description:
+        "Explore an interactive learning application designed to enhance your understanding of academic writing concepts.",
       icon: Gamepad2,
       link: null,
       linkText: "Coming Soon",
@@ -90,7 +105,8 @@ const Weeks2to4 = () => {
     {
       number: 4,
       title: "Join the Collaborative Chat",
-      description: "Participate in a real-time discussion with your peers and instructor to share ideas and get feedback.",
+      description:
+        "Participate in a real-time discussion with your peers and instructor to share ideas and get feedback.",
       icon: MessageSquare,
       link: null,
       linkText: "Coming Soon",
