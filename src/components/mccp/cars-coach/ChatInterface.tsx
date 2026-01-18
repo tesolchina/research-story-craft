@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -178,8 +181,10 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
               msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
             }`}>
               {msg.role === "assistant" ? (
-                <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-lg [&>h2]:text-base [&>h3]:text-sm [&>strong]:font-semibold">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>p]:my-2 [&>ul]:my-2 [&>ol]:my-2 [&>h1]:text-lg [&>h2]:text-base [&>h3]:text-sm [&>strong]:font-semibold [&_.katex]:text-inherit">
+                  <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    {msg.content}
+                  </ReactMarkdown>
                 </div>
               ) : (
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
