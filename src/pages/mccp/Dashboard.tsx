@@ -14,7 +14,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 
 interface StudentInfo {
-  pseudonym: string;
+  uniqueId: string;
+  displayName: string;
   last4Digits: string;
 }
 
@@ -77,6 +78,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
   const loadProgress = async () => {
     setIsLoading(true);
     
+    // Query using last_4_digits since that's what students_progress uses
     const { data, error } = await supabase
       .from("students_progress")
       .select("task_id, task_type, score, ai_feedback, answer, updated_at, is_correct")
@@ -119,8 +121,8 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
             <User className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">{studentInfo.pseudonym}</h1>
-            <p className="text-sm text-muted-foreground">Student ID: ****{studentInfo.last4Digits}</p>
+            <h1 className="text-2xl font-bold">{studentInfo.displayName}</h1>
+            <p className="text-sm text-muted-foreground">ID: {studentInfo.uniqueId}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={onLogout}>
@@ -499,7 +501,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
 const Dashboard = () => {
   const [userType, setUserType] = useState<"student" | "teacher" | null>(null);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [last4Digits, setLast4Digits] = useState("");
+  const [uniqueId, setUniqueId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -509,59 +511,63 @@ const Dashboard = () => {
 
   // Check for stored session on mount
   useEffect(() => {
-    const storedStudentId = localStorage.getItem("mccp_student_id");
+    const storedUniqueId = localStorage.getItem("mccp_unique_id");
     const storedTeacherCreds = sessionStorage.getItem("teacher_creds");
     
-    if (storedStudentId) {
+    if (storedUniqueId) {
       // Auto-login student
-      fetchStudentPseudonym(storedStudentId);
+      fetchStudentByUniqueId(storedUniqueId);
     } else if (storedTeacherCreds) {
       setUserType("teacher");
     }
   }, []);
 
-  const fetchStudentPseudonym = async (digits: string) => {
+  const fetchStudentByUniqueId = async (id: string) => {
     setIsLoading(true);
     setError(null);
     
     try {
       const { data, error: fetchError } = await supabase
-        .from("student_pseudonyms")
-        .select("pseudonym, last_4_digits")
-        .eq("last_4_digits", digits)
+        .from("mccp_students")
+        .select("unique_id, display_name, last_4_digits")
+        .eq("unique_id", id.toUpperCase().trim())
         .maybeSingle();
       
       if (fetchError) {
-        console.error("Error fetching pseudonym:", fetchError);
+        console.error("Error fetching student:", fetchError);
         setError("Error looking up your ID. Please try again.");
-        localStorage.removeItem("mccp_student_id");
+        localStorage.removeItem("mccp_unique_id");
         return;
       }
       
       if (!data) {
-        setError("Student ID not found. Please check your last 4 digits.");
-        localStorage.removeItem("mccp_student_id");
+        setError("Unique ID not found. Please check your ID.");
+        localStorage.removeItem("mccp_unique_id");
         return;
       }
 
       // Set both states together to ensure they're in sync
-      const info = { pseudonym: data.pseudonym, last4Digits: data.last_4_digits };
+      const info: StudentInfo = { 
+        uniqueId: data.unique_id, 
+        displayName: data.display_name || data.unique_id,
+        last4Digits: data.last_4_digits
+      };
       setStudentInfo(info);
       setUserType("student");
-      localStorage.setItem("mccp_student_id", digits);
+      localStorage.setItem("mccp_unique_id", data.unique_id);
     } catch (err) {
       console.error("Unexpected error:", err);
       setError("An unexpected error occurred. Please try again.");
-      localStorage.removeItem("mccp_student_id");
+      localStorage.removeItem("mccp_unique_id");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleStudentLogin = async () => {
-    if (last4Digits.length === 4 && /^\d{4}$/.test(last4Digits)) {
+    if (uniqueId.trim().length >= 4) {
       setError(null);
-      await fetchStudentPseudonym(last4Digits);
+      await fetchStudentByUniqueId(uniqueId.trim());
     }
   };
 
@@ -597,11 +603,11 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("mccp_student_id");
+    localStorage.removeItem("mccp_unique_id");
     sessionStorage.removeItem("teacher_creds");
     setUserType(null);
     setStudentInfo(null);
-    setLast4Digits("");
+    setUniqueId("");
     setTeacherEmail("");
     setTeacherPassword("");
     setError(null);
@@ -645,28 +651,28 @@ const Dashboard = () => {
                 Student Login
               </CardTitle>
               <CardDescription>
-                Enter the last 4 digits of your student ID to view your tasks
+                Enter your unique ID to view your tasks (e.g., 1234-AB-XY)
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-3 items-center">
                 <Input
                   type="text"
-                  placeholder="e.g., 1234"
-                  maxLength={4}
-                  value={last4Digits}
+                  placeholder="e.g., 1234-AB-XY"
+                  maxLength={12}
+                  value={uniqueId}
                   onChange={(e) => {
-                    setLast4Digits(e.target.value.replace(/\D/g, ""));
+                    setUniqueId(e.target.value.toUpperCase());
                     setError(null);
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && last4Digits.length === 4) {
+                    if (e.key === "Enter" && uniqueId.trim().length >= 4) {
                       handleStudentLogin();
                     }
                   }}
-                  className="max-w-32 text-center text-lg font-mono"
+                  className="max-w-48 text-center text-lg font-mono"
                 />
-                <Button onClick={handleStudentLogin} disabled={last4Digits.length !== 4 || isLoading}>
+                <Button onClick={handleStudentLogin} disabled={uniqueId.trim().length < 4 || isLoading}>
                   {isLoading ? "Loading..." : "View Dashboard"}
                 </Button>
               </div>
