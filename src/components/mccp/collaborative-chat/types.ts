@@ -33,23 +33,26 @@ export interface ChatParticipant {
 
 export type AIPersona = 'ai_expert' | 'ai_peer_john' | 'ai_peer_karen';
 
-export const AI_PERSONA_INFO: Record<AIPersona, { name: string; title: string; avatar: string; color: string }> = {
+export const AI_PERSONA_INFO: Record<AIPersona, { name: string; title: string; avatar: string; color: string; mention: string }> = {
   ai_expert: {
-    name: 'Dr. Jennifer Cooper',
+    name: 'Dr Cooper',
     title: 'Research Expert',
     avatar: '👩‍🔬',
-    color: 'text-purple-600'
+    color: 'text-purple-600',
+    mention: '@DrCooper'
   },
   ai_peer_john: {
     name: 'John',
     title: 'Motivated Peer',
     avatar: '👨‍🎓',
-    color: 'text-blue-600'
+    color: 'text-blue-600',
+    mention: '@John'
   },
   ai_peer_karen: {
     name: 'Karen',
     title: 'Thoughtful Peer',
     avatar: '👩‍🎓',
-    color: 'text-green-600'
+    color: 'text-green-600',
+    mention: '@Karen'
   }
 };
