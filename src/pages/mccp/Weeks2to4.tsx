@@ -1,49 +1,105 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Users, LogIn, ClipboardList, Gamepad2, MessageSquare, CheckCircle2, ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Users, LogIn, ClipboardList, Gamepad2, MessageSquare, CheckCircle2, ExternalLink, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
-const agendaItems = [
-  {
-    number: 1,
-    title: "Login with Your Unique ID",
-    description: "Use the unique ID provided by your teacher to access the course platform and track your progress.",
-    icon: LogIn,
-    link: "/mccp/auth",
-    linkText: "Go to Login",
-    status: "required",
-  },
-  {
-    number: 2,
-    title: "Complete the Needs Analysis Questionnaire",
-    description: "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
-    icon: ClipboardList,
-    link: "/mccp/needs-analysis#questionnaire",
-    linkText: "Start Questionnaire",
-    status: "required",
-  },
-  {
-    number: 3,
-    title: "Test a Learning App",
-    description: "Explore an interactive learning application designed to enhance your understanding of academic writing concepts.",
-    icon: Gamepad2,
-    link: null, // Link to be provided
-    linkText: "Coming Soon",
-    status: "upcoming",
-  },
-  {
-    number: 4,
-    title: "Join the Collaborative Chat",
-    description: "Participate in a real-time discussion with your peers and instructor to share ideas and get feedback.",
-    icon: MessageSquare,
-    link: null, // Link to be provided
-    linkText: "Coming Soon",
-    status: "upcoming",
-  },
-];
+interface AgendaItem {
+  number: number;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  link: string | null;
+  linkText: string;
+  completedLinkText?: string;
+  status: "required" | "upcoming" | "completed";
+}
 
 const Weeks2to4 = () => {
+  const { isAuthenticated, studentId } = useAuth();
+  const [questionnaireCompleted, setQuestionnaireCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkQuestionnaireStatus = async () => {
+      if (!isAuthenticated) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Get unique_id from localStorage
+      const uniqueId = localStorage.getItem("mccp_unique_id");
+      if (!uniqueId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("survey_responses")
+          .select("id")
+          .eq("student_id", uniqueId)
+          .maybeSingle();
+
+        if (!error && data) {
+          setQuestionnaireCompleted(true);
+        }
+      } catch (err) {
+        console.error("Error checking questionnaire status:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkQuestionnaireStatus();
+  }, [isAuthenticated]);
+
+  const getAgendaItems = (): AgendaItem[] => [
+    {
+      number: 1,
+      title: "Login with Your Unique ID",
+      description: "Use the unique ID provided by your teacher to access the course platform and track your progress.",
+      icon: LogIn,
+      link: "/mccp/auth",
+      linkText: "Go to Login",
+      completedLinkText: "Already Logged In",
+      status: isAuthenticated ? "completed" : "required",
+    },
+    {
+      number: 2,
+      title: "Complete the Needs Analysis Questionnaire",
+      description: "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
+      icon: ClipboardList,
+      link: "/mccp/needs-analysis#questionnaire",
+      linkText: "Start Questionnaire",
+      completedLinkText: "Completed",
+      status: questionnaireCompleted ? "completed" : "required",
+    },
+    {
+      number: 3,
+      title: "Test a Learning App",
+      description: "Explore an interactive learning application designed to enhance your understanding of academic writing concepts.",
+      icon: Gamepad2,
+      link: null,
+      linkText: "Coming Soon",
+      status: "upcoming",
+    },
+    {
+      number: 4,
+      title: "Join the Collaborative Chat",
+      description: "Participate in a real-time discussion with your peers and instructor to share ideas and get feedback.",
+      icon: MessageSquare,
+      link: null,
+      linkText: "Coming Soon",
+      status: "upcoming",
+    },
+  ];
+
+  const agendaItems = getAgendaItems();
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -72,11 +128,16 @@ const Weeks2to4 = () => {
           <CardContent className="space-y-4">
             {agendaItems.map((item) => {
               const IconComponent = item.icon;
+              const isCompleted = item.status === "completed";
+              const isUpcoming = item.status === "upcoming";
+              
               return (
                 <div
                   key={item.number}
                   className={`p-4 rounded-lg border transition-colors ${
-                    item.status === "upcoming"
+                    isCompleted
+                      ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
+                      : isUpcoming
                       ? "bg-muted/30 border-dashed"
                       : "bg-card hover:bg-muted/50"
                   }`}
@@ -85,24 +146,35 @@ const Weeks2to4 = () => {
                     <div className="flex-shrink-0">
                       <div
                         className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                          item.status === "upcoming"
+                          isCompleted
+                            ? "bg-green-100 text-green-600 dark:bg-green-900/50 dark:text-green-400"
+                            : isUpcoming
                             ? "bg-muted text-muted-foreground"
                             : "bg-primary/10 text-primary"
                         }`}
                       >
-                        <span className="font-bold">{item.number}</span>
+                        {isCompleted ? (
+                          <Check className="h-5 w-5" />
+                        ) : (
+                          <span className="font-bold">{item.number}</span>
+                        )}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <IconComponent className="h-4 w-4 text-muted-foreground" />
                         <h3 className="font-semibold">{item.title}</h3>
+                        {isCompleted && (
+                          <Badge variant="default" className="text-xs bg-green-600 hover:bg-green-700">
+                            Completed
+                          </Badge>
+                        )}
                         {item.status === "required" && (
                           <Badge variant="secondary" className="text-xs">
                             Required
                           </Badge>
                         )}
-                        {item.status === "upcoming" && (
+                        {isUpcoming && (
                           <Badge variant="outline" className="text-xs">
                             Coming Soon
                           </Badge>
@@ -111,7 +183,12 @@ const Weeks2to4 = () => {
                       <p className="text-sm text-muted-foreground mb-3">
                         {item.description}
                       </p>
-                      {item.link ? (
+                      {isCompleted ? (
+                        <Button size="sm" variant="outline" className="text-green-600 border-green-300" disabled>
+                          <Check className="h-3 w-3 mr-1" />
+                          {item.completedLinkText || "Completed"}
+                        </Button>
+                      ) : item.link ? (
                         <Button size="sm" asChild>
                           <Link to={item.link}>
                             {item.linkText}
