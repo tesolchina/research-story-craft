@@ -18,7 +18,8 @@ import {
   XCircle,
   PanelRightClose,
   PanelRight,
-  Sparkles
+  Sparkles,
+  Archive
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -371,58 +372,72 @@ export function ChatRoom({
           )}
         </ScrollArea>
 
-        {/* Message input */}
-        <div className="p-2 border-t bg-muted/20 relative">
-          {/* Mention autocomplete */}
-          {showMentions && (
-            <MentionAutocomplete
-              inputValue={message}
-              cursorPosition={cursorPosition}
-              participants={participants}
-              currentUserId={studentId}
-              onSelectAI={handleAIMentionSelect}
-              onSelectHuman={handleHumanMentionSelect}
-              onSelectAll={handleAllMentionSelect}
-              onClose={() => setShowMentions(false)}
-              showAI={canAccessAI}
-            />
-          )}
-          
-          <div className="flex gap-2 items-end">
-            <Textarea
-              ref={textareaRef}
-              value={message}
-              onChange={handleTextareaChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Type @ to mention participants or AI..."
-              disabled={session.status !== 'active' || sending}
-              className="flex-1 min-h-[40px] max-h-[100px] resize-none text-sm"
-              rows={1}
-            />
-            <Button 
-              onClick={handleSend}
-              disabled={!message.trim() || sending || session.status !== 'active'}
-              size="icon"
-              className="h-10 w-10 shrink-0"
-            >
-              {sending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
+        {/* Message input - only show for active sessions */}
+        {session.status === 'active' ? (
+          <div className="p-2 border-t bg-muted/20 relative">
+            {/* Mention autocomplete */}
+            {showMentions && (
+              <MentionAutocomplete
+                inputValue={message}
+                cursorPosition={cursorPosition}
+                participants={participants}
+                currentUserId={studentId}
+                onSelectAI={handleAIMentionSelect}
+                onSelectHuman={handleHumanMentionSelect}
+                onSelectAll={handleAllMentionSelect}
+                onClose={() => setShowMentions(false)}
+                showAI={canAccessAI}
+              />
+            )}
+            
+            <div className="flex gap-2 items-end">
+              <Textarea
+                ref={textareaRef}
+                value={message}
+                onChange={handleTextareaChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Type @ to mention participants or AI..."
+                disabled={sending}
+                className="flex-1 min-h-[40px] max-h-[100px] resize-none text-sm"
+                rows={1}
+              />
+              <Button 
+                onClick={handleSend}
+                disabled={!message.trim() || sending}
+                size="icon"
+                className="h-10 w-10 shrink-0"
+              >
+                {sending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <div className="flex items-center justify-between mt-1 px-1">
+              <p className="text-[9px] text-muted-foreground">
+                <kbd className="px-1 py-0.5 bg-muted rounded">Enter</kbd> send · <kbd className="px-1 py-0.5 bg-muted rounded">Shift+Enter</kbd> new line
+              </p>
+              {canAccessAI && (
+                <p className="text-[9px] text-purple-500">
+                  <Sparkles className="h-2.5 w-2.5 inline" /> AI available
+                </p>
               )}
-            </Button>
+            </div>
           </div>
-          <div className="flex items-center justify-between mt-1 px-1">
-            <p className="text-[9px] text-muted-foreground">
-              <kbd className="px-1 py-0.5 bg-muted rounded">Enter</kbd> send · <kbd className="px-1 py-0.5 bg-muted rounded">Shift+Enter</kbd> new line
-            </p>
-            {canAccessAI && (
-              <p className="text-[9px] text-purple-500">
-                <Sparkles className="h-2.5 w-2.5 inline" /> AI available
+        ) : (
+          <div className="p-3 border-t bg-muted/30 text-center">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Archive className="h-4 w-4" />
+              <span>This session has ended. Viewing chat history.</span>
+            </div>
+            {session.ended_at && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Ended on {format(new Date(session.ended_at), 'MMMM d, yyyy \'at\' HH:mm')}
               </p>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Participants sidebar */}
