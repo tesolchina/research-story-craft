@@ -122,9 +122,16 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
 
   const saveMessages = async () => {
     if (!session.id) return;
+    // Convert Message[] to JSON-compatible format for Supabase
+    const chatHistoryJson = messages.map(m => ({
+      id: m.id,
+      role: m.role,
+      content: m.content,
+      timestamp: m.timestamp.toISOString(),
+    }));
     await supabase
       .from("cars_coach_sessions")
-      .update({ chat_history: messages })
+      .update({ chat_history: chatHistoryJson })
       .eq("id", session.id);
   };
 
