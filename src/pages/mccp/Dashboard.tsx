@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot, LogOut, Users, BarChart3 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot, LogOut, Users, BarChart3, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { exportSurveyResponsesAsCSV } from "@/utils/exportSurveyData";
@@ -60,6 +60,15 @@ interface SurveyData {
   created_at: string;
 }
 
+interface ChatSessionData {
+  sessionId: string;
+  topic: string;
+  status: string;
+  isStudentLed: boolean;
+  messageCount: number;
+  joinedAt: string;
+}
+
 interface StudentSummary {
   pseudonym: string;
   studentId: string;
@@ -71,6 +80,8 @@ interface StudentSummary {
   carsCoachDone: boolean;
   carsCoachSessions: number;
   carsCoachData: CarsCoachSessionData[];
+  chatSessions: ChatSessionData[];
+  chatMessageCount: number;
   progress: ProgressData[];
 }
 
@@ -91,6 +102,14 @@ const ALL_TASKS: { id: string; type: string; label: string; week: string; descri
     week: "Week 1",
     description: "AI-guided learning about the CARS model for research introductions",
     link: "/mccp/learning-labs"
+  },
+  { 
+    id: "collaborative_chat", 
+    type: "chat", 
+    label: "Collaborative Discussions", 
+    week: "Ongoing",
+    description: "Participate in AI-assisted group discussions with peers and instructor",
+    link: "/mccp/learning-labs#collaborative-chat"
   },
 ];
 
@@ -369,6 +388,53 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       .eq("student_id", uniqueId || '')
       .order("created_at", { ascending: false });
 
+    // Check Collaborative Chat participation
+    const { data: chatParticipations } = await supabase
+      .from("chat_participants")
+      .select(`
+        session_id,
+        joined_at,
+        left_at,
+        is_teacher,
+        display_name,
+        chat_sessions (
+          id,
+          topic,
+          status,
+          is_student_led,
+          created_at,
+          ended_at
+        )
+      `)
+      .eq("student_id", uniqueId || '')
+      .order("joined_at", { ascending: false });
+
+    // Get message counts for each chat session
+    const chatSessionsWithCounts = await Promise.all(
+      (chatParticipations || []).map(async (part: any) => {
+        const session = part.chat_sessions;
+        if (!session) return null;
+        
+        const { count } = await supabase
+          .from("chat_messages")
+          .select("*", { count: "exact", head: true })
+          .eq("session_id", session.id)
+          .eq("sender_id", uniqueId || '');
+
+        return {
+          sessionId: session.id,
+          topic: session.topic,
+          status: session.status,
+          isStudentLed: session.is_student_led,
+          createdAt: session.created_at,
+          endedAt: session.ended_at,
+          joinedAt: part.joined_at,
+          messageCount: count || 0
+        };
+      })
+    );
+    const validChatSessions = chatSessionsWithCounts.filter(Boolean);
+
     // Map all tasks with their completion status
     const taskProgress: TaskProgress[] = ALL_TASKS.map((task) => {
       const progress = data?.find((p) => p.task_id === task.id);
@@ -420,6 +486,29 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
             learningReport: latestSession.learning_report ?? null,
           },
           updatedAt: latestSession.completed_at || latestSession.created_at,
+        };
+      }
+
+      // Special handling for Collaborative Chat
+      if (task.id === "collaborative_chat" && validChatSessions.length > 0) {
+        const totalMessages = validChatSessions.reduce((sum: number, s: any) => sum + s.messageCount, 0);
+        const activeSessions = validChatSessions.filter((s: any) => s.status === 'active').length;
+        const completedSessions = validChatSessions.filter((s: any) => s.status === 'ended').length;
+        
+        return {
+          taskId: task.id,
+          taskType: task.type,
+          completed: validChatSessions.length > 0,
+          score: null,
+          aiFeedback: `${validChatSessions.length} session(s), ${totalMessages} messages`,
+          answer: {
+            sessions: validChatSessions,
+            totalSessions: validChatSessions.length,
+            activeSessions,
+            completedSessions,
+            totalMessages
+          },
+          updatedAt: validChatSessions[0]?.joinedAt || null,
         };
       }
       
@@ -504,6 +593,65 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
     );
   };
 
+  const renderChatSessions = (answer: unknown) => {
+    if (!answer || typeof answer !== 'object') return null;
+    const data = answer as { sessions?: any[]; totalSessions?: number; totalMessages?: number; activeSessions?: number; completedSessions?: number };
+    
+    if (!data.sessions || data.sessions.length === 0) {
+      return (
+        <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm">
+          <p className="text-muted-foreground">No chat sessions yet.</p>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm space-y-3">
+        <div className="flex gap-4 text-xs">
+          <div className="flex items-center gap-1">
+            <MessageSquare className="h-3 w-3" />
+            <span className="font-medium">{data.totalSessions}</span> sessions
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="font-medium">{data.totalMessages}</span> messages sent
+          </div>
+          {data.activeSessions !== undefined && data.activeSessions > 0 && (
+            <Badge variant="default" className="text-xs">
+              {data.activeSessions} active
+            </Badge>
+          )}
+        </div>
+        
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {data.sessions.map((session: any, idx: number) => (
+            <div 
+              key={session.sessionId || idx}
+              className="p-3 bg-background rounded border flex items-center justify-between"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{session.topic}</p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                  <span>{new Date(session.createdAt).toLocaleDateString("en-HK", { month: "short", day: "numeric" })}</span>
+                  <span>•</span>
+                  <span>{session.messageCount} messages</span>
+                  {session.isStudentLed && (
+                    <>
+                      <span>•</span>
+                      <span className="text-blue-600">Practice</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
+                {session.status === 'active' ? 'Active' : 'Ended'}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const completedCount = tasks.filter((t) => t.completed).length;
   const totalCount = tasks.length;
 
@@ -575,6 +723,8 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                             <ClipboardList className="h-5 w-5 text-muted-foreground" />
                           ) : task.taskType === "coach" ? (
                             <Bot className="h-5 w-5 text-muted-foreground" />
+                          ) : task.taskType === "chat" ? (
+                            <MessageSquare className="h-5 w-5 text-muted-foreground" />
                           ) : (
                             <PenTool className="h-5 w-5 text-muted-foreground" />
                           )}
@@ -628,6 +778,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                       )}
                       {isExpanded && task.answer && task.taskType === "survey" && renderSurveyAnswer(task.answer)}
                       {isExpanded && task.answer && task.taskType === "coach" && renderCarsCoachReport(task.answer)}
+                      {isExpanded && task.answer && task.taskType === "chat" && renderChatSessions(task.answer)}
                     </div>
                   );
 
@@ -699,6 +850,29 @@ const TeacherDashboardView = ({
         .from("cars_coach_sessions")
         .select("id, student_id, completed_at, discipline, chat_history, current_phase, learning_report");
 
+      // Fetch all chat participations with session info
+      const { data: chatParticipationsData } = await supabase
+        .from("chat_participants")
+        .select(`
+          student_id,
+          session_id,
+          joined_at,
+          is_teacher,
+          chat_sessions (
+            id,
+            topic,
+            status,
+            is_student_led,
+            created_at
+          )
+        `)
+        .eq("is_teacher", false);
+
+      // Fetch message counts per student per session
+      const { data: messageCountsData } = await supabase
+        .from("chat_messages")
+        .select("sender_id, session_id");
+
       // Build student map
       const studentMap = new Map<string, StudentSummary>();
 
@@ -717,6 +891,8 @@ const TeacherDashboardView = ({
             carsCoachDone: false,
             carsCoachSessions: 0,
             carsCoachData: [],
+            chatSessions: [],
+            chatMessageCount: 0,
             progress: [],
           });
         }
@@ -764,6 +940,45 @@ const TeacherDashboardView = ({
           });
           if (session.completed_at && (!student.lastActive || new Date(session.completed_at) > new Date(student.lastActive))) {
             student.lastActive = session.completed_at;
+          }
+        }
+      });
+
+      // Add Chat session data
+      const messageCountMap = new Map<string, Map<string, number>>();
+      (messageCountsData || []).forEach((msg: any) => {
+        if (!msg.sender_id) return;
+        if (!messageCountMap.has(msg.sender_id)) {
+          messageCountMap.set(msg.sender_id, new Map());
+        }
+        const sessionCounts = messageCountMap.get(msg.sender_id)!;
+        sessionCounts.set(msg.session_id, (sessionCounts.get(msg.session_id) || 0) + 1);
+      });
+
+      (chatParticipationsData || []).forEach((part: any) => {
+        const session = part.chat_sessions;
+        if (!session) return;
+        
+        // Match student by unique_id format
+        const studentId = part.student_id;
+        const parts = studentId.split('-');
+        const last4 = parts[0];
+        const student = studentMap.get(last4);
+        
+        if (student) {
+          const msgCount = messageCountMap.get(studentId)?.get(session.id) || 0;
+          student.chatSessions.push({
+            sessionId: session.id,
+            topic: session.topic,
+            status: session.status,
+            isStudentLed: session.is_student_led,
+            messageCount: msgCount,
+            joinedAt: part.joined_at
+          });
+          student.chatMessageCount += msgCount;
+          
+          if (!student.lastActive || new Date(part.joined_at) > new Date(student.lastActive)) {
+            student.lastActive = part.joined_at;
           }
         }
       });
