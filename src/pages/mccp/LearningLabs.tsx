@@ -276,8 +276,8 @@ const LearningLabs = () => {
 
         {/* Collaborative Chat Module */}
         {activeModule === "chat" && (
-          studentId ? (
-            <CollaborativeChat studentId={studentId} />
+          (studentId || isTeacher) ? (
+            <CollaborativeChat studentId={isTeacher ? '1989' : studentId!} />
           ) : (
             <Card className="border-2 border-primary/30">
               <CardHeader>
