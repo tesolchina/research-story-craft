@@ -50,26 +50,48 @@ interface CarsCoachSessionData {
   learningReport?: any;
 }
 
+interface SurveyData {
+  field_of_study: string;
+  ai_frequency: number;
+  ai_tools_used: string;
+  helpful_stages: string[];
+  workflow_description: string;
+  ai_wishlist: string;
+  created_at: string;
+}
+
 interface StudentSummary {
   pseudonym: string;
   studentId: string;
-  session1McScore: number | null;
-  session1McTotal: number;
-  session1WritingDone: boolean;
-  session2McScore: number | null;
-  session2McTotal: number;
-  session2WritingDone: boolean;
+  uniqueId: string;
+  registeredAt: string;
+  lastActive: string | null;
+  surveyCompleted: boolean;
+  surveyData: SurveyData | null;
   carsCoachDone: boolean;
   carsCoachSessions: number;
   carsCoachData: CarsCoachSessionData[];
-  lastActive: string | null;
   progress: ProgressData[];
 }
 
-// Define all tasks students need to complete
-const ALL_TASKS: { id: string; type: string; label: string; week: string; link?: string }[] = [
-  { id: "needs_analysis_survey", type: "survey", label: "Complete Learning Labs Survey", week: "Pre-course", link: "/mccp/learning-labs#questionnaire" },
-  { id: "cars_coach", type: "coach", label: "Complete CARS Coach Session", week: "Week 1", link: "/mccp/learning-labs" },
+// Define all required tasks students need to complete
+const ALL_TASKS: { id: string; type: string; label: string; week: string; description: string; link?: string }[] = [
+  { 
+    id: "needs_analysis_survey", 
+    type: "survey", 
+    label: "Learning Labs Survey", 
+    week: "Pre-course",
+    description: "Survey on AI-collaborative academic writing practices and preferences",
+    link: "/mccp/learning-labs#questionnaire"
+  },
+  { 
+    id: "cars_coach", 
+    type: "coach", 
+    label: "CARS Coach Session", 
+    week: "Week 1",
+    description: "AI-guided learning about the CARS model for research introductions",
+    link: "/mccp/learning-labs"
+  },
 ];
 
 type CarsCoachChatMsg = { role?: string; content?: string };
@@ -633,112 +655,114 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<StudentSummary | null>(null);
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+
+  const toggleTaskExpanded = (taskId: string) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) newSet.delete(taskId);
+      else newSet.add(taskId);
+      return newSet;
+    });
+  };
 
   const loadDashboardData = async (teacherEmail: string, teacherPassword: string) => {
     setIsLoading(true);
     setCredentials({ email: teacherEmail, password: teacherPassword });
 
     try {
-      const { data, error: rpcError } = await supabase.rpc("get_teacher_dashboard_data", {
-        p_email: teacherEmail,
-        p_password: teacherPassword,
-      });
+      // Fetch all registered students from mccp_students
+      const { data: studentsData, error: studentsError } = await supabase
+        .from("mccp_students")
+        .select("unique_id, display_name, last_4_digits, created_at, updated_at")
+        .order("created_at", { ascending: false });
 
-      if (rpcError) {
-        console.error("Failed to load data:", rpcError);
+      if (studentsError) {
+        console.error("Failed to load students:", studentsError);
         setIsLoading(false);
         return;
       }
 
-      if (data) {
-        const studentMap = new Map<string, StudentSummary>();
+      // Fetch all survey responses
+      const { data: surveyData } = await supabase
+        .from("survey_responses")
+        .select("*");
 
-        (data as any[]).forEach((row) => {
-          const studentCode = row.last_4_digits;
-          
-          if (!studentMap.has(studentCode)) {
-            studentMap.set(studentCode, {
-              pseudonym: row.pseudonym,
-              studentId: studentCode,
-              session1McScore: null,
-              session1McTotal: 5,
-              session1WritingDone: false,
-              session2McScore: null,
-              session2McTotal: 5,
-              session2WritingDone: false,
-              carsCoachDone: false,
-              carsCoachSessions: 0,
-              carsCoachData: [],
-              lastActive: null,
-              progress: [],
-            });
-          }
+      // Fetch all CARS Coach sessions
+      const { data: carsData } = await supabase
+        .from("cars_coach_sessions")
+        .select("id, student_id, completed_at, discipline, chat_history, current_phase, learning_report");
 
-          const student = studentMap.get(studentCode)!;
+      // Build student map
+      const studentMap = new Map<string, StudentSummary>();
 
-          if (row.student_id) {
-            const progressItem: ProgressData = {
-              student_id: row.student_id,
-              task_id: row.task_id,
-              task_type: row.task_type,
-              answer: row.answer,
-              ai_feedback: row.ai_feedback,
-              is_correct: row.is_correct,
-              score: row.score,
-              updated_at: row.updated_at,
-            };
-
-            student.progress.push(progressItem);
-
-            if (!student.lastActive || new Date(row.updated_at) > new Date(student.lastActive)) {
-              student.lastActive = row.updated_at;
-            }
-
-            if (row.task_id === "session1_mc" && row.score !== null) {
-              student.session1McScore = row.score;
-            } else if (row.task_id === "session1_writing" && row.ai_feedback) {
-              student.session1WritingDone = true;
-            } else if (row.task_id === "session2_mc" && row.score !== null) {
-              student.session2McScore = row.score;
-            } else if (row.task_id === "session2_writing" && row.ai_feedback) {
-              student.session2WritingDone = true;
-            }
-          }
-        });
-
-        // Now fetch CARS Coach sessions for all students with full details
-        const { data: carsData } = await supabase
-          .from("cars_coach_sessions")
-          .select("id, student_id, completed_at, discipline, chat_history, current_phase, learning_report")
-          .not("completed_at", "is", null);
-
-        if (carsData) {
-          carsData.forEach((session) => {
-            // student_id in cars_coach_sessions is like "1989-SW-9Q", extract last_4_digits
-            const parts = session.student_id.split('-');
-            const last4 = parts[0]; // The first part before hyphen is the 4-digit code
-            
-            const student = studentMap.get(last4);
-            if (student) {
-              student.carsCoachDone = true;
-              student.carsCoachSessions += 1;
-              student.carsCoachData.push({
-                id: session.id,
-                discipline: session.discipline,
-                chatHistory: (session.chat_history as any[]) || [],
-                completedAt: session.completed_at!,
-                currentPhase: session.current_phase,
-                learningReport: (session as any).learning_report ?? null,
-              });
-              if (!student.lastActive || new Date(session.completed_at!) > new Date(student.lastActive)) {
-                student.lastActive = session.completed_at;
-              }
-            }
+      (studentsData || []).forEach((row) => {
+        const studentCode = row.last_4_digits;
+        
+        if (!studentMap.has(studentCode)) {
+          studentMap.set(studentCode, {
+            pseudonym: row.display_name || row.unique_id,
+            studentId: studentCode,
+            uniqueId: row.unique_id,
+            registeredAt: row.created_at,
+            lastActive: row.updated_at,
+            surveyCompleted: false,
+            surveyData: null,
+            carsCoachDone: false,
+            carsCoachSessions: 0,
+            carsCoachData: [],
+            progress: [],
           });
         }
+      });
 
-        setStudents(Array.from(studentMap.values()));
-      }
+      // Add survey data
+      (surveyData || []).forEach((survey) => {
+        const parts = survey.student_id.split('-');
+        const last4 = parts[0];
+        const student = studentMap.get(last4);
+        if (student) {
+          student.surveyCompleted = true;
+          student.surveyData = {
+            field_of_study: survey.field_of_study,
+            ai_frequency: survey.ai_frequency,
+            ai_tools_used: survey.ai_tools_used,
+            helpful_stages: survey.helpful_stages,
+            workflow_description: survey.workflow_description,
+            ai_wishlist: survey.ai_wishlist,
+            created_at: survey.created_at,
+          };
+          if (!student.lastActive || new Date(survey.created_at) > new Date(student.lastActive)) {
+            student.lastActive = survey.created_at;
+          }
+        }
+      });
+
+      // Add CARS Coach data
+      (carsData || []).forEach((session) => {
+        const parts = session.student_id.split('-');
+        const last4 = parts[0];
+        const student = studentMap.get(last4);
+        if (student) {
+          if (session.completed_at) {
+            student.carsCoachDone = true;
+            student.carsCoachSessions += 1;
+          }
+          student.carsCoachData.push({
+            id: session.id,
+            discipline: session.discipline,
+            chatHistory: (session.chat_history as any[]) || [],
+            completedAt: session.completed_at || '',
+            currentPhase: session.current_phase,
+            learningReport: (session as any).learning_report ?? null,
+          });
+          if (session.completed_at && (!student.lastActive || new Date(session.completed_at) > new Date(student.lastActive))) {
+            student.lastActive = session.completed_at;
+          }
+        }
+      });
+
+      setStudents(Array.from(studentMap.values()));
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
     } finally {
@@ -746,7 +770,6 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
     }
   };
 
-  // Load data when component mounts (credentials are passed from parent)
   useEffect(() => {
     const storedCreds = sessionStorage.getItem("teacher_creds");
     if (storedCreds) {
@@ -758,6 +781,12 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
   const handleRefresh = () => {
     if (credentials) {
       loadDashboardData(credentials.email, credentials.password);
+    } else {
+      const storedCreds = sessionStorage.getItem("teacher_creds");
+      if (storedCreds) {
+        const { email, password } = JSON.parse(storedCreds);
+        loadDashboardData(email, password);
+      }
     }
   };
 
@@ -786,6 +815,286 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
     }
   };
 
+  const getTaskStatus = (student: StudentSummary, taskId: string) => {
+    if (taskId === 'needs_analysis_survey') {
+      return student.surveyCompleted;
+    }
+    if (taskId === 'cars_coach') {
+      return student.carsCoachDone;
+    }
+    return false;
+  };
+
+  const getCompletedTasksCount = (student: StudentSummary) => {
+    let count = 0;
+    if (student.surveyCompleted) count++;
+    if (student.carsCoachDone) count++;
+    return count;
+  };
+
+  // Render student detail view
+  if (selectedStudent) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" onClick={() => setSelectedStudent(null)}>
+              ← Back to Overview
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">{selectedStudent.pseudonym}</h1>
+              <p className="text-muted-foreground">Student ID: {selectedStudent.uniqueId}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Student Info Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Student Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Registered</p>
+                <p className="font-medium">{formatDate(selectedStudent.registeredAt)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Last Active</p>
+                <p className="font-medium">{formatDate(selectedStudent.lastActive)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Tasks Completed</p>
+                <p className="font-medium">{getCompletedTasksCount(selectedStudent)} / {ALL_TASKS.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Progress</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary transition-all" 
+                      style={{ width: `${(getCompletedTasksCount(selectedStudent) / ALL_TASKS.length) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium">
+                    {Math.round((getCompletedTasksCount(selectedStudent) / ALL_TASKS.length) * 100)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tasks Detail */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Task Progress</CardTitle>
+            <CardDescription>Click on any completed task to view detailed report</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {ALL_TASKS.map((task) => {
+              const isCompleted = getTaskStatus(selectedStudent, task.id);
+              const isExpanded = expandedTasks.has(task.id);
+              
+              return (
+                <div 
+                  key={task.id}
+                  className={`p-4 rounded-lg border transition-all ${
+                    isCompleted 
+                      ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800" 
+                      : "bg-muted/30 border-muted"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {task.type === "survey" ? (
+                        <ClipboardList className={`h-5 w-5 ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`} />
+                      ) : (
+                        <Bot className={`h-5 w-5 ${isCompleted ? 'text-green-600' : 'text-muted-foreground'}`} />
+                      )}
+                      <div>
+                        <p className="font-medium">{task.label}</p>
+                        <p className="text-sm text-muted-foreground">{task.week} • {task.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isCompleted ? (
+                        <>
+                          <Badge variant="default" className="bg-green-600">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Completed
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleTaskExpanded(task.id)}
+                          >
+                            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            <span className="ml-1">View Report</span>
+                          </Button>
+                        </>
+                      ) : (
+                        <Badge variant="outline">
+                          <Clock className="h-3 w-3 mr-1" />
+                          Pending
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expanded Task Details */}
+                  {isExpanded && isCompleted && (
+                    <div className="mt-4 pt-4 border-t">
+                      {task.id === 'needs_analysis_survey' && selectedStudent.surveyData && (
+                        <div className="space-y-4">
+                          <div className="text-xs text-muted-foreground">
+                            Completed: {formatDate(selectedStudent.surveyData.created_at)}
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Field of Study</p>
+                              <p>{selectedStudent.surveyData.field_of_study}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">AI Usage Frequency</p>
+                              <p>{selectedStudent.surveyData.ai_frequency}/5</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">AI Tools Used</p>
+                            <pre className="text-sm whitespace-pre-wrap bg-muted/50 p-3 rounded-lg">
+                              {selectedStudent.surveyData.ai_tools_used}
+                            </pre>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Helpful Stages</p>
+                            <div className="flex flex-wrap gap-1">
+                              {selectedStudent.surveyData.helpful_stages.map((stage, i) => (
+                                <Badge key={i} variant="secondary">{stage}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Workflow Description</p>
+                            <pre className="text-sm whitespace-pre-wrap bg-muted/50 p-3 rounded-lg max-h-48 overflow-y-auto">
+                              {selectedStudent.surveyData.workflow_description}
+                            </pre>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">AI Wishlist</p>
+                            <p className="text-sm">{selectedStudent.surveyData.ai_wishlist}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {task.id === 'cars_coach' && selectedStudent.carsCoachData.length > 0 && (
+                        <div className="space-y-4">
+                          <p className="text-sm text-muted-foreground">
+                            {selectedStudent.carsCoachSessions} session{selectedStudent.carsCoachSessions !== 1 ? 's' : ''} completed
+                          </p>
+                          {selectedStudent.carsCoachData.filter(s => s.completedAt).map((session, idx) => (
+                            <Collapsible key={session.id} className="border rounded-lg">
+                              <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50">
+                                <div className="flex items-center gap-3">
+                                  <Badge variant="default">Session {idx + 1}</Badge>
+                                  <span className="text-sm">{session.discipline}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <span>{new Date(session.completedAt).toLocaleDateString()}</span>
+                                  <ChevronDown className="h-4 w-4" />
+                                </div>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="px-4 pb-4">
+                                <div className="space-y-3">
+                                  <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Discipline</p>
+                                      <p className="font-medium">{session.discipline}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Quiz Accuracy</p>
+                                      <p className="font-medium">{calculateCarsCoachAccuracyFromChat(session.chatHistory)}%</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Messages</p>
+                                      <p className="font-medium">{session.chatHistory.length}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs text-muted-foreground">Completed</p>
+                                      <p className="font-medium">{formatDate(session.completedAt)}</p>
+                                    </div>
+                                  </div>
+
+                                  {session.learningReport && (
+                                    <div className="p-3 bg-muted/30 rounded-lg">
+                                      <p className="text-sm font-medium mb-2">Learning Report</p>
+                                      {Array.isArray(session.learningReport.keyTakeaways) && (
+                                        <div className="mb-2">
+                                          <p className="text-xs text-muted-foreground">Key Takeaways</p>
+                                          <ul className="list-disc pl-5 text-sm">
+                                            {session.learningReport.keyTakeaways.map((t: string, i: number) => (
+                                              <li key={i}>{t}</li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      downloadTextFile(
+                                        buildCarsCoachTranscriptText(session.chatHistory),
+                                        `${selectedStudent.pseudonym}_CARS_Coach_Session_${idx + 1}.txt`
+                                      )
+                                    }
+                                  >
+                                    <Download className="h-4 w-4 mr-2" /> Download Full Transcript
+                                  </Button>
+
+                                  {/* Chat History */}
+                                  <div className="border rounded-lg mt-3">
+                                    <div className="p-3 border-b bg-muted/30">
+                                      <span className="font-medium text-sm">Chat History ({session.chatHistory.length} messages)</span>
+                                    </div>
+                                    <div className="p-3 space-y-3 max-h-96 overflow-y-auto">
+                                      {session.chatHistory.map((msg, msgIdx) => (
+                                        <div 
+                                          key={msgIdx} 
+                                          className={`p-3 rounded-lg text-sm ${
+                                            msg.role === 'assistant' 
+                                              ? 'bg-primary/10 border-l-2 border-primary' 
+                                              : 'bg-muted ml-6'
+                                          }`}
+                                        >
+                                          <p className="font-semibold mb-1 text-xs uppercase text-muted-foreground">
+                                            {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student'}
+                                          </p>
+                                          <p className="whitespace-pre-wrap">{msg.content}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Main overview
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -818,269 +1127,156 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
         </TabsList>
 
         <TabsContent value="progress" className="mt-6">
+          {/* Task Overview Cards */}
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            {ALL_TASKS.map((task) => {
+              const completedCount = students.filter(s => getTaskStatus(s, task.id)).length;
+              return (
+                <Card key={task.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-2">
+                      {task.type === "survey" ? (
+                        <ClipboardList className="h-5 w-5 text-primary" />
+                      ) : (
+                        <Bot className="h-5 w-5 text-primary" />
+                      )}
+                      <CardTitle className="text-base">{task.label}</CardTitle>
+                    </div>
+                    <CardDescription>{task.week}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-2xl font-bold">{completedCount}</p>
+                        <p className="text-sm text-muted-foreground">of {students.length} completed</p>
+                      </div>
+                      <div className="w-16 h-16">
+                        <div className="relative w-full h-full">
+                          <svg className="w-full h-full transform -rotate-90">
+                            <circle
+                              cx="32" cy="32" r="28"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                              className="text-muted"
+                            />
+                            <circle
+                              cx="32" cy="32" r="28"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                              strokeDasharray={`${(completedCount / Math.max(students.length, 1)) * 176} 176`}
+                              className="text-primary"
+                            />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center text-sm font-medium">
+                            {students.length > 0 ? Math.round((completedCount / students.length) * 100) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
           <div className="flex justify-end mb-4">
             <Button variant="outline" onClick={handleExportSurveys} disabled={isExporting}>
               <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
-              {isExporting ? 'Exporting...' : 'Export All Surveys'}
+              {isExporting ? 'Exporting...' : 'Export All Data'}
             </Button>
           </div>
 
           <Card>
-        <CardHeader>
-          <CardTitle>Student Progress Overview</CardTitle>
-          <CardDescription>
-            {students.length} students registered • {students.filter((s) => s.lastActive).length} have started tasks
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p className="text-center py-8 text-muted-foreground">Loading student data...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead>CARS Coach</TableHead>
-                  <TableHead>Session 1 MC</TableHead>
-                  <TableHead>Session 1 Writing</TableHead>
-                  <TableHead>Session 2 MC</TableHead>
-                  <TableHead>Session 2 Writing</TableHead>
-                  <TableHead>Last Active</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {students.map((student) => (
-                  <TableRow key={student.studentId}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{student.pseudonym}</p>
-                        <p className="text-xs text-muted-foreground">****{student.studentId}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {student.carsCoachDone ? (
-                        <Badge variant="default">
-                          <Bot className="h-3 w-3 mr-1" />
-                          {student.carsCoachSessions} {student.carsCoachSessions === 1 ? 'session' : 'sessions'}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Pending
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.session1McScore !== null ? (
-                        <Badge variant={student.session1McScore >= 3 ? "default" : "secondary"}>
-                          {student.session1McScore}/{student.session1McTotal}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Pending
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.session1WritingDone ? (
-                        <Badge variant="default">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Done
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Pending
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.session2McScore !== null ? (
-                        <Badge variant={student.session2McScore >= 3 ? "default" : "secondary"}>
-                          {student.session2McScore}/{student.session2McTotal}
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Pending
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {student.session2WritingDone ? (
-                        <Badge variant="default">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
-                          Done
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Pending
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {formatDate(student.lastActive)}
-                    </TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedStudent(student)}
-                            disabled={!student.lastActive}
-                          >
+            <CardHeader>
+              <CardTitle>All Registered Students</CardTitle>
+              <CardDescription>
+                {students.length} students registered • Click on a student to view detailed progress
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <p className="text-center py-8 text-muted-foreground">Loading student data...</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Registered</TableHead>
+                      <TableHead>Survey</TableHead>
+                      <TableHead>CARS Coach</TableHead>
+                      <TableHead>Progress</TableHead>
+                      <TableHead>Last Active</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {students.map((student) => (
+                      <TableRow key={student.studentId} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedStudent(student)}>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{student.pseudonym}</p>
+                            <p className="text-xs text-muted-foreground">{student.uniqueId}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(student.registeredAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {student.surveyCompleted ? (
+                            <Badge variant="default" className="bg-green-600">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Done
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pending
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {student.carsCoachDone ? (
+                            <Badge variant="default" className="bg-green-600">
+                              <Bot className="h-3 w-3 mr-1" />
+                              {student.carsCoachSessions} session{student.carsCoachSessions !== 1 ? 's' : ''}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Pending
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-primary" 
+                                style={{ width: `${(getCompletedTasksCount(student) / ALL_TASKS.length) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {getCompletedTasksCount(student)}/{ALL_TASKS.length}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {formatDate(student.lastActive)}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>{student.pseudonym}'s Responses</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-6">
-                            {/* CARS Coach Sessions */}
-                            {student.carsCoachData.length > 0 && (
-                              <div className="space-y-4">
-                                <h3 className="font-semibold flex items-center gap-2">
-                                  <Bot className="h-4 w-4" />
-                                  CARS Coach Sessions ({student.carsCoachData.length})
-                                </h3>
-                                {student.carsCoachData.map((session, idx) => (
-                                  <Collapsible key={session.id} className="border rounded-lg">
-                                    <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-muted/50">
-                                      <div className="flex items-center gap-3">
-                                        <Badge variant="default">Session {idx + 1}</Badge>
-                                        <span className="text-sm text-muted-foreground">
-                                          {session.discipline}
-                                        </span>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                        <span>{new Date(session.completedAt).toLocaleDateString()}</span>
-                                        <ChevronDown className="h-4 w-4" />
-                                      </div>
-                                    </CollapsibleTrigger>
-                                    <CollapsibleContent className="px-4 pb-4">
-                                      <div className="space-y-3">
-                                        <div className="p-3 rounded-lg bg-muted/30 text-sm space-y-2">
-                                          <div className="grid grid-cols-2 gap-3">
-                                            <div>
-                                              <p className="text-xs text-muted-foreground">Discipline</p>
-                                              <p className="font-medium">{session.discipline}</p>
-                                            </div>
-                                            <div>
-                                              <p className="text-xs text-muted-foreground">Quiz accuracy</p>
-                                              <p className="font-medium">{calculateCarsCoachAccuracyFromChat(session.chatHistory)}%</p>
-                                            </div>
-                                          </div>
-
-                                          {session.learningReport && (
-                                            <div className="pt-2 border-t">
-                                              <p className="text-xs text-muted-foreground mb-1">Saved learning report</p>
-                                              {Array.isArray(session.learningReport.keyTakeaways) && session.learningReport.keyTakeaways.length > 0 && (
-                                                <ul className="list-disc pl-5 text-sm space-y-1">
-                                                  {session.learningReport.keyTakeaways.map((t: string, i: number) => (
-                                                    <li key={i}>{t}</li>
-                                                  ))}
-                                                </ul>
-                                              )}
-                                            </div>
-                                          )}
-                                          <div className="flex items-center justify-between gap-2">
-                                            <p className="text-xs text-muted-foreground">
-                                              {session.chatHistory.length} messages in conversation
-                                            </p>
-                                            <Button
-                                              type="button"
-                                              variant="outline"
-                                              size="sm"
-                                              onClick={() =>
-                                                downloadTextFile(
-                                                  buildCarsCoachTranscriptText(session.chatHistory),
-                                                  `${student.pseudonym}_CARS_Coach_Session_${idx + 1}.txt`
-                                                )
-                                              }
-                                            >
-                                              <Download className="h-4 w-4 mr-2" /> Download
-                                            </Button>
-                                          </div>
-                                        </div>
-
-                                        <div className="space-y-3 max-h-96 overflow-y-auto">
-                                          {session.chatHistory.map((msg, msgIdx) => (
-                                            <div 
-                                              key={msgIdx} 
-                                              className={`p-3 rounded-lg text-sm ${
-                                                msg.role === 'assistant' 
-                                                  ? 'bg-primary/10 border-l-2 border-primary' 
-                                                  : 'bg-muted ml-8'
-                                              }`}
-                                            >
-                                              <p className="text-xs font-medium mb-1 text-muted-foreground">
-                                                {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student'}
-                                              </p>
-                                              <p className="whitespace-pre-wrap">{msg.content}</p>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </CollapsibleContent>
-                                  </Collapsible>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Other Progress Items */}
-                            {student.progress.length > 0 && (
-                              <div className="space-y-4">
-                                <h3 className="font-semibold">Other Tasks</h3>
-                                {student.progress.map((p, idx) => (
-                                  <div key={idx} className="p-4 border rounded-lg">
-                                    <p className="font-medium text-sm mb-2">
-                                      {p.task_id.replace(/_/g, " ").toUpperCase()}
-                                    </p>
-                                    {p.task_type === "writing" && p.answer && (
-                                      <div className="space-y-2">
-                                        <p className="text-sm"><strong>Response:</strong></p>
-                                        <p className="text-sm bg-muted p-2 rounded whitespace-pre-wrap">
-                                          {(p.answer as { text: string }).text}
-                                        </p>
-                                        {p.ai_feedback && (
-                                          <>
-                                            <p className="text-sm"><strong>AI Feedback:</strong></p>
-                                            <p className="text-sm bg-purple-50 p-2 rounded whitespace-pre-wrap">
-                                              {p.ai_feedback}
-                                            </p>
-                                          </>
-                                        )}
-                                      </div>
-                                    )}
-                                    {p.task_type === "mc" && (
-                                      <p className="text-sm">Score: {p.score}/5</p>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {student.progress.length === 0 && student.carsCoachData.length === 0 && (
-                              <p className="text-muted-foreground text-center py-4">
-                                No responses yet
-                              </p>
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="surveys" className="mt-6">
