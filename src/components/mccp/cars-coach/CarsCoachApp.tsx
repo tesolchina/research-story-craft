@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Circle, GraduationCap, ArrowLeft } from "lucide-react";
+import { CheckCircle2, Circle, GraduationCap, ArrowLeft, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TASKS, DISCIPLINES, type Phase, type Message, type CarsCoachSession } from "./types";
@@ -60,6 +60,28 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
       console.error("Error loading session:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleStartOver = async () => {
+    if (!session?.id) return;
+    
+    try {
+      // Mark current session as completed (preserves chat history)
+      await supabase
+        .from("cars_coach_sessions")
+        .update({ completed_at: new Date().toISOString() })
+        .eq("id", session.id);
+
+      // Reset local state to start fresh
+      setSession(null);
+      setCurrentPhase("discipline_selection");
+      setTasksCompleted([]);
+      
+      toast({ title: "Starting fresh!", description: "Your previous session has been saved." });
+    } catch (error) {
+      console.error("Error starting over:", error);
+      toast({ title: "Error", description: "Failed to start over", variant: "destructive" });
     }
   };
 
@@ -142,6 +164,11 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
           <Badge variant="secondary">
             {DISCIPLINES.find(d => d.value === session.discipline)?.label}
           </Badge>
+        )}
+        {session && currentPhase !== "discipline_selection" && (
+          <Button variant="outline" size="sm" onClick={handleStartOver} className="ml-auto">
+            <RotateCcw className="h-4 w-4 mr-2" /> Start Over
+          </Button>
         )}
       </div>
 
