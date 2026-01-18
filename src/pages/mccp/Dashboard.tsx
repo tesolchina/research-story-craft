@@ -650,7 +650,13 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
 };
 
 // ===== TEACHER DASHBOARD =====
-const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
+const TeacherDashboardView = ({
+  onLogout,
+  teacherEmail,
+}: {
+  onLogout: () => void;
+  teacherEmail: string | null;
+}) => {
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [credentials, setCredentials] = useState<{ email: string; password: string } | null>(null);
@@ -771,22 +777,35 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
   };
 
   useEffect(() => {
+    // Legacy: some older teacher flows store full creds in sessionStorage.
     const storedCreds = sessionStorage.getItem("teacher_creds");
     if (storedCreds) {
       const { email, password } = JSON.parse(storedCreds);
       loadDashboardData(email, password);
+      return;
     }
-  }, []);
+
+    // Current auth flow stores teacher identity in localStorage via AuthContext.
+    if (teacherEmail) {
+      loadDashboardData(teacherEmail, "");
+    }
+  }, [teacherEmail]);
 
   const handleRefresh = () => {
     if (credentials) {
       loadDashboardData(credentials.email, credentials.password);
-    } else {
-      const storedCreds = sessionStorage.getItem("teacher_creds");
-      if (storedCreds) {
-        const { email, password } = JSON.parse(storedCreds);
-        loadDashboardData(email, password);
-      }
+      return;
+    }
+
+    const storedCreds = sessionStorage.getItem("teacher_creds");
+    if (storedCreds) {
+      const { email, password } = JSON.parse(storedCreds);
+      loadDashboardData(email, password);
+      return;
+    }
+
+    if (teacherEmail) {
+      loadDashboardData(teacherEmail, "");
     }
   };
 
@@ -1290,7 +1309,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
 // ===== MAIN DASHBOARD PAGE =====
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userType, studentId, studentData, signOut, isLoading } = useAuth();
+  const { isAuthenticated, userType, studentId, teacherEmail, studentData, signOut, isLoading } = useAuth();
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
   const [loadingStudent, setLoadingStudent] = useState(false);
 
@@ -1355,7 +1374,7 @@ const Dashboard = () => {
 
   // Show teacher dashboard
   if (userType === "teacher") {
-    return <TeacherDashboardView onLogout={handleLogout} />;
+    return <TeacherDashboardView onLogout={handleLogout} teacherEmail={teacherEmail} />;
   }
 
   // Fallback - redirect to auth
