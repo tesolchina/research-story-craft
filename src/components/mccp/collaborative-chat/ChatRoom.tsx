@@ -166,8 +166,18 @@ export function ChatRoom({
     }
   };
 
-  // Handle mention autocomplete
-  const handleMentionSelect = (mention: string, persona: AIPersona) => {
+  // Handle AI mention autocomplete
+  const handleAIMentionSelect = (mention: string, persona: AIPersona) => {
+    insertMention(mention);
+  };
+
+  // Handle human mention autocomplete
+  const handleHumanMentionSelect = (mention: string, participantName: string) => {
+    insertMention(mention);
+  };
+
+  // Helper to insert mention into message
+  const insertMention = (mention: string) => {
     const textBeforeCursor = message.slice(0, cursorPosition);
     const textAfterCursor = message.slice(cursorPosition);
     
@@ -189,8 +199,11 @@ export function ChatRoom({
     setCursorPosition(position);
     
     // Check if we should show mention autocomplete
+    // Show for AI personas (if can access AI) or for any participants
     const textBeforeCursor = value.slice(0, position);
-    const shouldShowMentions = /@\w*$/.test(textBeforeCursor) && canAccessAI;
+    const hasAtSymbol = /@\w*$/.test(textBeforeCursor);
+    const hasOtherParticipants = participants.filter(p => p.student_id !== studentId).length > 0;
+    const shouldShowMentions = hasAtSymbol && (canAccessAI || hasOtherParticipants);
     setShowMentions(shouldShowMentions);
   };
 
@@ -349,12 +362,16 @@ export function ChatRoom({
         {/* Message input */}
         <div className="p-2 border-t bg-muted/20 relative">
           {/* Mention autocomplete */}
-          {showMentions && canAccessAI && (
+          {showMentions && (
             <MentionAutocomplete
               inputValue={message}
               cursorPosition={cursorPosition}
-              onSelect={handleMentionSelect}
+              participants={participants}
+              currentUserId={studentId}
+              onSelectAI={handleAIMentionSelect}
+              onSelectHuman={handleHumanMentionSelect}
               onClose={() => setShowMentions(false)}
+              showAI={canAccessAI}
             />
           )}
           
@@ -364,10 +381,7 @@ export function ChatRoom({
               value={message}
               onChange={handleTextareaChange}
               onKeyDown={handleKeyDown}
-              placeholder={canAccessAI 
-                ? "Type @ to mention AI personas..."
-                : "Type your message..."
-              }
+              placeholder="Type @ to mention participants or AI..."
               disabled={session.status !== 'active' || sending}
               className="flex-1 min-h-[40px] max-h-[100px] resize-none text-sm"
               rows={1}
