@@ -53,7 +53,7 @@ serve(async (req) => {
   }
 
   try {
-    const { action, persona, topic, agenda, messages, task, userPrompt: mentionContext } = await req.json();
+    const { action, persona, topic, agenda, messages, task, userPrompt: mentionContext, senderName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -77,6 +77,9 @@ serve(async (req) => {
         `${m.sender_name}: ${m.content}`
       ).join("\n");
 
+      // Get the name of who mentioned the AI
+      const mentionerName = senderName || "A participant";
+
       userPrompt = `Current discussion topic: ${topic}
 
 ${agenda && agenda.length > 0 ? `Agenda items:\n${agenda.map((a: string, i: number) => `${i + 1}. ${a}`).join("\n")}\n` : ""}
@@ -84,7 +87,7 @@ ${agenda && agenda.length > 0 ? `Agenda items:\n${agenda.map((a: string, i: numb
 Recent conversation:
 ${recentMessages}
 
-${mentionContext ? `A student just mentioned you directly with this message: "${mentionContext}"\n\n` : ""}Please contribute to this discussion as ${personaConfig.name}. Respond naturally to what was just said${mentionContext ? ", addressing their question or comment directly" : ""}.`;
+${mentionContext ? `${mentionerName} just mentioned you directly with this message: "${mentionContext}"\n\n` : ""}Please contribute to this discussion as ${personaConfig.name}. Respond naturally to what was just said${mentionContext ? `, addressing ${mentionerName} directly by name` : ""}.`;
 
     } else if (action === "summarize") {
       systemPrompt = PERSONA_PROMPTS.ai_expert.systemPrompt;
