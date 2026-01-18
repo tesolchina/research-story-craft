@@ -522,22 +522,40 @@ const Dashboard = () => {
 
   const fetchStudentPseudonym = async (digits: string) => {
     setIsLoading(true);
-    const { data, error: fetchError } = await supabase
-      .from("student_pseudonyms")
-      .select("pseudonym, last_4_digits")
-      .eq("last_4_digits", digits)
-      .maybeSingle();
+    setError(null);
     
-    setIsLoading(false);
-    
-    if (fetchError || !data) {
-      setError("Student ID not found. Please check your last 4 digits.");
-      return;
-    }
+    try {
+      const { data, error: fetchError } = await supabase
+        .from("student_pseudonyms")
+        .select("pseudonym, last_4_digits")
+        .eq("last_4_digits", digits)
+        .maybeSingle();
+      
+      if (fetchError) {
+        console.error("Error fetching pseudonym:", fetchError);
+        setError("Error looking up your ID. Please try again.");
+        localStorage.removeItem("mccp_student_id");
+        return;
+      }
+      
+      if (!data) {
+        setError("Student ID not found. Please check your last 4 digits.");
+        localStorage.removeItem("mccp_student_id");
+        return;
+      }
 
-    setStudentInfo({ pseudonym: data.pseudonym, last4Digits: data.last_4_digits });
-    setUserType("student");
-    localStorage.setItem("mccp_student_id", digits);
+      // Set both states together to ensure they're in sync
+      const info = { pseudonym: data.pseudonym, last4Digits: data.last_4_digits };
+      setStudentInfo(info);
+      setUserType("student");
+      localStorage.setItem("mccp_student_id", digits);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("An unexpected error occurred. Please try again.");
+      localStorage.removeItem("mccp_student_id");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleStudentLogin = async () => {
