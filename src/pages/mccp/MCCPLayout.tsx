@@ -121,10 +121,10 @@ const MCCPLayout = () => {
                   </SidebarMenuItem>
 
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={location.pathname === "/mccp/participation"}>
-                      <Link to="/mccp/participation">
+                    <SidebarMenuButton asChild isActive={location.pathname === "/mccp/dashboard"}>
+                      <Link to="/mccp/dashboard">
                         <UserCheck className="h-4 w-4" />
-                        <span>Student Participation</span>
+                        <span>Dashboard</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
