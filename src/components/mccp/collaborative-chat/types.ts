@@ -55,7 +55,7 @@ export const AI_PERSONA_INFO: Record<AIPersona, { name: string; title: string; a
   },
   ai_peer_karen: {
     name: 'Karen',
-    title: 'Thoughtful Peer',
+    title: 'Skeptical Peer',
     avatar: '👩‍🎓',
     color: 'text-green-600',
     mention: '@Karen'
