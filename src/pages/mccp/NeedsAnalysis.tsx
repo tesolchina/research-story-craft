@@ -7,13 +7,14 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ClipboardList, Bot, MessageSquare, Users, ChevronDown, BarChart3 } from "lucide-react";
+import { ClipboardList, Bot, MessageSquare, Users, ChevronDown, BarChart3, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AIWritingSurvey } from "@/components/mccp/surveys/AIWritingSurvey";
 import { SurveyDashboard } from "@/components/mccp/surveys/SurveyDashboard";
+import CarsCoachApp from "@/components/mccp/cars-coach/CarsCoachApp";
 
 // Module type for type safety
-type ModuleId = "questionnaire" | "ai-template" | "chat" | "dashboard" | null;
+type ModuleId = "questionnaire" | "ai-template" | "cars-coach" | "chat" | "dashboard" | null;
 
 const NeedsAnalysis = () => {
   const location = useLocation();
@@ -31,6 +32,7 @@ const NeedsAnalysis = () => {
   
   const userType = localStorage.getItem('mccp_user_type');
   const isTeacher = userType === 'teacher';
+  const studentId = localStorage.getItem('mccp_student_id');
 
   // Toggle handler - closes if same module clicked, opens new one otherwise
   const handleToggle = (moduleId: ModuleId) => {
@@ -108,29 +110,29 @@ const NeedsAnalysis = () => {
           </CardHeader>
         </Card>
 
-        {/* Card 2: AI Learning App Template */}
+        {/* Card 2: CARS Coach - AI Tutor */}
         <Card 
           className={cn(
             "cursor-pointer transition-all hover:shadow-lg border-2",
-            activeModule === "ai-template" 
+            activeModule === "cars-coach" 
               ? "border-primary bg-primary/5 shadow-lg" 
               : "hover:border-primary/50"
           )}
-          onClick={() => handleToggle("ai-template")}
+          onClick={() => handleToggle("cars-coach")}
         >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-secondary-foreground" />
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-primary" />
               </div>
               <ChevronDown className={cn(
                 "w-5 h-5 text-muted-foreground transition-transform",
-                activeModule === "ai-template" && "rotate-180"
+                activeModule === "cars-coach" && "rotate-180"
               )} />
             </div>
-            <CardTitle className="text-lg mt-3">AI Learning App Template</CardTitle>
+            <CardTitle className="text-lg mt-3">🎓 CARS Coach</CardTitle>
             <CardDescription className="text-sm">
-              Test AI-powered tools with interactive demos
+              Learn genre analysis with an AI tutor using the CARS model
             </CardDescription>
           </CardHeader>
         </Card>
@@ -178,48 +180,40 @@ const NeedsAnalysis = () => {
           <AIWritingSurvey />
         )}
 
-        {/* AI Template Module */}
-        {activeModule === "ai-template" && (
-          <Card className="border-2 border-primary/30">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="w-5 h-5 text-primary" />
-                AI Learning App Template
-              </CardTitle>
-              <CardDescription>
-                Experience hands-on demos of how AI can enhance your research workflow.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">📚 Literature Review</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Get AI assistance in summarizing and analyzing research papers.
-                    </p>
-                  </div>
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">✍️ Writing Feedback</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Receive suggestions to improve your academic writing.
-                    </p>
-                  </div>
-                  <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="font-medium mb-2">🔬 Methodology Guide</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Explore research methodology guidance and best practices.
-                    </p>
-                  </div>
-                </div>
+        {/* CARS Coach Module */}
+        {activeModule === "cars-coach" && (
+          studentId ? (
+            <CarsCoachApp 
+              studentId={studentId} 
+              onBack={() => setActiveModule(null)} 
+            />
+          ) : (
+            <Card className="border-2 border-primary/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-primary" />
+                  CARS Coach
+                </CardTitle>
+                <CardDescription>
+                  Please log in to access the CARS Coach AI tutor.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <div className="bg-muted/30 border rounded-lg p-6 text-center">
+                  <GraduationCap className="w-12 h-12 text-muted-foreground/50 mx-auto mb-3" />
                   <p className="text-muted-foreground">
-                    Interactive AI template interface will be available here.
+                    Login with your student ID to start learning about the CARS model.
                   </p>
+                  <a 
+                    href="/mccp/auth" 
+                    className="inline-block mt-4 text-primary hover:underline"
+                  >
+                    Go to Login →
+                  </a>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )
         )}
 
         {/* Collaborative Chat Module */}
