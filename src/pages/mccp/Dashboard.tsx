@@ -83,26 +83,43 @@ const calculateCarsCoachAccuracyFromChat = (chatHistory: CarsCoachChatMsg[]) => 
       const prevWasUser = i > 0 && (chatHistory[i - 1]?.role || "") === "user";
       if (!prevWasUser) continue;
 
-      if (
-        content.includes("correct") ||
+      // Check for correct answer indicators
+      const isCorrect = 
+        content.includes("correct!") ||
+        content.includes("that's correct") ||
+        content.includes("you're right") ||
         content.includes("well done") ||
-        content.includes("thats right") ||
         content.includes("that's right") ||
-        content.includes("exactly")
-      ) {
-        correctCount++;
-        totalQuestions++;
-      } else if (
+        content.includes("exactly!") ||
+        content.includes("great job") ||
+        content.includes("excellent!") ||
+        content.includes("perfectly identified") ||
+        content.includes("you got it") ||
+        content.includes("nice work") ||
+        (content.includes("correct") && content.includes("answer"));
+
+      // Check for incorrect answer indicators  
+      const isIncorrect =
         content.includes("incorrect") ||
         content.includes("not quite") ||
-        content.includes("the correct answer")
-      ) {
+        content.includes("the correct answer is") ||
+        content.includes("the correct answer was") ||
+        content.includes("actually, the answer") ||
+        content.includes("let me explain") ||
+        content.includes("that's not") ||
+        content.includes("isn't quite right") ||
+        content.includes("wrong");
+
+      if (isCorrect && !isIncorrect) {
+        correctCount++;
+        totalQuestions++;
+      } else if (isIncorrect) {
         totalQuestions++;
       }
     }
   }
 
-  return totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+  return totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : null;
 };
 
 const buildCarsCoachTranscriptText = (chatHistory: CarsCoachChatMsg[]) => {
@@ -153,7 +170,7 @@ const downloadTextFile = (content: string, filename: string) => {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <p className="text-xs text-muted-foreground">Quiz accuracy</p>
-            <p className="font-medium">{accuracy}%</p>
+            <p className="font-medium">{accuracy !== null ? `${accuracy}%` : "N/A"}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Messages</p>
@@ -198,6 +215,7 @@ const downloadTextFile = (content: string, filename: string) => {
           </div>
         )}
 
+        {/* Download button */}
         <div className="flex gap-2 flex-wrap">
           <Button
             type="button"
@@ -213,6 +231,35 @@ const downloadTextFile = (content: string, filename: string) => {
             <Download className="h-4 w-4 mr-2" /> Download transcript
           </Button>
         </div>
+
+        {/* Chat History Display */}
+        {chatHistory.length > 0 && (
+          <Collapsible className="border rounded-lg mt-3">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 hover:bg-muted/50 text-sm">
+              <span className="font-medium">View Chat History ({chatHistory.length} messages)</span>
+              <ChevronDown className="h-4 w-4" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="px-3 pb-3">
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {chatHistory.map((msg, idx) => (
+                  <div 
+                    key={idx} 
+                    className={`p-2 rounded-lg text-xs ${
+                      msg.role === 'assistant' 
+                        ? 'bg-primary/10 border-l-2 border-primary' 
+                        : 'bg-muted ml-4'
+                    }`}
+                  >
+                    <p className="font-medium mb-1 text-muted-foreground">
+                      {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 You'}
+                    </p>
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
         {!lr && (
           <p className="text-xs text-muted-foreground">
