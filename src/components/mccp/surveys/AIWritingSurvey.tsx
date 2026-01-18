@@ -201,6 +201,37 @@ export function AIWritingSurvey() {
 
       if (insertError) throw insertError;
 
+      // Also track in students_progress for dashboard
+      const progressData = {
+        student_id: studentId,
+        task_id: 'needs_analysis_survey',
+        task_type: 'survey',
+        answer: surveyData as any,
+        ai_feedback: 'Survey completed',
+        is_correct: true,
+        score: 1
+      };
+      
+      // Check if exists first, then insert or update
+      const { data: existingProgress } = await supabase
+        .from('students_progress')
+        .select('id')
+        .eq('student_id', studentId)
+        .eq('task_id', 'needs_analysis_survey')
+        .single();
+
+      if (existingProgress) {
+        await supabase
+          .from('students_progress')
+          .update(progressData as any)
+          .eq('student_id', studentId)
+          .eq('task_id', 'needs_analysis_survey');
+      } else {
+        await supabase
+          .from('students_progress')
+          .insert([progressData] as any);
+      }
+
       setIsSubmitted(true);
       toast.success('Survey submitted successfully!');
     } catch (err) {

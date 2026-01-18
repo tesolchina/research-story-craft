@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
@@ -59,6 +60,7 @@ const ALL_TASKS: { id: string; type: string; label: string; week: string; link?:
 const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo; onLogout: () => void }) => {
   const [tasks, setTasks] = useState<TaskProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadProgress();
@@ -85,7 +87,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       return {
         taskId: task.id,
         taskType: task.type,
-        completed: progress ? (task.type === "mc" ? progress.score !== null : !!progress.ai_feedback) : false,
+        completed: progress ? (task.type === "mc" ? progress.score !== null : !!progress.answer || !!progress.ai_feedback) : false,
         score: progress?.score ?? null,
         aiFeedback: progress?.ai_feedback ?? null,
         answer: progress?.answer ?? null,
@@ -95,6 +97,72 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
 
     setTasks(taskProgress);
     setIsLoading(false);
+  };
+
+  const toggleExpanded = (taskId: string) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  const renderSurveyAnswer = (answer: unknown) => {
+    if (!answer || typeof answer !== 'object') return null;
+    const data = answer as Record<string, unknown>;
+    
+    return (
+      <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm space-y-3">
+        {data.field_of_study && (
+          <div>
+            <span className="font-medium text-muted-foreground">Discipline:</span>{' '}
+            <span>{String(data.field_of_study)}</span>
+          </div>
+        )}
+        {data.ai_frequency !== undefined && data.ai_frequency !== null && (
+          <div>
+            <span className="font-medium text-muted-foreground">AI Usage Frequency:</span>{' '}
+            <span>{String(data.ai_frequency)}/5</span>
+          </div>
+        )}
+        {data.ai_tools_used && (
+          <div>
+            <span className="font-medium text-muted-foreground">AI Tools Used:</span>
+            <pre className="mt-1 text-xs whitespace-pre-wrap bg-background p-2 rounded border">
+              {String(data.ai_tools_used)}
+            </pre>
+          </div>
+        )}
+        {Array.isArray(data.helpful_stages) && data.helpful_stages.length > 0 && (
+          <div>
+            <span className="font-medium text-muted-foreground">Helpful Stages:</span>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {data.helpful_stages.map((stage: string) => (
+                <Badge key={stage} variant="secondary" className="text-xs">{stage}</Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        {data.workflow_description && (
+          <div>
+            <span className="font-medium text-muted-foreground">Workflow Description:</span>
+            <pre className="mt-1 text-xs whitespace-pre-wrap bg-background p-2 rounded border max-h-40 overflow-y-auto">
+              {String(data.workflow_description)}
+            </pre>
+          </div>
+        )}
+        {data.ai_wishlist && (
+          <div>
+            <span className="font-medium text-muted-foreground">AI Wishlist:</span>
+            <p className="mt-1 text-muted-foreground">{String(data.ai_wishlist)}</p>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const completedCount = tasks.filter((t) => t.completed).length;
@@ -147,6 +215,8 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
               ) : (
                 tasks.map((task) => {
                   const taskInfo = getTaskInfo(task.taskId);
+                  const isExpanded = expandedTasks.has(task.taskId);
+                  
                   const taskContent = (
                     <div 
                       className={`p-4 rounded-lg border transition-colors ${
@@ -178,10 +248,27 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                         </div>
                         <div className="flex items-center gap-2">
                           {task.completed ? (
-                            <Badge variant="default" className="bg-green-600">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              {task.taskType === "mc" ? `Score: ${task.score}/5` : "Completed"}
-                            </Badge>
+                            <>
+                              <Badge variant="default" className="bg-green-600">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                {task.taskType === "mc" ? `Score: ${task.score}/5` : "Completed"}
+                              </Badge>
+                              {task.answer && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => toggleExpanded(task.taskId)}
+                                  className="h-8 px-2"
+                                >
+                                  {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                  )}
+                                  <span className="ml-1 text-xs">View</span>
+                                </Button>
+                              )}
+                            </>
                           ) : (
                             <Badge variant="outline">
                               <Clock className="h-3 w-3 mr-1" />
@@ -197,6 +284,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                           })}
                         </p>
                       )}
+                      {isExpanded && task.answer && task.taskType === "survey" && renderSurveyAnswer(task.answer)}
                     </div>
                   );
 
