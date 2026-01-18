@@ -4,7 +4,8 @@
  * Index page for Needs Analysis / Use Cases Exploration
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ClipboardList, Bot, MessageSquare, Users, ChevronDown, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,8 +16,18 @@ import { SurveyDashboard } from "@/components/mccp/surveys/SurveyDashboard";
 type ModuleId = "questionnaire" | "ai-template" | "chat" | "dashboard" | null;
 
 const NeedsAnalysis = () => {
+  const location = useLocation();
+  
   // Track which module is currently expanded (null = none)
   const [activeModule, setActiveModule] = useState<ModuleId>(null);
+
+  // Handle hash-based navigation
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (hash === 'questionnaire') {
+      setActiveModule('questionnaire');
+    }
+  }, [location.hash]);
   
   const userType = localStorage.getItem('mccp_user_type');
   const isTeacher = userType === 'teacher';

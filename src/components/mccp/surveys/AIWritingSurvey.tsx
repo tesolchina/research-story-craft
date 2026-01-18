@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Send, CheckCircle } from 'lucide-react';
+import { Send, CheckCircle, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,17 @@ const HELPFUL_STAGES = [
   { id: 'citation', label: 'Citation Management' },
 ];
 
+interface ToolUsage {
+  tool: string;
+  useCase: string;
+}
+
+interface WorkflowExample {
+  input: string;
+  process: string;
+  output: string;
+}
+
 interface SurveyData {
   student_id: string;
   field_of_study: string;
@@ -40,12 +51,19 @@ export function AIWritingSurvey() {
   const [existingResponse, setExistingResponse] = useState<boolean>(false);
   
   // Form state
-  const [fieldOfStudy, setFieldOfStudy] = useState('');
+  const [discipline, setDiscipline] = useState('');
+  const [subField, setSubField] = useState('');
   const [aiFrequency, setAiFrequency] = useState('');
-  const [aiToolsUsed, setAiToolsUsed] = useState('');
+  const [toolUsages, setToolUsages] = useState<ToolUsage[]>([
+    { tool: '', useCase: '' },
+    { tool: '', useCase: '' },
+    { tool: '', useCase: '' },
+  ]);
   const [helpfulStages, setHelpfulStages] = useState<string[]>([]);
   const [otherStage, setOtherStage] = useState('');
-  const [workflowDescription, setWorkflowDescription] = useState('');
+  const [workflowExamples, setWorkflowExamples] = useState<WorkflowExample[]>([
+    { input: '', process: '', output: '' },
+  ]);
   const [aiWishlist, setAiWishlist] = useState('');
 
   const studentId = localStorage.getItem('mccp_student_id');
@@ -77,12 +95,55 @@ export function AIWritingSurvey() {
     }
   };
 
+  const handleToolUsageChange = (index: number, field: keyof ToolUsage, value: string) => {
+    const updated = [...toolUsages];
+    updated[index][field] = value;
+    setToolUsages(updated);
+  };
+
+  const addToolUsage = () => {
+    if (toolUsages.length < 10) {
+      setToolUsages([...toolUsages, { tool: '', useCase: '' }]);
+    }
+  };
+
+  const removeToolUsage = (index: number) => {
+    if (toolUsages.length > 3) {
+      setToolUsages(toolUsages.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleWorkflowChange = (index: number, field: keyof WorkflowExample, value: string) => {
+    const updated = [...workflowExamples];
+    updated[index][field] = value;
+    setWorkflowExamples(updated);
+  };
+
+  const addWorkflowExample = () => {
+    if (workflowExamples.length < 3) {
+      setWorkflowExamples([...workflowExamples, { input: '', process: '', output: '' }]);
+    }
+  };
+
+  const removeWorkflowExample = (index: number) => {
+    if (workflowExamples.length > 1) {
+      setWorkflowExamples(workflowExamples.filter((_, i) => i !== index));
+    }
+  };
+
   const validateForm = () => {
-    if (!fieldOfStudy.trim()) return 'Please enter your field of study';
+    if (!discipline.trim()) return 'Please enter your academic discipline';
+    if (!subField.trim()) return 'Please enter your sub-field or specialization';
     if (!aiFrequency) return 'Please select your AI usage frequency';
-    if (!aiToolsUsed.trim()) return 'Please list the AI tools you use';
+    
+    const filledTools = toolUsages.filter(t => t.tool.trim() && t.useCase.trim());
+    if (filledTools.length < 3) return 'Please provide at least 3 AI tools with their use cases';
+    
     if (helpfulStages.length === 0) return 'Please select at least one helpful stage';
-    if (!workflowDescription.trim()) return 'Please describe your workflow';
+    
+    const filledWorkflows = workflowExamples.filter(w => w.input.trim() && w.process.trim() && w.output.trim());
+    if (filledWorkflows.length === 0) return 'Please provide at least one complete workflow example (input, process, and output)';
+    
     if (!aiWishlist.trim()) return 'Please share what you wish AI could do better';
     return null;
   };
@@ -108,13 +169,25 @@ export function AIWritingSurvey() {
         ? [...helpfulStages, `other: ${otherStage}`]
         : helpfulStages;
 
+      // Format tools as structured string
+      const toolsFormatted = toolUsages
+        .filter(t => t.tool.trim() && t.useCase.trim())
+        .map(t => `${t.tool}: ${t.useCase}`)
+        .join('\n');
+
+      // Format workflow examples
+      const workflowFormatted = workflowExamples
+        .filter(w => w.input.trim() || w.process.trim() || w.output.trim())
+        .map((w, i) => `Example ${i + 1}:\nInput: ${w.input}\nProcess: ${w.process}\nOutput: ${w.output}`)
+        .join('\n\n');
+
       const surveyData: SurveyData = {
         student_id: studentId,
-        field_of_study: fieldOfStudy.trim(),
+        field_of_study: `${discipline.trim()} - ${subField.trim()}`,
         ai_frequency: parseInt(aiFrequency),
-        ai_tools_used: aiToolsUsed.trim(),
+        ai_tools_used: toolsFormatted,
         helpful_stages: allStages,
-        workflow_description: workflowDescription.trim(),
+        workflow_description: workflowFormatted,
         ai_wishlist: aiWishlist.trim()
       };
 
@@ -173,26 +246,44 @@ export function AIWritingSurvey() {
       <CardHeader>
         <CardTitle>Survey on AI-Collaborative Academic Writing</CardTitle>
         <CardDescription>
-          This survey aims to understand how researchers and students utilize AI tools for collaborative writing and research. Your responses will help us identify current trends in human-AI co-creation. The survey is anonymous and takes approximately 3 minutes.
+          This survey aims to understand how researchers and students utilize AI tools for collaborative writing and research. Your responses will help us identify current trends in human-AI co-creation. The survey is anonymous and takes approximately 5 minutes.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Field of Study */}
-        <div className="space-y-2">
-          <Label htmlFor="field-of-study">
-            Which field of study best describes your research? <span className="text-destructive">*</span>
+      <CardContent className="space-y-8">
+        {/* Discipline and Sub-field */}
+        <div className="space-y-4">
+          <Label className="text-base font-medium">
+            What is your academic discipline and area of specialization? <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="field-of-study"
-            value={fieldOfStudy}
-            onChange={(e) => setFieldOfStudy(e.target.value)}
-            placeholder="e.g., Computer Science, Education, Linguistics"
-          />
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="discipline" className="text-sm text-muted-foreground">
+                Primary Discipline
+              </Label>
+              <Input
+                id="discipline"
+                value={discipline}
+                onChange={(e) => setDiscipline(e.target.value)}
+                placeholder="e.g., Linguistics, Education, Computer Science"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sub-field" className="text-sm text-muted-foreground">
+                Sub-field / Specialization
+              </Label>
+              <Input
+                id="sub-field"
+                value={subField}
+                onChange={(e) => setSubField(e.target.value)}
+                placeholder="e.g., Applied Linguistics, TESOL, NLP"
+              />
+            </div>
+          </div>
         </div>
 
         {/* AI Frequency */}
         <div className="space-y-3">
-          <Label>
+          <Label className="text-base font-medium">
             How frequently do you use AI tools in your academic writing process? <span className="text-destructive">*</span>
           </Label>
           <RadioGroup value={aiFrequency} onValueChange={setAiFrequency}>
@@ -211,23 +302,65 @@ export function AIWritingSurvey() {
           </RadioGroup>
         </div>
 
-        {/* AI Tools Used */}
-        <div className="space-y-2">
-          <Label htmlFor="ai-tools">
-            Which AI tools or Platform do you actively use for writing or research? (List out at least 3 Tools / Platforms) <span className="text-destructive">*</span>
+        {/* AI Tools Used - Two Column Layout */}
+        <div className="space-y-4">
+          <Label className="text-base font-medium">
+            Which AI tools or platforms do you actively use for writing or research? <span className="text-destructive">*</span>
           </Label>
-          <Textarea
-            id="ai-tools"
-            value={aiToolsUsed}
-            onChange={(e) => setAiToolsUsed(e.target.value)}
-            placeholder="e.g., ChatGPT, Claude, Grammarly, Perplexity, Notion AI..."
-            rows={3}
-          />
+          <p className="text-sm text-muted-foreground">
+            Please list at least 3 tools and describe the primary purpose for which you use each one.
+          </p>
+          
+          <div className="space-y-3">
+            <div className="grid grid-cols-[1fr_1fr_40px] gap-2 text-sm font-medium text-muted-foreground">
+              <span>Tool / Platform</span>
+              <span>Primary Use Case</span>
+              <span></span>
+            </div>
+            
+            {toolUsages.map((usage, index) => (
+              <div key={index} className="grid grid-cols-[1fr_1fr_40px] gap-2 items-center">
+                <Input
+                  value={usage.tool}
+                  onChange={(e) => handleToolUsageChange(index, 'tool', e.target.value)}
+                  placeholder="e.g., ChatGPT, Grammarly"
+                />
+                <Input
+                  value={usage.useCase}
+                  onChange={(e) => handleToolUsageChange(index, 'useCase', e.target.value)}
+                  placeholder="e.g., Drafting paragraphs, Grammar check"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeToolUsage(index)}
+                  disabled={toolUsages.length <= 3}
+                  className="h-9 w-9"
+                >
+                  <Trash2 className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </div>
+            ))}
+            
+            {toolUsages.length < 10 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addToolUsage}
+                className="mt-2"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Another Tool
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Helpful Stages */}
         <div className="space-y-3">
-          <Label>
+          <Label className="text-base font-medium">
             In which stages of the writing process do you find AI most helpful? <span className="text-destructive">*</span>
           </Label>
           <div className="space-y-2">
@@ -260,23 +393,96 @@ export function AIWritingSurvey() {
           </div>
         </div>
 
-        {/* Workflow Description */}
-        <div className="space-y-2">
-          <Label htmlFor="workflow">
-            Briefly describe your workflow: How do you collaborate with AI to do academic writing? <span className="text-destructive">*</span>
-          </Label>
-          <Textarea
-            id="workflow"
-            value={workflowDescription}
-            onChange={(e) => setWorkflowDescription(e.target.value)}
-            placeholder='e.g., "I use ChatGPT for outlining, then search articles by Perplexity, and finally edit with Grammarly."'
-            rows={4}
-          />
+        {/* Workflow Description - Input/Process/Output */}
+        <div className="space-y-4">
+          <div>
+            <Label className="text-base font-medium">
+              Describe your AI collaboration workflow using the Input → Process → Output framework <span className="text-destructive">*</span>
+            </Label>
+            <p className="text-sm text-muted-foreground mt-1">
+              Please provide up to 3 examples of how you collaborate with AI in your academic writing. Each example should include:
+            </p>
+            <ul className="text-sm text-muted-foreground mt-2 ml-4 list-disc space-y-1">
+              <li><strong>Input:</strong> What you provide to the AI (e.g., a draft paragraph, teacher feedback, research notes)</li>
+              <li><strong>Process:</strong> What you ask the AI to do (e.g., revise based on feedback, summarize, check grammar)</li>
+              <li><strong>Output:</strong> What result you expect (e.g., a revised paragraph with explanations, a summary)</li>
+            </ul>
+          </div>
+
+          <div className="p-4 bg-muted/50 rounded-lg border">
+            <p className="text-sm font-medium mb-2">Example:</p>
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p><strong>Input:</strong> A paragraph I wrote + teacher's comment suggesting more specific examples</p>
+              <p><strong>Process:</strong> Ask AI to revise the paragraph incorporating more concrete examples while maintaining my voice</p>
+              <p><strong>Output:</strong> A revised paragraph with added examples and brief explanations of the changes made</p>
+            </div>
+          </div>
+
+          {workflowExamples.map((example, index) => (
+            <div key={index} className="p-4 border rounded-lg space-y-3 bg-background">
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-sm">Workflow Example {index + 1}</span>
+                {workflowExamples.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeWorkflowExample(index)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Remove
+                  </Button>
+                )}
+              </div>
+              
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-sm text-muted-foreground">Input (What do you provide to the AI?)</Label>
+                  <Textarea
+                    value={example.input}
+                    onChange={(e) => handleWorkflowChange(index, 'input', e.target.value)}
+                    placeholder="Describe what materials or content you give to the AI..."
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-sm text-muted-foreground">Process (What do you ask the AI to do?)</Label>
+                  <Textarea
+                    value={example.process}
+                    onChange={(e) => handleWorkflowChange(index, 'process', e.target.value)}
+                    placeholder="Describe the task or instruction you give to the AI..."
+                    rows={2}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-sm text-muted-foreground">Output (What result do you expect?)</Label>
+                  <Textarea
+                    value={example.output}
+                    onChange={(e) => handleWorkflowChange(index, 'output', e.target.value)}
+                    placeholder="Describe the expected outcome from the AI..."
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {workflowExamples.length < 3 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addWorkflowExample}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Another Workflow Example
+            </Button>
+          )}
         </div>
 
         {/* AI Wishlist */}
         <div className="space-y-2">
-          <Label htmlFor="wishlist">
+          <Label htmlFor="wishlist" className="text-base font-medium">
             Which specific tasks do you wish AI could handle better or more automatically? <span className="text-destructive">*</span>
           </Label>
           <Textarea
