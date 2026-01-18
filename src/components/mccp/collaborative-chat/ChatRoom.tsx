@@ -176,19 +176,31 @@ export function ChatRoom({
     insertMention(mention);
   };
 
-  // Helper to insert mention into message
+  // Handle "mention all" autocomplete
+  const handleAllMentionSelect = (mention: string) => {
+    insertMention(mention);
+  };
+
+  // Helper to insert mention into message and position cursor after it
   const insertMention = (mention: string) => {
     const textBeforeCursor = message.slice(0, cursorPosition);
     const textAfterCursor = message.slice(cursorPosition);
     
     // Find and replace the @... pattern
     const newTextBefore = textBeforeCursor.replace(/@\w*$/, mention + ' ');
-    setMessage(newTextBefore + textAfterCursor);
+    const newMessage = newTextBefore + textAfterCursor;
+    const newCursorPosition = newTextBefore.length;
+    
+    setMessage(newMessage);
+    setCursorPosition(newCursorPosition);
     setShowMentions(false);
     
-    // Focus back on textarea
+    // Focus back on textarea and set cursor position
     setTimeout(() => {
-      textareaRef.current?.focus();
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+      }
     }, 0);
   };
 
@@ -370,6 +382,7 @@ export function ChatRoom({
               currentUserId={studentId}
               onSelectAI={handleAIMentionSelect}
               onSelectHuman={handleHumanMentionSelect}
+              onSelectAll={handleAllMentionSelect}
               onClose={() => setShowMentions(false)}
               showAI={canAccessAI}
             />
