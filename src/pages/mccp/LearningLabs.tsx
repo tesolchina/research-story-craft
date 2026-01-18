@@ -80,118 +80,152 @@ const LearningLabs = () => {
     setCarsCoachCompleted(false);
   };
 
+  // When chat is fully expanded, show minimal UI
+  const isChatFullscreen = activeModule === "chat";
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Learning Labs
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Interactive modules to enhance your academic writing skills
-        </p>
-        {isTeacher && (
-          <Badge variant="secondary" className="mt-2">
-            Teacher View - Preview student modules
-          </Badge>
-        )}
-      </div>
+    <div className={cn(
+      "container mx-auto px-4 max-w-6xl",
+      isChatFullscreen ? "py-4" : "py-8"
+    )}>
+      {/* Page Header - hidden when chat is fullscreen */}
+      {!isChatFullscreen && (
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Learning Labs
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Interactive modules to enhance your academic writing skills
+          </p>
+          {isTeacher && (
+            <Badge variant="secondary" className="mt-2">
+              Teacher View - Preview student modules
+            </Badge>
+          )}
+        </div>
+      )}
 
-      {/* Feature Cards Grid */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+      {/* Feature Cards Grid - Compact when chat is active */}
+      <div className={cn(
+        "grid gap-4 mb-6",
+        isChatFullscreen 
+          ? "grid-cols-1 md:grid-cols-3" 
+          : "md:grid-cols-3"
+      )}>
         
-        {/* Card 1: General Questionnaire */}
-        <Card 
-          className={cn(
-            "cursor-pointer transition-all hover:shadow-lg border-2",
-            activeModule === "questionnaire" 
-              ? "border-primary bg-primary/5 shadow-lg" 
-              : "hover:border-primary/50"
-          )}
-          onClick={() => handleToggle("questionnaire")}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ClipboardList className="w-5 h-5 text-primary" />
-              </div>
-              <ChevronDown className={cn(
-                "w-5 h-5 text-muted-foreground transition-transform",
-                activeModule === "questionnaire" && "rotate-180"
-              )} />
-            </div>
-            <CardTitle className="text-lg mt-3">General Questionnaire</CardTitle>
-            <CardDescription className="text-sm">
-              {isTeacher 
-                ? "Preview survey questions (view responses in Dashboard)" 
-                : "Identify your research needs and learning preferences"}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
-        {/* Card 2: CARS Coach - AI Tutor */}
-        <Card 
-          className={cn(
-            "cursor-pointer transition-all hover:shadow-lg border-2",
-            activeModule === "cars-coach" 
-              ? "border-primary bg-primary/5 shadow-lg" 
-              : "hover:border-primary/50"
-          )}
-          onClick={() => handleToggle("cars-coach")}
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex items-center gap-2">
-                {!isTeacher && carsCoachCompleted && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-700">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    Completed
-                  </Badge>
-                )}
+        {/* Card 1: General Questionnaire - Hidden when chat is fullscreen */}
+        {!isChatFullscreen && (
+          <Card 
+            className={cn(
+              "cursor-pointer transition-all hover:shadow-lg border-2",
+              activeModule === "questionnaire" 
+                ? "border-primary bg-primary/5 shadow-lg" 
+                : "hover:border-primary/50"
+            )}
+            onClick={() => handleToggle("questionnaire")}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ClipboardList className="w-5 h-5 text-primary" />
+                </div>
                 <ChevronDown className={cn(
                   "w-5 h-5 text-muted-foreground transition-transform",
-                  activeModule === "cars-coach" && "rotate-180"
+                  activeModule === "questionnaire" && "rotate-180"
                 )} />
               </div>
-            </div>
-            <CardTitle className="text-lg mt-3">🎓 CARS Coach</CardTitle>
-            <CardDescription className="text-sm">
-              {isTeacher 
-                ? "Preview task flow (view student progress in Dashboard)" 
-                : "Learn genre analysis with an AI tutor using the CARS model"}
-            </CardDescription>
-          </CardHeader>
-        </Card>
+              <CardTitle className="text-lg mt-3">General Questionnaire</CardTitle>
+              <CardDescription className="text-sm">
+                {isTeacher 
+                  ? "Preview survey questions (view responses in Dashboard)" 
+                  : "Identify your research needs and learning preferences"}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
 
-        {/* Card 3: Collaborative Chat */}
+        {/* Card 2: CARS Coach - Hidden when chat is fullscreen */}
+        {!isChatFullscreen && (
+          <Card 
+            className={cn(
+              "cursor-pointer transition-all hover:shadow-lg border-2",
+              activeModule === "cars-coach" 
+                ? "border-primary bg-primary/5 shadow-lg" 
+                : "hover:border-primary/50"
+            )}
+            onClick={() => handleToggle("cars-coach")}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                  <GraduationCap className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex items-center gap-2">
+                  {!isTeacher && carsCoachCompleted && (
+                    <Badge variant="secondary" className="bg-green-100 text-green-700">
+                      <CheckCircle2 className="w-3 h-3 mr-1" />
+                      Completed
+                    </Badge>
+                  )}
+                  <ChevronDown className={cn(
+                    "w-5 h-5 text-muted-foreground transition-transform",
+                    activeModule === "cars-coach" && "rotate-180"
+                  )} />
+                </div>
+              </div>
+              <CardTitle className="text-lg mt-3">🎓 CARS Coach</CardTitle>
+              <CardDescription className="text-sm">
+                {isTeacher 
+                  ? "Preview task flow (view student progress in Dashboard)" 
+                  : "Learn genre analysis with an AI tutor using the CARS model"}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+
+        {/* Card 3: Collaborative Chat - Always visible, compact when active */}
         <Card 
           className={cn(
-            "cursor-pointer transition-all hover:shadow-lg border-2",
-            activeModule === "chat" 
-              ? "border-primary bg-primary/5 shadow-lg" 
-              : "hover:border-primary/50"
+            "cursor-pointer transition-all border-2",
+            isChatFullscreen
+              ? "border-primary bg-primary/5 col-span-full md:col-span-1"
+              : isChatFullscreen 
+                ? "border-primary bg-primary/5 shadow-lg" 
+                : "hover:shadow-lg hover:border-primary/50"
           )}
           onClick={() => handleToggle("chat")}
         >
-          <CardHeader className="pb-3">
+          <CardHeader className={cn("pb-3", isChatFullscreen && "py-2")}>
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-accent-foreground" />
+              <div className={cn(
+                "rounded-lg bg-accent flex items-center justify-center",
+                isChatFullscreen ? "w-8 h-8" : "w-10 h-10"
+              )}>
+                <MessageSquare className={cn(
+                  "text-accent-foreground",
+                  isChatFullscreen ? "w-4 h-4" : "w-5 h-5"
+                )} />
               </div>
-              <ChevronDown className={cn(
-                "w-5 h-5 text-muted-foreground transition-transform",
-                activeModule === "chat" && "rotate-180"
-              )} />
+              <div className="flex items-center gap-2">
+                {isChatFullscreen && (
+                  <span className="text-xs text-muted-foreground">Click to collapse</span>
+                )}
+                <ChevronDown className={cn(
+                  "w-5 h-5 text-muted-foreground transition-transform",
+                  isChatFullscreen && "rotate-180"
+                )} />
+              </div>
             </div>
-            <CardTitle className="text-lg mt-3">Collaborative Chat</CardTitle>
-            <CardDescription className="text-sm">
-              {isTeacher 
-                ? "Create and manage discussion sessions" 
-                : "Start or join discussions with fellow students"}
-            </CardDescription>
+            {!isChatFullscreen && (
+              <>
+                <CardTitle className="text-lg mt-3">Collaborative Chat</CardTitle>
+                <CardDescription className="text-sm">
+                  {isTeacher 
+                    ? "Create and manage discussion sessions" 
+                    : "Start or join discussions with fellow students"}
+                </CardDescription>
+              </>
+            )}
           </CardHeader>
         </Card>
       </div>
