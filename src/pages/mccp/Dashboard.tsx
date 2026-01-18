@@ -71,7 +71,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
   const loadProgress = async () => {
     setIsLoading(true);
     
-    // Query using last_4_digits since that's what students_progress uses
+    // Query students_progress using last_4_digits
     const { data, error } = await supabase
       .from("students_progress")
       .select("task_id, task_type, score, ai_feedback, answer, updated_at, is_correct")
@@ -79,13 +79,33 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
 
     if (error) {
       console.error("Error loading progress:", error);
-      setIsLoading(false);
-      return;
     }
+
+    // Also check survey_responses table (uses unique_id format like "1989-SW-9Q")
+    const uniqueId = localStorage.getItem('mccp_student_id');
+    const { data: surveyData } = await supabase
+      .from("survey_responses")
+      .select("student_id, field_of_study, ai_frequency, ai_tools_used, helpful_stages, workflow_description, ai_wishlist, created_at")
+      .eq("student_id", uniqueId || '')
+      .maybeSingle();
 
     // Map all tasks with their completion status
     const taskProgress: TaskProgress[] = ALL_TASKS.map((task) => {
       const progress = data?.find((p) => p.task_id === task.id);
+      
+      // Special handling for survey task - check survey_responses table
+      if (task.id === "needs_analysis_survey" && surveyData) {
+        return {
+          taskId: task.id,
+          taskType: task.type,
+          completed: true,
+          score: null,
+          aiFeedback: "Survey completed",
+          answer: surveyData as unknown,
+          updatedAt: surveyData.created_at,
+        };
+      }
+      
       return {
         taskId: task.id,
         taskType: task.type,
