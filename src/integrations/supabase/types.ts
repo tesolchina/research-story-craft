@@ -65,6 +65,121 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_queued: boolean
+          sender_id: string | null
+          sender_name: string
+          sender_type: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_queued?: boolean
+          sender_id?: string | null
+          sender_name: string
+          sender_type: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_queued?: boolean
+          sender_id?: string | null
+          sender_name?: string
+          sender_type?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_participants: {
+        Row: {
+          display_name: string
+          id: string
+          is_teacher: boolean
+          joined_at: string
+          left_at: string | null
+          session_id: string
+          student_id: string
+        }
+        Insert: {
+          display_name: string
+          id?: string
+          is_teacher?: boolean
+          joined_at?: string
+          left_at?: string | null
+          session_id: string
+          student_id: string
+        }
+        Update: {
+          display_name?: string
+          id?: string
+          is_teacher?: boolean
+          joined_at?: string
+          left_at?: string | null
+          session_id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          agenda: Json | null
+          created_at: string
+          created_by: string
+          ended_at: string | null
+          id: string
+          is_student_led: boolean
+          max_participants: number
+          status: string
+          topic: string
+        }
+        Insert: {
+          agenda?: Json | null
+          created_at?: string
+          created_by: string
+          ended_at?: string | null
+          id?: string
+          is_student_led?: boolean
+          max_participants?: number
+          status?: string
+          topic: string
+        }
+        Update: {
+          agenda?: Json | null
+          created_at?: string
+          created_by?: string
+          ended_at?: string | null
+          id?: string
+          is_student_led?: boolean
+          max_participants?: number
+          status?: string
+          topic?: string
+        }
+        Relationships: []
+      }
       discussions: {
         Row: {
           created_at: string
