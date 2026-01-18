@@ -4,7 +4,7 @@ import { MessageBubble } from './MessageBubble';
 import { ParticipantsList } from './ParticipantsList';
 import { AIPersonaPanel } from './AIPersonaPanel';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -13,7 +13,9 @@ import {
   Users, 
   Loader2,
   Calendar,
-  XCircle
+  XCircle,
+  PanelRightClose,
+  PanelRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -34,7 +36,7 @@ export function ChatRoom({
   onEndSession 
 }: ChatRoomProps) {
   const [message, setMessage] = useState('');
-  const [showParticipants, setShowParticipants] = useState(true);
+  const [showParticipants, setShowParticipants] = useState(false); // Default collapsed
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +99,7 @@ export function ChatRoom({
   }
 
   return (
-    <div className="flex h-[600px] border rounded-xl overflow-hidden bg-card">
+    <div className="flex h-[calc(100vh-280px)] min-h-[500px] max-h-[800px] border rounded-xl overflow-hidden bg-card">
       {/* Main chat area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -126,11 +128,18 @@ export function ChatRoom({
 
           <Button
             variant="ghost"
-            size="icon"
-            className={cn('h-8 w-8', showParticipants && 'bg-muted')}
+            size="sm"
+            className={cn('h-8 gap-2', showParticipants && 'bg-muted')}
             onClick={() => setShowParticipants(!showParticipants)}
           >
-            <Users className="h-4 w-4" />
+            {showParticipants ? (
+              <PanelRightClose className="h-4 w-4" />
+            ) : (
+              <PanelRight className="h-4 w-4" />
+            )}
+            <span className="hidden sm:inline text-xs">
+              {participants.length} online
+            </span>
           </Button>
 
           {isTeacher && onEndSession && (
@@ -193,19 +202,22 @@ export function ChatRoom({
         )}
 
         {/* Message input */}
-        <div className="p-4 border-t">
-          <div className="flex gap-2">
-            <Input
+        <div className="p-3 border-t bg-muted/20">
+          <div className="flex gap-2 items-end">
+            <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your message..."
+              placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
               disabled={session.status !== 'active'}
-              className="flex-1"
+              className="flex-1 min-h-[44px] max-h-[120px] resize-none"
+              rows={1}
             />
             <Button 
               onClick={handleSend}
               disabled={!message.trim() || sending || session.status !== 'active'}
+              size="icon"
+              className="h-11 w-11 shrink-0"
             >
               {sending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -214,6 +226,9 @@ export function ChatRoom({
               )}
             </Button>
           </div>
+          <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
+            Press <kbd className="px-1 py-0.5 bg-muted rounded text-[9px]">Enter</kbd> to send, <kbd className="px-1 py-0.5 bg-muted rounded text-[9px]">Shift+Enter</kbd> for new line
+          </p>
         </div>
       </div>
 
