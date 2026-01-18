@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.verify-zhou-access]
 verify_jwt = false
+
+[functions.cars-coach-chat]
+verify_jwt = false
