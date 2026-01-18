@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download, Bot } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { exportSurveyResponsesAsCSV } from "@/utils/exportSurveyData";
@@ -48,6 +48,8 @@ interface StudentSummary {
   session2McScore: number | null;
   session2McTotal: number;
   session2WritingDone: boolean;
+  carsCoachDone: boolean;
+  carsCoachSessions: number;
   lastActive: string | null;
   progress: ProgressData[];
 }
@@ -55,6 +57,7 @@ interface StudentSummary {
 // Define all tasks students need to complete
 const ALL_TASKS: { id: string; type: string; label: string; week: string; link?: string }[] = [
   { id: "needs_analysis_survey", type: "survey", label: "Complete Needs Analysis Survey", week: "Pre-course", link: "/mccp/needs-analysis#questionnaire" },
+  { id: "cars_coach", type: "coach", label: "Complete CARS Coach Session", week: "Week 1", link: "/mccp/cars-coach" },
 ];
 
 
@@ -89,6 +92,15 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
       .eq("student_id", uniqueId || '')
       .maybeSingle();
 
+    // Check CARS Coach sessions
+    const { data: carsCoachData } = await supabase
+      .from("cars_coach_sessions")
+      .select("id, completed_at, discipline, current_phase")
+      .eq("student_id", uniqueId || '')
+      .not("completed_at", "is", null)
+      .order("completed_at", { ascending: false })
+      .limit(1);
+
     // Map all tasks with their completion status
     const taskProgress: TaskProgress[] = ALL_TASKS.map((task) => {
       const progress = data?.find((p) => p.task_id === task.id);
@@ -103,6 +115,20 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
           aiFeedback: "Survey completed",
           answer: surveyData as unknown,
           updatedAt: surveyData.created_at,
+        };
+      }
+
+      // Special handling for CARS Coach - check cars_coach_sessions table
+      if (task.id === "cars_coach" && carsCoachData && carsCoachData.length > 0) {
+        const session = carsCoachData[0];
+        return {
+          taskId: task.id,
+          taskType: task.type,
+          completed: true,
+          score: null,
+          aiFeedback: `Completed ${session.discipline} session`,
+          answer: { discipline: session.discipline },
+          updatedAt: session.completed_at,
         };
       }
       
@@ -255,6 +281,8 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                             <BookOpen className="h-5 w-5 text-muted-foreground" />
                           ) : task.taskType === "survey" ? (
                             <ClipboardList className="h-5 w-5 text-muted-foreground" />
+                          ) : task.taskType === "coach" ? (
+                            <Bot className="h-5 w-5 text-muted-foreground" />
                           ) : (
                             <PenTool className="h-5 w-5 text-muted-foreground" />
                           )}
@@ -381,6 +409,8 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
               session2McScore: null,
               session2McTotal: 5,
               session2WritingDone: false,
+              carsCoachDone: false,
+              carsCoachSessions: 0,
               lastActive: null,
               progress: [],
             });
@@ -417,6 +447,29 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
             }
           }
         });
+
+        // Now fetch CARS Coach sessions for all students
+        const { data: carsData } = await supabase
+          .from("cars_coach_sessions")
+          .select("student_id, completed_at")
+          .not("completed_at", "is", null);
+
+        if (carsData) {
+          carsData.forEach((session) => {
+            // student_id in cars_coach_sessions is like "1989-SW-9Q", extract last_4_digits
+            const parts = session.student_id.split('-');
+            const last4 = parts[0]; // The first part before hyphen is the 4-digit code
+            
+            const student = studentMap.get(last4);
+            if (student) {
+              student.carsCoachDone = true;
+              student.carsCoachSessions += 1;
+              if (!student.lastActive || new Date(session.completed_at) > new Date(student.lastActive)) {
+                student.lastActive = session.completed_at;
+              }
+            }
+          });
+        }
 
         setStudents(Array.from(studentMap.values()));
       }
@@ -504,6 +557,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Student</TableHead>
+                  <TableHead>CARS Coach</TableHead>
                   <TableHead>Session 1 MC</TableHead>
                   <TableHead>Session 1 Writing</TableHead>
                   <TableHead>Session 2 MC</TableHead>
@@ -520,6 +574,19 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
                         <p className="font-medium">{student.pseudonym}</p>
                         <p className="text-xs text-muted-foreground">****{student.studentId}</p>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {student.carsCoachDone ? (
+                        <Badge variant="default">
+                          <Bot className="h-3 w-3 mr-1" />
+                          {student.carsCoachSessions} {student.carsCoachSessions === 1 ? 'session' : 'sessions'}
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline">
+                          <Clock className="h-3 w-3 mr-1" />
+                          Pending
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell>
                       {student.session1McScore !== null ? (
