@@ -139,10 +139,10 @@ const MCCPLayout = () => {
                   </SidebarMenuItem>
 
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={location.pathname.startsWith("/mccp/needs-analysis")}>
-                      <Link to="/mccp/needs-analysis">
+                    <SidebarMenuButton asChild isActive={location.pathname.startsWith("/mccp/learning-labs")}>
+                      <Link to="/mccp/learning-labs">
                         <Compass className="h-4 w-4" />
-                        <span>Needs Analysis</span>
+                        <span>Learning Labs</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
