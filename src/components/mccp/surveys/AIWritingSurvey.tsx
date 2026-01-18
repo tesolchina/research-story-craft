@@ -13,13 +13,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const HELPFUL_STAGES = [
-  { id: 'brainstorming', label: 'Brainstorming & Outlining (Topic selection)' },
-  { id: 'literature', label: 'Literature Review & Summarization' },
-  { id: 'drafting', label: 'Drafting Content (Generating text)' },
-  { id: 'editing', label: 'Editing & Proofreading (Grammar/Style)' },
-  { id: 'translating', label: 'Translating (Native language to English)' },
-  { id: 'coding', label: 'Coding / Data Analysis' },
-  { id: 'citation', label: 'Citation Management' },
+  { id: 'ideation', label: 'Idea Generation & Topic Selection' },
+  { id: 'literature', label: 'Literature Search & Synthesis' },
+  { id: 'outlining', label: 'Outlining & Structuring Content' },
+  { id: 'drafting', label: 'Drafting & Content Generation' },
+  { id: 'revision', label: 'Revision & Editing' },
+  { id: 'proofreading', label: 'Proofreading (Grammar, Style, Mechanics)' },
+  { id: 'translation', label: 'Translation (L1 → English)' },
+  { id: 'data-analysis', label: 'Data Analysis & Coding' },
+  { id: 'citation', label: 'Citation & Reference Management' },
 ];
 
 interface ToolUsage {
