@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, GraduationCap, ClipboardList, BookOpen, PenTool, RefreshCw, ExternalLink, ChevronDown, ChevronUp, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { exportSurveyResponsesAsCSV } from "@/utils/exportSurveyData";
+import { toast } from "sonner";
 
 interface StudentInfo {
   uniqueId: string;
@@ -430,6 +432,21 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
     });
   };
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportSurveys = async () => {
+    setIsExporting(true);
+    try {
+      await exportSurveyResponsesAsCSV();
+      toast.success('Survey responses exported successfully!');
+    } catch (error: any) {
+      console.error('Export error:', error);
+      toast.error(error.message || 'Failed to export survey responses');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -438,6 +455,10 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
           <p className="text-muted-foreground">View all student progress</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportSurveys} disabled={isExporting}>
+            <Download className={`h-4 w-4 mr-2 ${isExporting ? "animate-pulse" : ""}`} />
+            {isExporting ? 'Exporting...' : 'Export Surveys'}
+          </Button>
           <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
