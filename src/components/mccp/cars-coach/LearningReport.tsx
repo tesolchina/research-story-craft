@@ -25,6 +25,13 @@ export default function LearningReport({ session, studentId }: LearningReportPro
     try {
       const completedAtIso = new Date().toISOString();
 
+      // Generate sample insights based on session
+      const sampleInsights = [
+        { text: "Start your introduction with a strong centrality claim connecting your topic to broader issues.", category: "move_1" },
+        { text: "Use gap-indicating language like 'however' or 'yet' to clearly signal Move 2.", category: "move_2" },
+        { text: "Ensure your research announcement directly addresses the gap you identified.", category: "move_3" },
+      ];
+
       // Persist completion + a compact learning_report so it can be shown on dashboards
       const chatHistoryJson = (session.chatHistory || []).map((m: any) => ({
         id: m.id || crypto.randomUUID(),
@@ -63,13 +70,6 @@ export default function LearningReport({ session, studentId }: LearningReportPro
           chat_history: chatHistoryJson as any,
         })
         .eq("id", session.id);
-
-      // Generate sample insights based on session
-      const sampleInsights = [
-        { text: "Start your introduction with a strong centrality claim connecting your topic to broader issues.", category: "move_1" },
-        { text: "Use gap-indicating language like 'however' or 'yet' to clearly signal Move 2.", category: "move_2" },
-        { text: "Ensure your research announcement directly addresses the gap you identified.", category: "move_3" },
-      ];
 
       // Save insights to database
       for (const insight of sampleInsights) {
