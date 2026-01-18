@@ -45,6 +45,7 @@ interface CarsCoachSessionData {
   chatHistory: { role: string; content: string }[];
   completedAt: string;
   currentPhase: string;
+  learningReport?: any;
 }
 
 interface StudentSummary {
@@ -68,6 +69,159 @@ const ALL_TASKS: { id: string; type: string; label: string; week: string; link?:
   { id: "needs_analysis_survey", type: "survey", label: "Complete Needs Analysis Survey", week: "Pre-course", link: "/mccp/needs-analysis#questionnaire" },
   { id: "cars_coach", type: "coach", label: "Complete CARS Coach Session", week: "Week 1", link: "/mccp/cars-coach" },
 ];
+
+type CarsCoachChatMsg = { role?: string; content?: string };
+
+const calculateCarsCoachAccuracyFromChat = (chatHistory: CarsCoachChatMsg[]) => {
+  let correctCount = 0;
+  let totalQuestions = 0;
+
+  for (let i = 0; i < chatHistory.length; i++) {
+    const msg = chatHistory[i];
+    if ((msg.role || "") === "assistant" && msg.content) {
+      const content = msg.content.toLowerCase();
+      const prevWasUser = i > 0 && (chatHistory[i - 1]?.role || "") === "user";
+      if (!prevWasUser) continue;
+
+      if (
+        content.includes("correct") ||
+        content.includes("well done") ||
+        content.includes("thats right") ||
+        content.includes("that's right") ||
+        content.includes("exactly")
+      ) {
+        correctCount++;
+        totalQuestions++;
+      } else if (
+        content.includes("incorrect") ||
+        content.includes("not quite") ||
+        content.includes("the correct answer")
+      ) {
+        totalQuestions++;
+      }
+    }
+  }
+
+  return totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+};
+
+const buildCarsCoachTranscriptText = (chatHistory: CarsCoachChatMsg[]) => {
+  const divider = "=".repeat(60);
+  const lines: string[] = [divider, "CARS COACH SESSION TRANSCRIPT", divider, ""];
+  for (const msg of chatHistory) {
+    const role = msg.role === "assistant" ? "CARS Coach" : "Student";
+    lines.push(`[${role}]`);
+    lines.push(msg.content || "");
+    lines.push("");
+  }
+  lines.push(divider);
+  return lines.join("\n");
+};
+
+const downloadTextFile = (content: string, filename: string) => {
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  };
+
+  const renderCarsCoachReport = (answer: unknown) => {
+    if (!answer || typeof answer !== "object") return null;
+    const data = answer as Record<string, any>;
+
+    const chatHistory = (data.chatHistory as CarsCoachChatMsg[]) || [];
+    const accuracy = calculateCarsCoachAccuracyFromChat(chatHistory);
+    const lr = data.learningReport as any;
+
+    return (
+      <div className="mt-3 p-4 bg-muted/30 rounded-lg text-sm space-y-3">
+        <div>
+          <span className="font-medium text-muted-foreground">Discipline:</span>{" "}
+          <span>{String(data.discipline || "-")}</span>
+        </div>
+        {data.completedAt && (
+          <div>
+            <span className="font-medium text-muted-foreground">Completed:</span>{" "}
+            <span>{new Date(String(data.completedAt)).toLocaleString("en-HK")}</span>
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <p className="text-xs text-muted-foreground">Quiz accuracy</p>
+            <p className="font-medium">{accuracy}%</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Messages</p>
+            <p className="font-medium">{chatHistory.length}</p>
+          </div>
+        </div>
+
+        {lr && (
+          <div className="pt-2 border-t space-y-2">
+            <p className="font-medium">Learning report</p>
+            {Array.isArray(lr.keyTakeaways) && lr.keyTakeaways.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Key takeaways</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  {lr.keyTakeaways.map((t: string, i: number) => (
+                    <li key={i}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {Array.isArray(lr.actionableInsights) && lr.actionableInsights.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Actionable insights</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  {lr.actionableInsights.map((ins: any, i: number) => (
+                    <li key={i}>
+                      {String(ins.text || ins.insightText || "")}
+                      {ins.category ? (
+                        <span className="text-xs text-muted-foreground"> ({String(ins.category)})</span>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {lr.finalReflection && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Student reflection</p>
+                <p className="whitespace-pre-wrap">{String(lr.finalReflection)}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              downloadTextFile(
+                buildCarsCoachTranscriptText(chatHistory),
+                `CARS_Coach_Transcript_${new Date().toISOString().split("T")[0]}.txt`
+              )
+            }
+          >
+            <Download className="h-4 w-4 mr-2" /> Download transcript
+          </Button>
+        </div>
+
+        {!lr && (
+          <p className="text-xs text-muted-foreground">
+            No saved learning report yet (it will appear after the student reaches the end screen).
+          </p>
+        )}
+      </div>
+    );
+  };
 
 
 // ===== STUDENT DASHBOARD =====
@@ -104,7 +258,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
     // Check CARS Coach sessions
     const { data: carsCoachData } = await supabase
       .from("cars_coach_sessions")
-      .select("id, completed_at, discipline, current_phase")
+      .select("id, completed_at, discipline, current_phase, chat_history, learning_report")
       .eq("student_id", uniqueId || '')
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: false })
@@ -129,14 +283,21 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
 
       // Special handling for CARS Coach - check cars_coach_sessions table
       if (task.id === "cars_coach" && carsCoachData && carsCoachData.length > 0) {
-        const session = carsCoachData[0];
+        const session = carsCoachData[0] as any;
         return {
           taskId: task.id,
           taskType: task.type,
           completed: true,
           score: null,
           aiFeedback: `Completed ${session.discipline} session`,
-          answer: { discipline: session.discipline },
+          answer: {
+            sessionId: session.id,
+            discipline: session.discipline,
+            completedAt: session.completed_at,
+            currentPhase: session.current_phase,
+            chatHistory: (session.chat_history as any[]) || [],
+            learningReport: session.learning_report ?? null,
+          },
           updatedAt: session.completed_at,
         };
       }
@@ -344,6 +505,7 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
                         </p>
                       )}
                       {isExpanded && task.answer && task.taskType === "survey" && renderSurveyAnswer(task.answer)}
+                      {isExpanded && task.answer && task.taskType === "coach" && renderCarsCoachReport(task.answer)}
                     </div>
                   );
 
@@ -361,20 +523,6 @@ const StudentDashboard = ({ studentInfo, onLogout }: { studentInfo: StudentInfo;
         </CardContent>
       </Card>
 
-      {/* Quick Links */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Links</CardTitle>
-        </CardHeader>
-        <CardContent className="flex gap-3 flex-wrap">
-          <Button variant="outline" asChild>
-            <a href="/mccp/weeks2-4/tasks">Go to Tasks</a>
-          </Button>
-          <Button variant="outline" asChild>
-            <a href="/mccp/weeks2-4/writing-materials">Writing Materials</a>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 };
@@ -461,7 +609,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
         // Now fetch CARS Coach sessions for all students with full details
         const { data: carsData } = await supabase
           .from("cars_coach_sessions")
-          .select("id, student_id, completed_at, discipline, chat_history, current_phase")
+          .select("id, student_id, completed_at, discipline, chat_history, current_phase, learning_report")
           .not("completed_at", "is", null);
 
         if (carsData) {
@@ -480,6 +628,7 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
                 chatHistory: (session.chat_history as any[]) || [],
                 completedAt: session.completed_at!,
                 currentPhase: session.current_phase,
+                learningReport: (session as any).learning_report ?? null,
               });
               if (!student.lastActive || new Date(session.completed_at!) > new Date(student.lastActive)) {
                 student.lastActive = session.completed_at;
@@ -697,25 +846,68 @@ const TeacherDashboardView = ({ onLogout }: { onLogout: () => void }) => {
                                       </div>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="px-4 pb-4">
-                                      <div className="space-y-3 max-h-96 overflow-y-auto">
-                                        <p className="text-xs text-muted-foreground">
-                                          {session.chatHistory.length} messages in conversation
-                                        </p>
-                                        {session.chatHistory.map((msg, msgIdx) => (
-                                          <div 
-                                            key={msgIdx} 
-                                            className={`p-3 rounded-lg text-sm ${
-                                              msg.role === 'assistant' 
-                                                ? 'bg-primary/10 border-l-2 border-primary' 
-                                                : 'bg-muted ml-8'
-                                            }`}
-                                          >
-                                            <p className="text-xs font-medium mb-1 text-muted-foreground">
-                                              {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student'}
-                                            </p>
-                                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                                      <div className="space-y-3">
+                                        <div className="p-3 rounded-lg bg-muted/30 text-sm space-y-2">
+                                          <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                              <p className="text-xs text-muted-foreground">Discipline</p>
+                                              <p className="font-medium">{session.discipline}</p>
+                                            </div>
+                                            <div>
+                                              <p className="text-xs text-muted-foreground">Quiz accuracy</p>
+                                              <p className="font-medium">{calculateCarsCoachAccuracyFromChat(session.chatHistory)}%</p>
+                                            </div>
                                           </div>
-                                        ))}
+
+                                          {session.learningReport && (
+                                            <div className="pt-2 border-t">
+                                              <p className="text-xs text-muted-foreground mb-1">Saved learning report</p>
+                                              {Array.isArray(session.learningReport.keyTakeaways) && session.learningReport.keyTakeaways.length > 0 && (
+                                                <ul className="list-disc pl-5 text-sm space-y-1">
+                                                  {session.learningReport.keyTakeaways.map((t: string, i: number) => (
+                                                    <li key={i}>{t}</li>
+                                                  ))}
+                                                </ul>
+                                              )}
+                                            </div>
+                                          )}
+                                          <div className="flex items-center justify-between gap-2">
+                                            <p className="text-xs text-muted-foreground">
+                                              {session.chatHistory.length} messages in conversation
+                                            </p>
+                                            <Button
+                                              type="button"
+                                              variant="outline"
+                                              size="sm"
+                                              onClick={() =>
+                                                downloadTextFile(
+                                                  buildCarsCoachTranscriptText(session.chatHistory),
+                                                  `${student.pseudonym}_CARS_Coach_Session_${idx + 1}.txt`
+                                                )
+                                              }
+                                            >
+                                              <Download className="h-4 w-4 mr-2" /> Download
+                                            </Button>
+                                          </div>
+                                        </div>
+
+                                        <div className="space-y-3 max-h-96 overflow-y-auto">
+                                          {session.chatHistory.map((msg, msgIdx) => (
+                                            <div 
+                                              key={msgIdx} 
+                                              className={`p-3 rounded-lg text-sm ${
+                                                msg.role === 'assistant' 
+                                                  ? 'bg-primary/10 border-l-2 border-primary' 
+                                                  : 'bg-muted ml-8'
+                                              }`}
+                                            >
+                                              <p className="text-xs font-medium mb-1 text-muted-foreground">
+                                                {msg.role === 'assistant' ? '🤖 CARS Coach' : '👤 Student'}
+                                              </p>
+                                              <p className="whitespace-pre-wrap">{msg.content}</p>
+                                            </div>
+                                          ))}
+                                        </div>
                                       </div>
                                     </CollapsibleContent>
                                   </Collapsible>
