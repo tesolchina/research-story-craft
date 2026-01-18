@@ -160,29 +160,25 @@ export function ChatSessionList({
       </div>
 
       {/* Tabs for Active vs Completed */}
-      {isTeacher ? (
-        <Tabs defaultValue="active" className="w-full">
-          <TabsList>
-            <TabsTrigger value="active" className="gap-2">
-              <MessageCircle className="h-4 w-4" />
-              Active ({activeSessions.length})
-            </TabsTrigger>
-            <TabsTrigger value="completed" className="gap-2">
-              <Archive className="h-4 w-4" />
-              Completed ({completedSessions.length})
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="active" className="mt-4">
-            {renderSessionList(activeSessions)}
-          </TabsContent>
-          <TabsContent value="completed" className="mt-4">
-            {renderSessionList(completedSessions, true)}
-          </TabsContent>
-        </Tabs>
-      ) : (
-        // Students only see active sessions
-        renderSessionList(activeSessions)
-      )}
+      {/* Both teachers and students can see Active and Completed tabs */}
+      <Tabs defaultValue="active" className="w-full">
+        <TabsList>
+          <TabsTrigger value="active" className="gap-2">
+            <MessageCircle className="h-4 w-4" />
+            Active ({activeSessions.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed" className="gap-2">
+            <Archive className="h-4 w-4" />
+            Completed ({completedSessions.length})
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="active" className="mt-4">
+          {renderSessionList(activeSessions)}
+        </TabsContent>
+        <TabsContent value="completed" className="mt-4">
+          {renderSessionList(completedSessions, true)}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
