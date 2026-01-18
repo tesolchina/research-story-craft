@@ -38,7 +38,7 @@ import Weeks11to12 from "./pages/mccp/Weeks11to12";
 import Week13 from "./pages/mccp/Week13";
 import TeacherDashboard from "./components/mccp/TeacherDashboard";
 import AssessmentPage from "./pages/mccp/AssessmentPage";
-import NeedsAnalysis from "./pages/mccp/NeedsAnalysis";
+import LearningLabs from "./pages/mccp/LearningLabs";
 
 import NotFound from "./pages/NotFound";
 
@@ -87,7 +87,7 @@ const App = () => (
             <Route path="weeks11-12" element={<Weeks11to12 />} />
             <Route path="week13" element={<Week13 />} />
             <Route path="assessment" element={<AssessmentPage />} />
-            <Route path="needs-analysis" element={<NeedsAnalysis />} />
+            <Route path="learning-labs" element={<LearningLabs />} />
             <Route path="auth" element={<AuthPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

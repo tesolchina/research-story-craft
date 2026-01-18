@@ -66,8 +66,8 @@ interface StudentSummary {
 
 // Define all tasks students need to complete
 const ALL_TASKS: { id: string; type: string; label: string; week: string; link?: string }[] = [
-  { id: "needs_analysis_survey", type: "survey", label: "Complete Needs Analysis Survey", week: "Pre-course", link: "/mccp/needs-analysis#questionnaire" },
-  { id: "cars_coach", type: "coach", label: "Complete CARS Coach Session", week: "Week 1", link: "/mccp/cars-coach" },
+  { id: "needs_analysis_survey", type: "survey", label: "Complete Learning Labs Survey", week: "Pre-course", link: "/mccp/learning-labs#questionnaire" },
+  { id: "cars_coach", type: "coach", label: "Complete CARS Coach Session", week: "Week 1", link: "/mccp/learning-labs" },
 ];
 
 type CarsCoachChatMsg = { role?: string; content?: string };

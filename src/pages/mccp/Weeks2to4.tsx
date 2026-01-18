@@ -83,11 +83,11 @@ const Weeks2to4 = () => {
     },
     {
       number: 2,
-      title: "Complete the Needs Analysis Questionnaire",
+      title: "Complete the Learning Labs Questionnaire",
       description:
         "Share your experience with AI tools and academic writing to help us tailor the course to your needs.",
       icon: ClipboardList,
-      link: "/mccp/needs-analysis#questionnaire",
+      link: "/mccp/learning-labs#questionnaire",
       linkText: "Start Questionnaire",
       completedLinkText: "Completed",
       status: questionnaireCompleted ? "completed" : "required",
