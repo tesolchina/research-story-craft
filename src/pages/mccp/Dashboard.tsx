@@ -494,7 +494,7 @@ const Dashboard = () => {
   // Redirect to auth if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/auth');
+      navigate('/mccp/auth');
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -530,7 +530,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     signOut();
-    navigate('/auth');
+    navigate('/mccp/auth');
   };
 
   // Show loading state
