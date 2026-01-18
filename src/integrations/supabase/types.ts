@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      cars_coach_sessions: {
+        Row: {
+          chat_history: Json | null
+          completed_at: string | null
+          created_at: string | null
+          current_phase: string
+          discipline: string
+          id: string
+          learning_report: Json | null
+          mc_responses: Json | null
+          paragraph_analysis: Json | null
+          short_answers: Json | null
+          started_at: string | null
+          student_id: string
+          tasks_completed: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          chat_history?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_phase?: string
+          discipline: string
+          id?: string
+          learning_report?: Json | null
+          mc_responses?: Json | null
+          paragraph_analysis?: Json | null
+          short_answers?: Json | null
+          started_at?: string | null
+          student_id: string
+          tasks_completed?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          chat_history?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_phase?: string
+          discipline?: string
+          id?: string
+          learning_report?: Json | null
+          mc_responses?: Json | null
+          paragraph_analysis?: Json | null
+          short_answers?: Json | null
+          started_at?: string | null
+          student_id?: string
+          tasks_completed?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       discussions: {
         Row: {
           created_at: string
@@ -135,6 +186,53 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      student_insights: {
+        Row: {
+          category: string
+          created_at: string | null
+          id: string
+          insight_text: string
+          is_applied: boolean | null
+          source_session_id: string | null
+          source_task: string
+          student_id: string
+          student_notes: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          id?: string
+          insight_text: string
+          is_applied?: boolean | null
+          source_session_id?: string | null
+          source_task: string
+          student_id: string
+          student_notes?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          id?: string
+          insight_text?: string
+          is_applied?: boolean | null
+          source_session_id?: string | null
+          source_task?: string
+          student_id?: string
+          student_notes?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_insights_source_session_id_fkey"
+            columns: ["source_session_id"]
+            isOneToOne: false
+            referencedRelation: "cars_coach_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_pseudonyms: {
         Row: {

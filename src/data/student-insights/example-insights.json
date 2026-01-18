@@ -1,0 +1,127 @@
+{
+  "description": "Anonymized examples of student insights from CARS Coach sessions. These examples show the format and quality of insights generated.",
+  "examples": [
+    {
+      "studentDiscipline": "applied_linguistics",
+      "sessionSummary": "Student completed all phases with 80% MC accuracy. Struggled with identifying Move 2 language signals.",
+      "insights": [
+        {
+          "text": "Practice identifying gap-signaling language like 'however,' 'yet,' and 'nevertheless' in papers from your field—you missed some of these cues in the MC section.",
+          "category": "move_2",
+          "context": "Student answered 2/3 Move 2 questions incorrectly"
+        },
+        {
+          "text": "Your paragraph analysis showed strong recognition of Move 1. Continue using phrases like 'increasingly important' and 'growing attention' in your own writing.",
+          "category": "move_1",
+          "context": "Correctly identified all Move 1 elements"
+        },
+        {
+          "text": "In Applied Linguistics, citation practices in Move 1 often cluster multiple references—observe how authors group citations to establish territory.",
+          "category": "discipline",
+          "context": "Discipline-specific advice"
+        },
+        {
+          "text": "When writing your Move 3, try starting with 'This study investigates...' followed by a clear statement of your research questions.",
+          "category": "move_3",
+          "context": "General Move 3 advice based on session"
+        }
+      ]
+    },
+    {
+      "studentDiscipline": "education",
+      "sessionSummary": "Strong performance throughout (90% MC). Excellent paragraph analysis. Some hesitation on structure questions.",
+      "insights": [
+        {
+          "text": "Your understanding of individual moves is strong. Now focus on transitions between moves—use connector phrases to guide readers smoothly.",
+          "category": "structure",
+          "context": "Advanced student needing next-level advice"
+        },
+        {
+          "text": "Consider how your introduction can preview your theoretical framework—this is valued in Education research.",
+          "category": "discipline",
+          "context": "Discipline-specific enhancement"
+        },
+        {
+          "text": "Your paragraph analysis was excellent! Apply this same analytical lens when revising your own introduction drafts.",
+          "category": "structure",
+          "context": "Positive reinforcement"
+        }
+      ]
+    },
+    {
+      "studentDiscipline": "stem",
+      "sessionSummary": "Quick learner. 100% MC accuracy. Completed session in 15 minutes. Asked about applying CARS to methods sections.",
+      "insights": [
+        {
+          "text": "While CARS is designed for introductions, the move structure can loosely apply to other sections—literature reviews also establish territory and gaps.",
+          "category": "structure",
+          "context": "Response to student's question"
+        },
+        {
+          "text": "In STEM writing, Move 2 often emphasizes methodological or technical limitations. Frame gaps in terms of what existing approaches cannot do.",
+          "category": "discipline",
+          "context": "STEM-specific Move 2 advice"
+        },
+        {
+          "text": "Your quick grasp of CARS suggests you're ready to analyze multiple introductions in your field. Compare how different authors approach Move 1.",
+          "category": "move_1",
+          "context": "Extension activity"
+        }
+      ]
+    },
+    {
+      "studentDiscipline": "social_sciences",
+      "sessionSummary": "Needed extra MC questions (7 total). Improved from 40% to 80% accuracy. Breakthrough moment in short answer section.",
+      "insights": [
+        {
+          "text": "You showed great improvement once you connected Move 2 to 'creating tension'—keep using this narrative framing when writing introductions.",
+          "category": "move_2",
+          "context": "Breakthrough acknowledgment"
+        },
+        {
+          "text": "Review the difference between 'indicating a gap' and 'presenting a problem'—both work for Move 2 but have different rhetorical effects.",
+          "category": "move_2",
+          "context": "Area needing reinforcement"
+        },
+        {
+          "text": "Social Sciences often have longer introductions with multiple Move cycles. Practice identifying where authors return to Move 1 within the same introduction.",
+          "category": "discipline",
+          "context": "Discipline complexity"
+        },
+        {
+          "text": "Your final paragraph analysis showed solid understanding. Trust your instincts—you can identify moves when you take your time.",
+          "category": "structure",
+          "context": "Confidence building"
+        }
+      ]
+    },
+    {
+      "studentDiscipline": "humanities",
+      "sessionSummary": "Engaged deeply with short answer questions. Provided thoughtful paragraph for analysis. Asked about disciplinary variation.",
+      "insights": [
+        {
+          "text": "In Humanities, Move 1 often includes theoretical positioning—consider where your theoretical lens fits in your introduction.",
+          "category": "discipline",
+          "context": "Humanities-specific"
+        },
+        {
+          "text": "Your observation that 'gaps aren't always about missing data' is perceptive. Humanities often create niches through reinterpretation or new frameworks.",
+          "category": "move_2",
+          "context": "Building on student insight"
+        },
+        {
+          "text": "The argumentative structure in your paragraph analysis was well-identified. Now apply this same critical reading to your own drafts.",
+          "category": "structure",
+          "context": "Transfer to practice"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Each insight should be specific and actionable",
+    "Positive insights are as important as corrective ones",
+    "Discipline context enhances relevance",
+    "Insights should build on observed student behavior",
+    "Avoid generic advice—personalize based on session data"
+  ]
+}
