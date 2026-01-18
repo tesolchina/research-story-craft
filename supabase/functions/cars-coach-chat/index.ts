@@ -93,14 +93,18 @@ Welcome the student briefly and introduce the CARS model in 2-3 sentences:
 - Research introductions follow 3 predictable "moves"
 - Move 1: Territory, Move 2: Niche, Move 3: Occupying the Niche
 
-Then IMMEDIATELY ask a multiple-choice question to check their initial understanding. Example:
+Then IMMEDIATELY ask a multiple-choice question. Format each option on its OWN LINE:
 
 **Quick Check:**
+
 According to the CARS model, what is the purpose of Move 2 (Establishing a Niche)?
 
 A) To summarize all previous research on the topic
+
 B) To identify a gap, limitation, or problem in existing research
+
 C) To state the objectives of your current study
+
 D) To provide definitions of key terms
 
 Wait for their answer, then provide feedback and continue teaching.`,
@@ -114,18 +118,24 @@ Generate ONE multiple-choice question about CARS concepts. Topics:
 - Understanding the purpose of each Move
 - Tense usage patterns in each Move
 
-Format EXACTLY like this:
+**FORMATTING - Each option MUST be on its own line with spacing:**
+
 ---
 **Question ${(sessionData?.mcTotal || 0) + 1}:**
+
 [Question text - can include an example sentence to analyze]
 
-A) [Option]
-B) [Option]
-C) [Option]
-D) [Option]
+A) [Option text here]
+
+B) [Option text here]
+
+C) [Option text here]
+
+D) [Option text here]
+
 ---
 
-After they answer, give brief feedback explaining WHY the answer is correct/incorrect, then immediately present the next question.
+After they answer, give brief feedback explaining WHY the answer is correct/incorrect, then immediately present the next question using the SAME format with options on separate lines.
 
 ${sessionData?.mcResponses?.length ? `Previous responses: ${sessionData.mcResponses.length} questions answered, ${sessionData.mcCorrect || 0} correct.` : ''}`,
 
@@ -137,14 +147,18 @@ Present 1-2 example paragraphs from ${discipline} research showing CARS moves. A
 [Move 2: Establishing Niche] "However, little is known about..."
 [Move 3: Occupying Niche] "This study investigates..."
 
-After showing examples, ask a multiple-choice question about what they observed:
+After showing examples, ask a multiple-choice question with options on separate lines:
 
 **Quick Check:**
+
 In the example above, which phrase signals Move 2?
 
 A) "has received considerable attention"
+
 B) "However, little is known about"
+
 C) "This study investigates"
+
 D) "Research on X"`,
 
     short_answers: `${baseIdentity}
@@ -153,7 +167,7 @@ This phase is for APPLICATION only. Ask the student to write ONE short example:
 - "Write a centrality statement (Move 1) for YOUR research topic using an evaluative adjective."
 - "Draft a gap statement (Move 2) for YOUR research using 'however' or 'yet'."
 
-Keep the task focused (1-2 sentences expected). After they respond, provide constructive feedback, then ask a follow-up MC question to reinforce the concept.
+Keep the task focused (1-2 sentences expected). After they respond, provide constructive feedback, then ask a follow-up MC question (with options on separate lines) to reinforce the concept.
 
 ${sessionData?.shortAnswers?.length ? `Previous short answers: ${sessionData.shortAnswers.length} completed.` : ''}`,
 
@@ -161,13 +175,18 @@ ${sessionData?.shortAnswers?.length ? `Previous short answers: ${sessionData.sho
 
 Guide the student to analyze a paragraph from their field:
 1. First, ask them to paste a short paragraph from a research introduction (their own or published)
-2. Once they share it, ask MC questions about it:
+2. Once they share it, ask MC questions about it with options on separate lines:
 
 **Identify the Move:**
+
 Which Move does the highlighted sentence represent?
+
 A) Move 1: Establishing Territory
+
 B) Move 2: Establishing Niche
+
 C) Move 3: Occupying the Niche
+
 D) Cannot determine from this sentence
 
 Help them identify specific language markers in their text.`,
