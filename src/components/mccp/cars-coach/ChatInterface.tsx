@@ -19,7 +19,16 @@ interface ChatInterfaceProps {
 }
 
 // MC questions phase is handled by separate UI component - not in chat flow
-const PHASE_ORDER: Phase[] = ["introduction", "examples", "short_answers", "paragraph_analysis", "final_reflection", "completion"];
+const CHAT_PHASE_ORDER: Phase[] = ["introduction", "examples", "short_answers", "paragraph_analysis", "final_reflection"];
+
+// Global progression: chat phases can route into standalone phases like mc_questions
+const NEXT_PHASE_BY_CHAT_PHASE: Partial<Record<Phase, Phase>> = {
+  introduction: "mc_questions",
+  examples: "short_answers",
+  short_answers: "paragraph_analysis",
+  paragraph_analysis: "final_reflection",
+  final_reflection: "completion",
+};
 
 const PHASE_LABELS: Record<Phase, string> = {
   overview: "Overview",
@@ -202,25 +211,22 @@ export default function ChatInterface({ session, currentPhase, onPhaseComplete, 
   };
 
   const handleAdvance = () => {
-    const currentIndex = PHASE_ORDER.indexOf(currentPhase);
-    if (currentIndex < PHASE_ORDER.length - 1) {
-      onPhaseComplete(currentPhase, PHASE_ORDER[currentIndex + 1]);
-      setMessages([]);
-      setCanAdvance(false);
-      setShowPhaseComplete(false);
-    }
+    const nextPhase = NEXT_PHASE_BY_CHAT_PHASE[currentPhase];
+    if (!nextPhase) return;
+
+    onPhaseComplete(currentPhase, nextPhase);
+    setMessages([]);
+    setCanAdvance(false);
+    setShowPhaseComplete(false);
   };
 
   const getNextPhaseName = () => {
-    const currentIndex = PHASE_ORDER.indexOf(currentPhase);
-    if (currentIndex < PHASE_ORDER.length - 1) {
-      return PHASE_LABELS[PHASE_ORDER[currentIndex + 1]];
-    }
-    return null;
+    const nextPhase = NEXT_PHASE_BY_CHAT_PHASE[currentPhase];
+    return nextPhase ? PHASE_LABELS[nextPhase] : null;
   };
 
-  const currentPhaseIndex = PHASE_ORDER.indexOf(currentPhase);
-  const totalPhases = PHASE_ORDER.length;
+  const currentPhaseIndex = Math.max(0, CHAT_PHASE_ORDER.indexOf(currentPhase));
+  const totalPhases = CHAT_PHASE_ORDER.length;
 
   return (
     <Card className="flex flex-col h-[600px]">
