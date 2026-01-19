@@ -18,7 +18,8 @@ interface ChatInterfaceProps {
   studentId: string;
 }
 
-const PHASE_ORDER: Phase[] = ["introduction", "mc_questions", "examples", "short_answers", "paragraph_analysis", "final_reflection", "completion"];
+// MC questions phase is handled by separate UI component - not in chat flow
+const PHASE_ORDER: Phase[] = ["introduction", "examples", "short_answers", "paragraph_analysis", "final_reflection", "completion"];
 
 const PHASE_LABELS: Record<Phase, string> = {
   overview: "Overview",
