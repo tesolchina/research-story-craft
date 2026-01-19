@@ -8,11 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import { TASKS, DISCIPLINES, type Phase, type Message, type CarsCoachSession } from "./types";
 import CarsCoachOverview from "./CarsCoachOverview";
 import DisciplineSelector from "./DisciplineSelector";
-import IntroductionPhase from "./IntroductionPhase";
-import MCQuestionsPhase from "./MCQuestionsPhase";
-import ChatInterface from "./ChatInterface";
+import { LessonModule } from "./lesson";
 import LearningReport from "./LearningReport";
-
 interface CarsCoachAppProps {
   studentId: string;
   onBack: () => void;
@@ -219,27 +216,15 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
             <DisciplineSelector onSelect={handleDisciplineSelect} />
           )}
 
-          {currentPhase === "introduction" && session && (
-            <IntroductionPhase
-              session={session}
-              onPhaseComplete={handlePhaseComplete}
-            />
-          )}
-
-          {currentPhase === "mc_questions" && session && (
-            <MCQuestionsPhase
-              session={session}
-              onPhaseComplete={handlePhaseComplete}
-            />
-          )}
-          
-          {/* Chat-based phases: examples, short_answers, paragraph_analysis, final_reflection */}
-          {["examples", "short_answers", "paragraph_analysis", "final_reflection"].includes(currentPhase) && session && (
-            <ChatInterface
-              session={session}
-              currentPhase={currentPhase}
-              onPhaseComplete={handlePhaseComplete}
+          {/* New Lesson Module handles: introduction, mc_questions, examples, short_answers, paragraph_analysis, final_reflection */}
+          {session && ["introduction", "mc_questions", "examples", "short_answers", "paragraph_analysis", "final_reflection"].includes(currentPhase) && (
+            <LessonModule
               studentId={studentId}
+              discipline={session.discipline || ""}
+              onBack={onBack}
+              onComplete={() => {
+                handlePhaseComplete("final_reflection", "completion");
+              }}
             />
           )}
           
