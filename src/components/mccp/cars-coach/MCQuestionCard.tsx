@@ -71,8 +71,9 @@ export default function MCQuestionCard({ onComplete, existingResponses }: MCQues
   }, [existingResponses]);
 
   const currentQuestion = questions[currentIndex];
-  const progress = (currentIndex / questions.length) * 100;
-  const isComplete = currentIndex >= questions.length;
+  const progress = questions.length > 0 ? (currentIndex / questions.length) * 100 : 0;
+  // Only mark complete if we have questions AND have answered all of them
+  const isComplete = questions.length > 0 && currentIndex >= questions.length;
 
   const handleSelect = (label: string) => {
     if (hasSubmitted) return;
