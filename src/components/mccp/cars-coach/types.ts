@@ -1,4 +1,5 @@
 export type Phase =
+  | "overview"
   | "discipline_selection"
   | "introduction"
   | "mc_questions"
@@ -203,6 +204,7 @@ export const DISCIPLINES = [
 ] as const;
 
 export const TASKS: Task[] = [
+  { id: "overview", number: 0, title: "Learn about CARS Coach", phase: "overview", completed: false },
   { id: "discipline", number: 1, title: "Select your discipline", phase: "discipline_selection", completed: false },
   { id: "intro", number: 2, title: "Learn about moves and steps", phase: "introduction", completed: false },
   { id: "mc", number: 3, title: "Answer concept check questions", phase: "mc_questions", completed: false },
