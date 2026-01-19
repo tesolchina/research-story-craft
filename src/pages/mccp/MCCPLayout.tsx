@@ -49,6 +49,18 @@ const weeklySchedule = [
 const MCCPLayout = () => {
   const [scheduleOpen, setScheduleOpen] = useState(true);
   const location = useLocation();
+  
+  // Hide sidebar on auth page
+  const isAuthPage = location.pathname === "/mccp/auth";
+
+  // Render auth page without sidebar
+  if (isAuthPage) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Outlet />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
