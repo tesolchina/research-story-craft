@@ -66,7 +66,7 @@ export function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 fixed inset-0 z-50">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <Card className="border-2">
           <CardContent className="pt-6">
