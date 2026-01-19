@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TASKS, DISCIPLINES, type Phase, type Message, type CarsCoachSession } from "./types";
 import CarsCoachOverview from "./CarsCoachOverview";
 import DisciplineSelector from "./DisciplineSelector";
+import IntroductionPhase from "./IntroductionPhase";
 import MCQuestionsPhase from "./MCQuestionsPhase";
 import ChatInterface from "./ChatInterface";
 import LearningReport from "./LearningReport";
@@ -218,6 +219,13 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
             <DisciplineSelector onSelect={handleDisciplineSelect} />
           )}
 
+          {currentPhase === "introduction" && session && (
+            <IntroductionPhase
+              session={session}
+              onPhaseComplete={handlePhaseComplete}
+            />
+          )}
+
           {currentPhase === "mc_questions" && session && (
             <MCQuestionsPhase
               session={session}
@@ -225,8 +233,8 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
             />
           )}
           
-          {/* Chat-based phases: introduction, examples, short_answers, paragraph_analysis, final_reflection */}
-          {["introduction", "examples", "short_answers", "paragraph_analysis", "final_reflection"].includes(currentPhase) && session && (
+          {/* Chat-based phases: examples, short_answers, paragraph_analysis, final_reflection */}
+          {["examples", "short_answers", "paragraph_analysis", "final_reflection"].includes(currentPhase) && session && (
             <ChatInterface
               session={session}
               currentPhase={currentPhase}
