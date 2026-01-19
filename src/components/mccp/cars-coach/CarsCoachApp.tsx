@@ -6,7 +6,9 @@ import { CheckCircle2, Circle, GraduationCap, ArrowLeft, RotateCcw } from "lucid
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TASKS, DISCIPLINES, type Phase, type Message, type CarsCoachSession } from "./types";
+import CarsCoachOverview from "./CarsCoachOverview";
 import DisciplineSelector from "./DisciplineSelector";
+import MCQuestionsPhase from "./MCQuestionsPhase";
 import ChatInterface from "./ChatInterface";
 import LearningReport from "./LearningReport";
 
@@ -18,7 +20,7 @@ interface CarsCoachAppProps {
 export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
   const { toast } = useToast();
   const [session, setSession] = useState<Partial<CarsCoachSession> | null>(null);
-  const [currentPhase, setCurrentPhase] = useState<Phase>("discipline_selection");
+  const [currentPhase, setCurrentPhase] = useState<Phase>("overview");
   const [tasksCompleted, setTasksCompleted] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -59,6 +61,9 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
         });
         setCurrentPhase(existing.current_phase as Phase);
         setTasksCompleted((existing.tasks_completed as unknown as string[]) || []);
+      } else {
+        // No existing session - start fresh with overview
+        setCurrentPhase("overview");
       }
     } catch (error) {
       console.error("Error loading session:", error);
@@ -79,7 +84,7 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
 
       // Reset local state to start fresh
       setSession(null);
-      setCurrentPhase("discipline_selection");
+      setCurrentPhase("overview");
       setTasksCompleted([]);
       
       toast({ title: "Starting fresh!", description: "Your previous session has been saved." });
@@ -87,6 +92,11 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
       console.error("Error starting over:", error);
       toast({ title: "Error", description: "Failed to start over", variant: "destructive" });
     }
+  };
+
+  const handleOverviewComplete = () => {
+    setCurrentPhase("discipline_selection");
+    setTasksCompleted(["overview"]);
   };
 
   const handleDisciplineSelect = async (discipline: string) => {
@@ -97,7 +107,7 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
           student_id: studentId,
           discipline,
           current_phase: "introduction",
-          tasks_completed: ["discipline"],
+          tasks_completed: ["overview", "discipline"],
         })
         .select()
         .single();
@@ -109,13 +119,13 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
         studentId: data.student_id,
         discipline: data.discipline,
         currentPhase: "introduction",
-        tasksCompleted: ["discipline"],
+        tasksCompleted: ["overview", "discipline"],
         chatHistory: [],
         mcResponses: [],
         shortAnswers: [],
       });
       setCurrentPhase("introduction");
-      setTasksCompleted(["discipline"]);
+      setTasksCompleted(["overview", "discipline"]);
       
       toast({ title: "Discipline selected!", description: "Let's begin learning about the CARS model." });
     } catch (error) {
@@ -200,11 +210,23 @@ export default function CarsCoachApp({ studentId, onBack }: CarsCoachAppProps) {
 
         {/* Main Content */}
         <div className="lg:col-span-3">
+          {currentPhase === "overview" && (
+            <CarsCoachOverview onStart={handleOverviewComplete} />
+          )}
+
           {currentPhase === "discipline_selection" && (
             <DisciplineSelector onSelect={handleDisciplineSelect} />
           )}
+
+          {currentPhase === "mc_questions" && session && (
+            <MCQuestionsPhase
+              session={session}
+              onPhaseComplete={handlePhaseComplete}
+            />
+          )}
           
-          {currentPhase !== "discipline_selection" && currentPhase !== "completion" && session && (
+          {/* Chat-based phases: introduction, examples, short_answers, paragraph_analysis, final_reflection */}
+          {["introduction", "examples", "short_answers", "paragraph_analysis", "final_reflection"].includes(currentPhase) && session && (
             <ChatInterface
               session={session}
               currentPhase={currentPhase}

@@ -21,6 +21,7 @@ interface ChatInterfaceProps {
 const PHASE_ORDER: Phase[] = ["introduction", "mc_questions", "examples", "short_answers", "paragraph_analysis", "final_reflection", "completion"];
 
 const PHASE_LABELS: Record<Phase, string> = {
+  overview: "Overview",
   discipline_selection: "Select Discipline",
   introduction: "Introduction to CARS",
   mc_questions: "Concept Check Questions",

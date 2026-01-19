@@ -32,9 +32,13 @@ const LearningLabs = () => {
 
   // Handle hash-based navigation
   useEffect(() => {
-    const hash = location.hash.replace('#', '');
+    const hash = location.hash.replace('#', '').toLowerCase();
     if (hash === 'questionnaire') {
       setActiveModule('questionnaire');
+    } else if (hash === 'cars' || hash === 'cars-coach') {
+      setActiveModule('cars-coach');
+    } else if (hash === 'chat') {
+      setActiveModule('chat');
     }
   }, [location.hash]);
 
